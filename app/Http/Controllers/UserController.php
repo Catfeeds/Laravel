@@ -9,7 +9,7 @@ use Overtrue\EasySms\EasySms;
 class UserController extends Controller
 {
     public function store(UserRequest $request){
-        $verifyData = \Cache::get($request->verification_key);
+        $verifyData = \Cache::get($request->phone);
         if (!$verifyData) {
             return $this->response->error('验证码已失效', 422);
         }
@@ -24,7 +24,7 @@ class UserController extends Controller
             'password' => bcrypt($request->password),
         ]);
         // 清除验证码缓存
-        \Cache::forget($request->verification_key);
+        \Cache::forget($request->phone);
         //return $this->response->created();  TODO
 //        return $this->response->item($user, )
 //            ->setMeta([

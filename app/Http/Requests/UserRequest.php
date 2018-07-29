@@ -28,7 +28,6 @@ class UserRequest extends FormRequest
             'type' => 'required|string|in:designer,party',
             'phone' => 'required|phone:CN',
             'password' => 'required|string|min:6',
-            'verification_key' => 'required|string',
             'verification_code' => 'required|string'
         ];
     }
