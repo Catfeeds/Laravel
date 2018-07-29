@@ -21,7 +21,8 @@ return [
         ],
         'submail' => [
             'app_id' => env('SUBMAIL_APP_ID'),
-            'app_key' => env('SUBMAIL_APP_KEY')
+            'app_key' => env('SUBMAIL_APP_KEY'),
+            'project' => 't2I513'
         ]
     ],
 ];
