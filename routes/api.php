@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', [
     'namespace' => 'App\Http\Controllers',
-    'middleware' => 'serializer:array'
+    'middleware' => ['serializer:array', 'bindings']
 ], function ($api) {
     // 短信验证码
     $api->post('verificationCode', 'VerificationCodeController@store')
@@ -49,5 +49,8 @@ $api->version('v1', [
         // 发布动态
         $api->post('activities', 'ActivityController@store')
             ->name('api.activities.store');
+        // 删除动态
+        $api->delete('activities/{activity}', 'ActivityController@destroy')
+            ->name('api.activities.delete');
     });
 });

@@ -19,6 +19,7 @@ class Activity extends Migration
             $table->string('photo_urls')->nullable();
             $table->integer('user_id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

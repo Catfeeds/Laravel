@@ -18,4 +18,10 @@ class ActivityController extends Controller
         return $this->response->item($activity, new ActivityTransformer())
             ->setStatusCode(201);
     }
+
+    public function destroy(Activity $activity) {
+        $this->authorize('delete', $activity);
+        $activity->delete();
+        return $this->response->noContent();
+    }
 }
