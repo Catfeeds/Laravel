@@ -14,7 +14,10 @@ use Illuminate\Http\Request;
 */
 
 $api = app('Dingo\Api\Routing\Router');
-$api->version('v1', ['namespace' => 'App\Http\Controllers'], function ($api) {
+$api->version('v1', [
+    'namespace' => 'App\Http\Controllers',
+    'middleware' => 'serializer:array'
+], function ($api) {
     // 短信验证码
     $api->post('verificationCode', 'VerificationCodeController@store')
         ->name('verificationCode.store');
