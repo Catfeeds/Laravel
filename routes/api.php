@@ -46,5 +46,8 @@ $api->version('v1', [
         // 图片资源
         $api->post('images', 'ImageController@store')
             ->name('api.images.store');
+        // 发布动态
+        $api->post('activities', 'ActivityController@store')
+            ->name('api.activities.store');
     });
 });
