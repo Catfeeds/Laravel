@@ -19,7 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('phone')->unique();
             $table->string('email')->unique()->nullable();
             $table->string('password');
-            $table->string('type')->comment('用户类型：party、designer、expert');
+            $table->enum('type', ['party', 'designer', 'expert'])->comment('用户类型：party、designer、expert');
             $table->string('avatar_url')->nullable();
             $table->string('title')->nullable()->comment('个人职位');
             $table->string('introduction')->nullable()->comment('个人简介');

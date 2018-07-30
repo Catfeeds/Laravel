@@ -20,25 +20,31 @@ $api->version('v1', [
 ], function ($api) {
     // 短信验证码
     $api->post('verificationCode', 'VerificationCodeController@store')
-        ->name('verificationCode.store');
+        ->name('api.verificationCode.store');
     // 用户注册
     $api->post('users', 'UserController@store')
-        ->name('users.store');
+        ->name('api.users.store');
 
     // 登录
     $api->post('authorizations', 'AuthorizationController@store')
-        ->name('authorizations.store');
+        ->name('api.authorizations.store');
     // 刷新token
     $api->put('authorizations/current', 'AuthorizationController@update')
-        ->name('authorizations.update');
+        ->name('api.authorizations.update');
     // 删除token
     $api->delete('authorizations/current', 'AuthorizationController@destroy')
-        ->name('authorizations.destroy');
+        ->name('api.authorizations.destroy');
 
     // 需要 token 验证的接口
     $api->group(['middleware' => 'api.auth'], function($api) {
         // 当前登录用户信息
         $api->get('user', 'UserController@me')
-            ->name('user.show');
+            ->name('api.user.show');
+        // 编辑登录用户信息
+        $api->patch('user', 'UserController@update')
+            ->name('api.user.update');
+        // 图片资源
+        $api->post('images', 'ImageController@store')
+            ->name('api.images.store');
     });
 });
