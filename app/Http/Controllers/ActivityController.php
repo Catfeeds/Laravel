@@ -6,6 +6,7 @@ use App\Http\Requests\ActivityRequest;
 use App\Models\Activity;
 use App\Models\Image;
 use App\Transformers\ActivityTransformer;
+use Illuminate\Http\Request;
 
 class ActivityController extends Controller
 {
@@ -23,5 +24,9 @@ class ActivityController extends Controller
         $this->authorize('delete', $activity);
         $activity->delete();
         return $this->response->noContent();
+    }
+
+    public function feed (Request $request, Activity $activity) {
+        
     }
 }

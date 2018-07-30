@@ -43,14 +43,26 @@ $api->version('v1', [
         // 编辑登录用户信息
         $api->patch('user', 'UserController@update')
             ->name('api.user.update');
+
+        // 关注一名用户
+        $api->put('user/following/{user}', 'UserController@follow')
+            ->name('api.user.follow');
+        // 取消关注
+        $api->delete('user/following/{user}', 'UserController@unfollow')
+            ->name('api.user.unfollow');
+
         // 图片资源
         $api->post('images', 'ImageController@store')
             ->name('api.images.store');
+
         // 发布动态
         $api->post('activities', 'ActivityController@store')
             ->name('api.activities.store');
         // 删除动态
         $api->delete('activities/{activity}', 'ActivityController@destroy')
             ->name('api.activities.delete');
+        // 首页：关注的人动态
+        $api->delete('activities/feed', 'ActivityController@feed')
+            ->name('api.activities.feed');
     });
 });

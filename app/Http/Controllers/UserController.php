@@ -6,6 +6,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\Image;
 use App\Models\User;
 use App\Transformers\UserTransformer;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class UserController extends Controller
@@ -58,5 +59,19 @@ class UserController extends Controller
     public function me()
     {
         return $this->response->item($this->user(), new UserTransformer());
+    }
+
+    public function follow(User $user) {
+        $currentUser = $this->user();
+        if($currentUser->id == $user->id) {
+            return $this->response->errorBadRequest('不能关注自己');
+        }
+        $currentUser->followings()->syncWithoutDetaching([$user->id]);
+        return $this->response->noContent();
+    }
+
+    public function unfollow(User $user) {
+        $this->user()->followings()->detach([$user->id]);
+        return $this->response->noContent();
     }
 }
