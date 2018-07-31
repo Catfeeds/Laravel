@@ -24,13 +24,12 @@ class ActivityTransformer extends TransformerAbstract
             'content'    => $activity->content,
             'photo_urls' => $activity->photo_urls,
             'created_at' => $activity->created_at->toDateTimeString(),
-            'updated_at' => $activity->updated_at->toDateTimeString(),
-            'author'     => $this->item($activity->user, new UserTransformer()),
+            'updated_at' => $activity->updated_at->toDateTimeString()
         ];
     }
 
     public function includeAuthor(Activity $activity)
     {
-        return $this->item($activity->user, new UserTransformer());
+        return $this->item($activity->author, new UserTransformer());
     }
 }

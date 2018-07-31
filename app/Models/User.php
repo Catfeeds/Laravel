@@ -13,7 +13,6 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * The attributes that are mass assignable.
-     *
      * @var array
      */
     protected $fillable = [
@@ -22,19 +21,32 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * The attributes that should be hidden for arrays.
-     *
      * @var array
      */
     protected $hidden = [
         'password'
     ];
 
-    public function followings(){
+    public function followings()
+    {
         return $this->belongsToMany('App\Models\User', 'follow', 'follower_id', 'user_id');
     }
 
-    public function followers(){
+    public function followers()
+    {
         return $this->belongsToMany('App\Models\User', 'follow', 'user_id', 'follower_id');
+    }
+
+    // 关注的人的所有动态
+    public function activities()
+    {
+        return $this->hasMany('App\Models\Activity');
+    }
+
+    // 关注的人的所有动态
+    public function feeds()
+    {
+        return $this->hasManyThrough('App\Models\Activity', 'App\Models\Follow', 'follower_id', 'user_id', 'id', 'user_id');
     }
 
     public function getJWTIdentifier()

@@ -15,7 +15,7 @@ class CreateImagesTable extends Migration
     {
         Schema::create('images', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id')->index()->comment('谁上传的图片');
+            $table->integer('user_id')->unsigned()->default(0)->index()->comment('谁上传的图片');
             $table->enum('type', ['avatar', 'activity'])->index()->comment('图片类型：头像、动态');
             $table->string('path')->index();
             $table->timestamps();

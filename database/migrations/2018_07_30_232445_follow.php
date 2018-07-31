@@ -13,10 +13,9 @@ class Follow extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('follow');
         Schema::create('follow', function (Blueprint $table) {
-            $table->integer('user_id');
-            $table->integer('follower_id');
+            $table->integer('user_id')->unsigned()->default(0);
+            $table->integer('follower_id')->unsigned()->default(0);
             $table->timestamps();
             $table->primary(['user_id', 'follower_id']);
         });

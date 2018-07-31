@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class Activity extends Migration
+class Reply extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,12 @@ class Activity extends Migration
      */
     public function up()
     {
-        Schema::create('activities', function (Blueprint $table) {
+        Schema::create('replies', function(Blueprint $table) {
             $table->increments('id');
-            $table->string('content');
-            $table->string('photo_urls')->nullable();
+            $table->integer('activity_id')->unsigned()->default(0)->index();
             $table->integer('user_id')->unsigned()->default(0)->index();
+            $table->string('content');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -30,6 +29,6 @@ class Activity extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('activities');
+        Schema::drop('replies');
     }
 }

@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ActivityRequest;
 use App\Models\Activity;
 use App\Models\Image;
+use App\Models\User;
 use App\Transformers\ActivityTransformer;
-use Illuminate\Http\Request;
 
 class ActivityController extends Controller
 {
@@ -26,7 +26,15 @@ class ActivityController extends Controller
         return $this->response->noContent();
     }
 
-    public function feed (Request $request, Activity $activity) {
-        
+    // 关注的人的动态
+    public function feeds () {
+        $activities = $this->user()->feeds()->latest()->paginate(20);
+        return $this->response->paginator($activities, new ActivityTransformer());
+    }
+
+    // 用户的动态
+    public function userIndex(User $user) {
+        $activities = $user->activities()->latest()->paginate(20);
+        return $this->response->paginator($activities, new ActivityTransformer());
     }
 }
