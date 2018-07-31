@@ -16,7 +16,7 @@ class User extends Authenticatable implements JWTSubject
 
     // 重写的主要目的是每次通知时通知数+1
     public function notify($instance) {
-        // 如果是自己通知自己，就不用通知了
+        // 不能自己通知自己
         if($this->id == Auth::id()) {
             return;
         }
@@ -78,5 +78,11 @@ class User extends Authenticatable implements JWTSubject
     public function isAuthorOf($model)
     {
         return $this->id == $model->user_id;
+    }
+
+    public function markAsRead() {
+        $this->notification_count = 0;
+        $this->save();
+        $this->unreadNotifications->markAsRead();
     }
 }

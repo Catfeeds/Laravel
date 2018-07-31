@@ -13,6 +13,7 @@ class UserTransformer extends TransformerAbstract
             'email' => $user->email,
             'avatar_url' => $user->avatar_url,
             'introduction' => $user->introduction,
+            'notification_count' => $user->notification_count,
             'created_at' => $user->created_at->toDateTimeString(),
             'updated_at' => $user->updated_at->toDateTimeString(),
         ];
