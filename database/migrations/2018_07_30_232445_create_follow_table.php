@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class Reply extends Migration
+class CreateFollowTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class Reply extends Migration
      */
     public function up()
     {
-        Schema::create('replies', function(Blueprint $table) {
-            $table->increments('id');
-            $table->integer('activity_id')->unsigned()->default(0)->index();
-            $table->integer('user_id')->unsigned()->default(0)->index();
-            $table->string('content');
+        Schema::create('follow', function (Blueprint $table) {
+            $table->integer('user_id')->unsigned()->default(0);
+            $table->integer('follower_id')->unsigned()->default(0);
             $table->timestamps();
-            $table->softDeletes();
+            $table->primary(['user_id', 'follower_id']);
         });
     }
 
@@ -30,6 +28,6 @@ class Reply extends Migration
      */
     public function down()
     {
-        Schema::drop('replies');
+        Schema::dropIfExists('follow');
     }
 }

@@ -14,8 +14,8 @@ class Reply extends Model
         return $this->belongsTo(Activity::class);
     }
 
-    public function author()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 }

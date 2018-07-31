@@ -14,22 +14,24 @@ use League\Fractal\TransformerAbstract;
 class ActivityTransformer extends TransformerAbstract
 {
     protected $defaultIncludes = [
-        'author'
+        'user'
     ];
 
     public function transform(Activity $activity)
     {
         return [
-            'id'         => $activity->id,
-            'content'    => $activity->content,
-            'photo_urls' => $activity->photo_urls,
-            'created_at' => $activity->created_at->toDateTimeString(),
-            'updated_at' => $activity->updated_at->toDateTimeString()
+            'id'          => $activity->id,
+            'content'     => $activity->content,
+            'photo_urls'  => $activity->photo_urls,
+            'like_count'  => (int)$activity->like_count,
+            'reply_count' => (int)$activity->reply_count,
+            'created_at'  => $activity->created_at->toDateTimeString(),
+            'updated_at'  => $activity->updated_at->toDateTimeString()
         ];
     }
 
-    public function includeAuthor(Activity $activity)
+    public function includeUser(Activity $activity)
     {
-        return $this->item($activity->author, new UserTransformer());
+        return $this->item($activity->user, new UserTransformer());
     }
 }

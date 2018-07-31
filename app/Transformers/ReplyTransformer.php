@@ -13,7 +13,7 @@ use League\Fractal\TransformerAbstract;
 class ReplyTransformer extends TransformerAbstract
 {
     protected $defaultIncludes = [
-        'author'
+        'user'
     ];
 
     public function transform(Reply $reply)
@@ -27,8 +27,8 @@ class ReplyTransformer extends TransformerAbstract
         ];
     }
 
-    public function includeAuthor(Reply $reply)
+    public function includeUser(Reply $reply)
     {
-        return $this->item($reply->author, new UserTransformer());
+        return $this->item($reply->user, new UserTransformer());
     }
 }

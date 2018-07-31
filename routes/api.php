@@ -38,6 +38,9 @@ $api->version('v1', [
     // 某个用户发布的动态
     $api->get('users/{user}/activities', 'ActivityController@userIndex')
         ->name('api.users.activities.index');
+    // 动态回复列表
+    $api->get('activities/{activity}/replies', 'ReplyController@index')
+        ->name('api.activities.replies.index');
 
     // 需要 token 验证的接口
     $api->group(['middleware' => 'api.auth'], function($api) {
@@ -75,5 +78,13 @@ $api->version('v1', [
         // 删除一条评论
         $api->delete('activities/{activity}/replies/{reply}', 'ReplyController@destroy')
             ->name('api.activities.replies.destroy');
+        // 当前用户发表的评论
+        $api->get('user/replies', 'ReplyController@userIndex')
+            ->name('api.user.replies.index');
+
+
+        // 通知列表
+        $api->get('user/notifications', 'NotificationController@index')
+            ->name('api.user.notifications.index');
     });
 });

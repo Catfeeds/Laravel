@@ -34,4 +34,14 @@ class ReplyController extends Controller
         $reply->delete();
         return $this->response->noContent();
     }
+
+    public function index(Activity $activity) {
+        $replies = $activity->replies()->latest()->paginate(20);
+        return $this->response->paginator($replies, new ReplyTransformer());
+    }
+
+    public function userIndex() {
+        $replies = $this->user()->replies()->latest()->paginate(20);
+        return $this->response->paginator($replies, new ReplyTransformer());
+    }
 }

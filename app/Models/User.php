@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Auth;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -9,8 +10,19 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable;
+    use Notifiable {
+        notify as protected laravelNotify;
+    }
 
+    // 重写的主要目的是每次通知时通知数+1
+    public function notify($instance) {
+        // 如果是自己通知自己，就不用通知了
+        if($this->id == Auth::id()) {
+            return;
+        }
+        $this->laravelNotify($instance);  // $instance 就是 Notifications\ActivityReplied
+        $this->increment('notification_count');
+    }
     /**
      * The attributes that are mass assignable.
      * @var array
@@ -37,10 +49,14 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany('App\Models\User', 'follow', 'user_id', 'follower_id');
     }
 
-    // 关注的人的所有动态
     public function activities()
     {
         return $this->hasMany('App\Models\Activity');
+    }
+
+    public function replies()
+    {
+        return $this->hasMany(Reply::class);
     }
 
     // 关注的人的所有动态

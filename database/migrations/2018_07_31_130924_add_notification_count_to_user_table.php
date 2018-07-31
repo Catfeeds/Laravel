@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class Follow extends Migration
+class AddNotificationCountToUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,8 @@ class Follow extends Migration
      */
     public function up()
     {
-        Schema::create('follow', function (Blueprint $table) {
-            $table->integer('user_id')->unsigned()->default(0);
-            $table->integer('follower_id')->unsigned()->default(0);
-            $table->timestamps();
-            $table->primary(['user_id', 'follower_id']);
+        Schema::table('users', function (Blueprint $table) {
+            $table->integer('notification_count')->unsigner()->default(0);
         });
     }
 
@@ -28,6 +25,8 @@ class Follow extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('follow');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('notification_count');
+        });
     }
 }
