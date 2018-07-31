@@ -18,4 +18,10 @@ class ReplyObserver
             $activity->user->notify(new ActivityReplied($reply));
         }
     }
+
+    // 每有一条评论删除成功后，动态评论数-1
+    public function deleted(Reply $reply)
+    {
+        $reply->activity->decrement('reply_count');
+    }
 }

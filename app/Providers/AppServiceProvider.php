@@ -14,6 +14,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         \App\Models\Reply::observe(\App\Observers\ReplyObserver::class);
+        \App\Models\Activity::observe(\App\Observers\ActivityObserver::class);
     }
 
     /**
