@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Auth;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -20,7 +21,7 @@ class User extends Authenticatable implements JWTSubject
         if($this->id == Auth::id()) {
             return;
         }
-        $this->laravelNotify($instance);  // $instance 就是 Notifications\ActivityReplied
+        $this->laravelNotify($instance);  // $instance 就是 Notifications\ActivityReplied 等对象
         $this->increment('notification_count');
     }
     /**
@@ -84,5 +85,13 @@ class User extends Authenticatable implements JWTSubject
         $this->notification_count = 0;
         $this->save();
         $this->unreadNotifications->markAsRead();
+    }
+
+    public function markOneAsRead($notificationId) {
+        $notification = DatabaseNotification::find($notificationId);
+        if($notification->unread()) {
+            $this->decrement('notification_count');
+            $notification->markAsRead();
+        }
     }
 }

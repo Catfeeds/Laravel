@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Transformers\NotificationTransformer;
 use Illuminate\Http\Request;
 
@@ -20,9 +21,15 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function read()
+    public function readAll()
     {
         $this->user()->markAsRead();
+        return $this->response->noContent();
+    }
+
+    public function readOne(Request $request)
+    {
+        $this->user()->markOneAsRead($request->notification_id);
         return $this->response->noContent();
     }
 }

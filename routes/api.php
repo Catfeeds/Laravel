@@ -89,5 +89,11 @@ $api->version('v1', [
         // 通知统计
         $api->get('user/notifications/stats', 'NotificationController@stats')
             ->name('api.user.notifications.stats');
+        // 标记所有通知为已读
+        $api->patch('user/read/notifications', 'NotificationController@readAll')
+            ->name('api.user.notifications.readAll');
+        // 标记单个通知为已读
+        $api->put('user/read/notifications/{notification_id}', 'NotificationController@readOne')
+            ->name('api.user.notifications.readOne');
     });
 });
