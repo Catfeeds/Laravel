@@ -21,7 +21,7 @@ class ActivityController extends Controller
     }
 
     public function destroy(Activity $activity) {
-        $this->authorize('delete', $activity);
+        $this->authorize('destroy', $activity);
         $activity->delete();
         return $this->response->noContent();
     }

@@ -10,7 +10,7 @@ class ActivityPolicy
 {
     use HandlesAuthorization;
 
-    public function delete(User $user, Activity $activity)
+    public function destroy(User $user, Activity $activity)
     {
         return  $user->isAuthorOf($activity);
     }

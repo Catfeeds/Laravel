@@ -19,6 +19,7 @@ class Reply extends Migration
             $table->integer('user_id')->unsigned()->default(0)->index();
             $table->string('content');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -72,5 +72,8 @@ $api->version('v1', [
         // 评论一条动态
         $api->post('activities/{activity}/replies', 'ReplyController@store')
             ->name('api.activities.replies.store');
+        // 删除一条评论
+        $api->delete('activities/{activity}/replies/{reply}', 'ReplyController@destroy')
+            ->name('api.activities.replies.destroy');
     });
 });
