@@ -9,7 +9,7 @@ use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
-class UserController extends Controller
+class UsersController extends Controller
 {
     public function store(UserRequest $request)
     {

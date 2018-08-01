@@ -13,7 +13,7 @@ use App\Models\Activity;
 use App\Models\Reply;
 use App\Transformers\ReplyTransformer;
 
-class ReplyController extends Controller
+class RepliesController extends Controller
 {
     public function store(ReplyRequest $request, Activity $activity, Reply $reply)
     {

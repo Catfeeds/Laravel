@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Overtrue\EasySms\EasySms;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
-class VerificationCodeController extends Controller
+class VerificationCodesController extends Controller
 {
     /**
      * @param Request $request

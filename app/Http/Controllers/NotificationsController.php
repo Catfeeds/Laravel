@@ -6,7 +6,7 @@ use App\Models\Notification;
 use App\Transformers\NotificationTransformer;
 use Illuminate\Http\Request;
 
-class NotificationController extends Controller
+class NotificationsController extends Controller
 {
     public function index()
     {

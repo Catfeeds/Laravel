@@ -9,7 +9,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AuthorizationRequest;
 
-class AuthorizationController extends Controller
+class AuthorizationsController extends Controller
 {
     public function store(AuthorizationRequest $request)
     {

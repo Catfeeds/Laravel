@@ -8,7 +8,7 @@ use App\Models\Image;
 use App\Models\User;
 use App\Transformers\ActivityTransformer;
 
-class ActivityController extends Controller
+class ActivitiesController extends Controller
 {
     public function store(ActivityRequest $request, Activity $activity)
     {
@@ -28,13 +28,13 @@ class ActivityController extends Controller
 
     // 关注的人的动态
     public function feeds () {
-        $activities = $this->user()->feeds()->latest()->paginate(20);
+        $activities = $this->user()->feeds()->recent()->paginate(20);
         return $this->response->paginator($activities, new ActivityTransformer());
     }
 
     // 用户的动态
     public function userIndex(User $user) {
-        $activities = $user->activities()->latest()->paginate(20);
+        $activities = $user->activities()->recent()->paginate(20);
         return $this->response->paginator($activities, new ActivityTransformer());
     }
 }
