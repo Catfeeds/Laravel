@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest as BaseFormRequest;
+use Dingo\Api\Http\FormRequest as BaseFormRequest;
 
 class FormRequest extends BaseFormRequest
 {

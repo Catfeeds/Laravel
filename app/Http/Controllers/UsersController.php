@@ -13,7 +13,7 @@ class UsersController extends Controller
 {
     public function checkPhone(Request $request) {
         if(User::where('phone', $request->phone)->first()) {
-            throw new ConflictHttpException('该手机号已被占用');
+            throw new ConflictHttpException(__('The phone number has been registered'));
         } else {
             return $this->response->noContent();
         }
@@ -22,15 +22,15 @@ class UsersController extends Controller
     public function store(UserRequest $request)
     {
         if(User::where('phone', $request->phone)->first()) {
-            throw new ConflictHttpException('该手机号已被占用');
+            throw new ConflictHttpException(__('The phone number has been registered'));
         }
         $verifyData = \Cache::get($request->phone);
         if (!$verifyData) {
-            return $this->response->error('验证码已失效', 422);
+            return $this->response->error(__('The validation code is expired'), 422);
         }
         if (!hash_equals($verifyData['code'], $request->verification_code)) {
             // 返回401
-            return $this->response->errorUnauthorized('验证码错误');
+            return $this->response->errorBadRequest(__('Wrong validation code'));
         }
         $user = User::create([
             'name'     => $request->name,
@@ -72,7 +72,7 @@ class UsersController extends Controller
     public function follow(User $user) {
         $currentUser = $this->user();
         if($currentUser->id == $user->id) {
-            return $this->response->errorBadRequest('不能关注自己');
+            return $this->response->errorBadRequest();
         }
         $currentUser->followings()->syncWithoutDetaching([$user->id]);
         return $this->response->noContent();

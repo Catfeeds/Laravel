@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', [
     'namespace'  => 'App\Http\Controllers',
-    'middleware' => ['serializer:array', 'bindings']
+    'middleware' => ['serializer:array', 'bindings', 'change-locale']
 ], function ($api) {
     // 检查手机号是否被注册
     $api->post('checkPhone/{phone}', 'UsersController@checkPhone')

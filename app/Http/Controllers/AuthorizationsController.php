@@ -21,7 +21,7 @@ class AuthorizationsController extends Controller
         $credentials['phone'] = $request->phone;
         $credentials['password'] = $request->password;
         if (!$token = \Auth::guard('api')->attempt($credentials)) {
-            return $this->response->errorUnauthorized('用户名或密码错误');
+            return $this->response->errorBadRequest(__('Wrong phone number or password'));
         }
         return $this->respondWithToken($token)->setStatusCode(201);
     }
@@ -43,7 +43,7 @@ class AuthorizationsController extends Controller
         return $this->response->array([
             'token' => $token,
             'token_type'   => 'Bearer',
-            'expires_in'   => \Auth::guard('api')->factory()->getTTL() * 60
+            'expires_in'   => \Auth::guard('api')->factory()->getTTL() // 一个月过期
         ]);
     }
 }

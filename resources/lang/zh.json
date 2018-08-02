@@ -1,0 +1,7 @@
+{
+  "The phone number has been registered": "该手机号已被注册",
+  "Too many requests. Please try again after one minute.": "请求过于频繁，请过一分钟再试",
+  "Wrong validation code": "验证码错误",
+  "The validation code is expired": "验证码已失效",
+  "Wrong phone number or password": "用户名或密码错误"
+}

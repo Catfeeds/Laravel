@@ -61,6 +61,10 @@ class Kernel extends HttpKernel
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
+
+        // 访问节流
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        // 接口语言设置
+        'change-locale' => \App\Http\Middleware\ChangeLocale::class
     ];
 }
