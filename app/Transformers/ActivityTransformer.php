@@ -26,6 +26,7 @@ class ActivityTransformer extends TransformerAbstract
             'like_count'  => (int)$activity->like_count,
             'reply_count' => (int)$activity->reply_count,
             'created_at'  => $activity->created_at->toDateTimeString(),
+            'created_diff_for_humans' => $activity->created_at->diffForHumans(),
             'updated_at'  => $activity->updated_at->toDateTimeString()
         ];
     }

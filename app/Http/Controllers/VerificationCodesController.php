@@ -22,15 +22,6 @@ class VerificationCodesController extends Controller
             'phone' => '手机号格式不合法'
         ]);
 
-        // 一分钟发一次
-        $verifyData = \Cache::get($request->phone);
-        if ($verifyData && $verifyData['send_at']->getTimestamp() + 60 > time()) {
-            throw new TooManyRequestsHttpException(
-                $verifyData['send_at']->getTimestamp() + 60 - time(),
-                '一分钟只能发送一次验证码'
-            );
-        }
-
         // 生成6位随机数，左侧补0
         $code = str_pad(random_int(1, 999999), 6, 0, STR_PAD_LEFT);
         $phone = $request->phone;

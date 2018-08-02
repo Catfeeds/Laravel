@@ -11,6 +11,14 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class UsersController extends Controller
 {
+    public function checkPhone(Request $request) {
+        if(User::where('phone', $request->phone)->first()) {
+            throw new ConflictHttpException('该手机号已被占用');
+        } else {
+            return $this->response->noContent();
+        }
+    }
+
     public function store(UserRequest $request)
     {
         if(User::where('phone', $request->phone)->first()) {
@@ -34,7 +42,7 @@ class UsersController extends Controller
         \Cache::forget($request->phone);
         return $this->response->item($user, new UserTransformer())
             ->setMeta([
-                'access_token' => \Auth::guard('api')->fromUser($user),
+                'token' => \Auth::guard('api')->fromUser($user),
                 'token_type' => 'Bearer',
                 'expires_in' => \Auth::guard('api')->factory()->getTTL() * 60
             ])

@@ -36,12 +36,12 @@ class RepliesController extends Controller
     }
 
     public function index(Activity $activity) {
-        $replies = $activity->replies()->latest()->paginate(20);
+        $replies = $activity->replies()->recent()->paginate(20);
         return $this->response->paginator($replies, new ReplyTransformer());
     }
 
     public function userIndex() {
-        $replies = $this->user()->replies()->latest()->paginate(20);
+        $replies = $this->user()->replies()->recent()->paginate(20);
         return $this->response->paginator($replies, new ReplyTransformer());
     }
 }

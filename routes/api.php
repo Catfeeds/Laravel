@@ -15,12 +15,21 @@ use Illuminate\Http\Request;
 
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', [
-    'namespace' => 'App\Http\Controllers',
+    'namespace'  => 'App\Http\Controllers',
     'middleware' => ['serializer:array', 'bindings']
 ], function ($api) {
+    // 检查手机号是否被注册
+    $api->post('checkPhone/{phone}', 'UsersController@checkPhone')
+        ->name('api.users.checkPhone');
     // 短信验证码
-    $api->post('verificationCode', 'VerificationCodesController@store')
-        ->name('api.verificationCode.store');
+    $api->group([
+        'middleware' => 'api.throttle',
+        'limit'      => 2,
+        'expires'    => 1
+    ], function ($api) {
+        $api->post('verificationCode', 'VerificationCodesController@store')
+            ->name('api.verificationCode.store');
+    });
     // 用户注册
     $api->post('users', 'UsersController@store')
         ->name('api.users.store');
@@ -43,7 +52,7 @@ $api->version('v1', [
         ->name('api.activities.replies.index');
 
     // 需要 token 验证的接口
-    $api->group(['middleware' => 'api.auth'], function($api) {
+    $api->group(['middleware' => 'api.auth'], function ($api) {
         // 当前登录用户信息
         $api->get('user', 'UsersController@me')
             ->name('api.user.show');

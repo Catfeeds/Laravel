@@ -20,6 +20,7 @@ class NotificationTransformer extends TransformerAbstract
             'data' => $notification->data,
             'read_at' => $notification->read_at ? $notification->read_at->toDateTimeString() : null,
             'created_at' => $notification->created_at->toDateTimeString(),
+            'created_diff_for_humans' => $notification->created_at->diffForHumans(),
             'updated_at' => $notification->updated_at->toDateTimeString(),
         ];
     }
