@@ -8,6 +8,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AuthorizationRequest;
+use App\Transformers\UserTransformer;
+use \Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthorizationsController extends Controller
 {
@@ -23,7 +25,14 @@ class AuthorizationsController extends Controller
         if (!$token = \Auth::guard('api')->attempt($credentials)) {
             return $this->response->errorBadRequest(__('Wrong phone number or password'));
         }
-        return $this->respondWithToken($token)->setStatusCode(201);
+        JWTAuth::setToken($token);
+        $user = JWTAuth::toUser($token);
+        return $this->response->item($user, new UserTransformer())
+            ->setMeta([
+                'token' => $token,
+                'token_type' => 'Bearer',
+                'expires_in' => \Auth::guard('api')->factory()->getTTL()
+            ]);
     }
 
     public function update()

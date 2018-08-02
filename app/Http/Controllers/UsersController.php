@@ -44,7 +44,7 @@ class UsersController extends Controller
             ->setMeta([
                 'token' => \Auth::guard('api')->fromUser($user),
                 'token_type' => 'Bearer',
-                'expires_in' => \Auth::guard('api')->factory()->getTTL() * 60
+                'expires_in' => \Auth::guard('api')->factory()->getTTL()
             ])
             ->setStatusCode(201);
     }
