@@ -51,6 +51,13 @@ $api->version('v1', [
     $api->get('activities/{activity}/replies', 'RepliesController@index')
         ->name('api.activities.replies.index');
 
+    // 某个用户关注的人
+    $api->get('users/{user}/following', 'UsersController@following')
+        ->name('api.users.following');
+    // 某个用户的粉丝
+    $api->get('users/{user}/followers', 'UsersController@follower')
+        ->name('api.users.follower');
+
     // 需要 token 验证的接口
     $api->group(['middleware' => 'api.auth'], function ($api) {
         // 当前登录用户信息
@@ -66,6 +73,9 @@ $api->version('v1', [
         // 取消关注
         $api->delete('user/following/{user}', 'UsersController@unfollow')
             ->name('api.user.unfollow');
+        // 推荐关注的设计师
+        $api->get('user/recommend', 'UsersController@recommend')
+            ->name('api.user.recommendDesigner');
 
         // 图片资源
         $api->post('images', 'ImagesController@store')
@@ -80,6 +90,13 @@ $api->version('v1', [
         // 首页：关注的人动态
         $api->get('activities/feeds', 'ActivitiesController@feeds')
             ->name('api.activities.feeds');
+
+        // 点赞动态
+        $api->post('activities/{activity}/likes', 'ActivityLikesController@store')
+            ->name('api.activities.likes.store');
+        // 取消点赞
+        $api->delete('activities/{activity}/likes', 'ActivityLikesController@destroy')
+            ->name('api.activities.likes.destroy');
 
         // 评论一条动态
         $api->post('activities/{activity}/replies', 'RepliesController@store')

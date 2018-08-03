@@ -10,10 +10,14 @@ class UserTransformer extends TransformerAbstract
         return [
             'id' => $user->id,
             'name' => $user->name,
-            'email' => $user->email,
-            'avatar_url' => $user->avatar_url,
-            'introduction' => $user->introduction,
-            'notification_count' => $user->notification_count,
+            'email' => (string)$user->email,
+            'type' => $user->type,
+            'avatar_url' => (string)$user->avatar_url,
+            'introduction' => (string)$user->introduction,
+            'notification_count' => (int)$user->notification_count,
+            'following_count' => (int)$user->following_count,
+            'follower_count' => (int)$user->follower_count,
+            'following' => (boolean)$user->following,
             'created_at' => $user->created_at->toDateTimeString(),
             'updated_at' => $user->updated_at->toDateTimeString(),
         ];

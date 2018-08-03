@@ -16,14 +16,16 @@ class User extends Authenticatable implements JWTSubject
     }
 
     // 重写的主要目的是每次通知时通知数+1
-    public function notify($instance) {
+    public function notify($instance)
+    {
         // 不能自己通知自己
-        if($this->id == Auth::id()) {
+        if ($this->id == Auth::id()) {
             return;
         }
         $this->laravelNotify($instance);  // $instance 就是 Notifications\ActivityReplied 等对象
         $this->increment('notification_count');
     }
+
     /**
      * The attributes that are mass assignable.
      * @var array
@@ -81,17 +83,33 @@ class User extends Authenticatable implements JWTSubject
         return $this->id == $model->user_id;
     }
 
-    public function markAsRead() {
+    public function markAsRead()
+    {
         $this->notification_count = 0;
         $this->save();
         $this->unreadNotifications->markAsRead();
     }
 
-    public function markOneAsRead($notificationId) {
+    public function markOneAsRead($notificationId)
+    {
         $notification = DatabaseNotification::find($notificationId);
-        if($notification->unread()) {
+        if ($notification->unread()) {
             $this->decrement('notification_count');
             $notification->markAsRead();
         }
+    }
+
+    // 设置following属性：$user用户是否关注了此用户
+    public function setFollowing($user)
+    {
+        if ($user instanceof User) {
+            $user = $user->id;
+        }
+        if (!$user) {
+            return $this->attributes['following'] = false;
+        }
+        $this->attributes['following'] = $this->followers()
+                ->newPivotStatementForId($user)
+                ->value('follower_id') === $user;
     }
 }

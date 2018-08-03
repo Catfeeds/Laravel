@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateActivitiesTable extends Migration
+class CreateActivityLikesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,11 @@ class CreateActivitiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('activities', function (Blueprint $table) {
+        Schema::create('activity_likes', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('content')->nullable();
-            $table->text('photo_urls')->nullable();
+            $table->integer('activity_id')->unsigned()->default(0)->index();
             $table->integer('user_id')->unsigned()->default(0)->index();
-            $table->integer('like_count')->unsigned()->default(0);
-            $table->integer('reply_count')->unsigned()->default(0);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -32,6 +28,6 @@ class CreateActivitiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('activities');
+        Schema::dropIfExists('activity_likes');
     }
 }
