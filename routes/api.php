@@ -58,6 +58,10 @@ $api->version('v1', [
     $api->get('users/{user}/followers', 'UsersController@follower')
         ->name('api.users.follower');
 
+    // 某个用户收到的评价
+    $api->get('users/{user}/reviews', 'UserReviewsController@index')
+        ->name('api.users.reviews.index');
+
     // 需要 token 验证的接口
     $api->group(['middleware' => 'api.auth'], function ($api) {
         // 当前登录用户信息
@@ -108,7 +112,6 @@ $api->version('v1', [
         $api->get('user/replies', 'RepliesController@userIndex')
             ->name('api.user.replies.index');
 
-
         // 通知列表
         $api->get('user/notifications', 'NotificationsController@index')
             ->name('api.user.notifications.index');
@@ -121,5 +124,6 @@ $api->version('v1', [
         // 标记单个通知为已读
         $api->put('user/read/notifications/{notification_id}', 'NotificationsController@readOne')
             ->name('api.user.notifications.readOne');
+
     });
 });
