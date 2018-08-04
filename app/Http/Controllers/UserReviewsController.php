@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class UserReviewsController extends Controller
 {
     public function index(User $user, Request $request) {
-        $reviews = Review::where('user_id', $user->id)->recent()->paginate($request->per_page ?? 20);
+        $reviews = Review::where('user_id', $user->id)->recent()->paginate($request->per_page ?? 1);
         return $this->response->paginator($reviews, new ReviewTransformer());
     }
 }

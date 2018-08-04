@@ -17,6 +17,7 @@ class ReviewTransformer extends TransformerAbstract
     {
         return [
             'id'                      => $review->id,
+            'rate'                    => (integer)$review->rate,
             'content'                 => (string)$review->content,
             'additional_content'      => (string)$review->additional_content,
             'order_id'                => (int)$review->user_id,
