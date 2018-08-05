@@ -8,6 +8,7 @@ class ReplyRequest extends FormRequest
     {
         return [
             'replyee_id' => 'integer|exists:users,id',
+            'reply_id'   => 'integer|exists:replies,id',
             'content'    => 'required|string|max:200'
         ];
     }

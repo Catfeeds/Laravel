@@ -17,6 +17,7 @@ class ActivityTransformer extends TransformerAbstract
     {
         return [
             'id'                      => $activity->id,
+            'user_id'                 => $activity->user_id,
             'content'                 => $activity->content,
             'photo_urls'              => $activity->photo_urls ?? [],
             'like_count'              => (int)$activity->like_count,

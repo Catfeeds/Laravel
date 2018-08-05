@@ -19,8 +19,9 @@ class RepliesController extends Controller
     {
         $currentUser = $this->user();
         $reply->content = $request->input('content');
-        $reply->activity_id = $activity->id;
         $reply->user_id = $currentUser->id;
+        $reply->activity_id = $activity->id;
+        $reply->reply_id = $request->reply_id;
         $reply->replyee_id = $request->replyee_id;
         $reply->save();
         return $this->response->item($reply, new ReplyTransformer())

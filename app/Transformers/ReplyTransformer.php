@@ -19,8 +19,9 @@ class ReplyTransformer extends TransformerAbstract
     {
         return [
             'id'           => $reply->id,
-            'activity_id'  => $reply->activity_id,
             'user_id'      => $reply->user_id,
+            'activity_id'  => $reply->activity_id,
+            'reply_id'     => $reply->reply_id,
             'replyee_id'   => $reply->replyee_id,
             'replyee_name' => $reply->replyee ? $reply->replyee->name : '',
             'content'      => $reply->content,
