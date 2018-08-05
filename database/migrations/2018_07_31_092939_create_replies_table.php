@@ -16,7 +16,8 @@ class CreateRepliesTable extends Migration
         Schema::create('replies', function(Blueprint $table) {
             $table->increments('id');
             $table->integer('activity_id')->unsigned()->default(0)->index();
-            $table->integer('user_id')->unsigned()->default(0)->index();
+            $table->integer('replyee_id')->unsigner()->nullable()->index()->comment('被评论的人');
+            $table->integer('user_id')->unsigned()->default(0)->index()->comment('发表评论的人');
             $table->string('content');
             $table->timestamps();
             $table->softDeletes();

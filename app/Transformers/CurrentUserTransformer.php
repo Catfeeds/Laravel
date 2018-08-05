@@ -3,13 +3,15 @@ namespace App\Transformers;
 use App\Models\User;
 use League\Fractal\TransformerAbstract;
 
-class UserTransformer extends TransformerAbstract
+class CurrentUserTransformer extends TransformerAbstract
 {
     public function transform(User $user)
     {
         return [
             'id' => $user->id,
             'name' => $user->name,
+            'phone' => (string)$user->phone,
+            'email' => (string)$user->email,
             'type' => $user->type,
             'avatar_url' => (string)$user->avatar_url,
             'title' => (string)$user->title,

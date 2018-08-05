@@ -44,6 +44,14 @@ $api->version('v1', [
     $api->delete('authorizations/current', 'AuthorizationsController@destroy')
         ->name('api.authorizations.destroy');
 
+    // 用户信息
+    $api->get('users/{user}', 'UsersController@index')
+        ->name('api.users.index');
+
+    // 获取一条动态
+    $api->get('activities/{activity}', 'ActivitiesController@index')
+        ->where('activity', '[0-9]+')
+        ->name('api.activities.index');
     // 某个用户发布的动态
     $api->get('users/{user}/activities', 'ActivitiesController@userIndex')
         ->name('api.users.activities.index');
@@ -85,15 +93,16 @@ $api->version('v1', [
         $api->post('images', 'ImagesController@store')
             ->name('api.images.store');
 
+        // 首页：关注的人动态
+        $api->get('user/feeds', 'ActivitiesController@feeds')
+            ->name('api.user.feeds');
         // 发布动态
         $api->post('activities', 'ActivitiesController@store')
             ->name('api.activities.store');
         // 删除动态
         $api->delete('activities/{activity}', 'ActivitiesController@destroy')
+            ->where('activity', '[0-9]+')
             ->name('api.activities.delete');
-        // 首页：关注的人动态
-        $api->get('activities/feeds', 'ActivitiesController@feeds')
-            ->name('api.activities.feeds');
 
         // 点赞动态
         $api->post('activities/{activity}/likes', 'ActivityLikesController@store')

@@ -10,6 +10,7 @@ use App\Transformers\ActivityTransformer;
 
 class ActivitiesController extends Controller
 {
+    // 发表动态
     public function store(ActivityRequest $request, Activity $activity)
     {
         $activity->user_id = $this->user()->id;
@@ -20,11 +21,20 @@ class ActivitiesController extends Controller
         return $this->response->item($activity, new ActivityTransformer())->setStatusCode(201);
     }
 
+    // 删除动态
     public function destroy(Activity $activity)
     {
         $this->authorize('destroy', $activity);
         $activity->delete();
         return $this->response->noContent();
+    }
+
+    // 动态详情
+    public function index(Activity $activity) {
+        $currentUser = $this->user();
+        $activity->setLiked($currentUser);
+        $activity->user->setFollowing($currentUser);
+        return $this->response->item($activity, new ActivityTransformer());
     }
 
     // 关注的人的动态

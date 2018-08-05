@@ -6,6 +6,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\Follow;
 use App\Models\Image;
 use App\Models\User;
+use App\Transformers\CurrentUserTransformer;
 use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -19,6 +20,11 @@ class UsersController extends Controller
         } else {
             return $this->response->noContent();
         }
+    }
+
+    public function index(User $user) {
+        $user->setFollowing($this->user());
+        return $this->response->item($user, new UserTransformer());
     }
 
     public function store(UserRequest $request)
@@ -66,9 +72,10 @@ class UsersController extends Controller
         return $this->response->item($user, new UserTransformer());
     }
 
+    // 当前登录用户
     public function me()
     {
-        return $this->response->item($this->user(), new UserTransformer());
+        return $this->response->item($this->user(), new CurrentUserTransformer());
     }
 
     public function follow(User $user)
@@ -102,6 +109,7 @@ class UsersController extends Controller
         return $this->response->noContent();
     }
 
+    // 某个用户关注的人
     public function following(User $user)
     {
         $currentUser = $this->user();
@@ -112,6 +120,7 @@ class UsersController extends Controller
         return $this->response->paginator($following, new UserTransformer());
     }
 
+    // 某个用户的粉丝
     public function follower(User $user)
     {
         $currentUser = $this->user();

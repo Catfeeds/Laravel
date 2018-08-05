@@ -17,9 +17,11 @@ class RepliesController extends Controller
 {
     public function store(ReplyRequest $request, Activity $activity, Reply $reply)
     {
+        $currentUser = $this->user();
         $reply->content = $request->input('content');
         $reply->activity_id = $activity->id;
-        $reply->user_id = $this->user()->id;
+        $reply->user_id = $currentUser->id;
+        $reply->replyee_id = $request->replyee_id;
         $reply->save();
         return $this->response->item($reply, new ReplyTransformer())
             ->setStatusCode(201);
@@ -36,7 +38,7 @@ class RepliesController extends Controller
     }
 
     public function index(Activity $activity) {
-        $replies = $activity->replies()->recent()->paginate(20);
+        $replies = $activity->replies()->recent()->paginate(10);
         return $this->response->paginator($replies, new ReplyTransformer());
     }
 
