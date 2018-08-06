@@ -89,9 +89,9 @@ $api->version('v1', [
         $api->get('user/recommend', 'UsersController@recommend')
             ->name('api.user.recommendDesigner');
 
-        // 图片资源
-        $api->post('images', 'ImagesController@store')
-            ->name('api.images.store');
+        // 上传文件
+        $api->post('uploads', 'UploadsController@store')
+            ->name('api.uploads.store');
 
         // 首页：关注的人动态
         $api->get('user/feeds', 'ActivitiesController@feeds')

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ActivityRequest;
 use App\Models\Activity;
-use App\Models\Image;
+use App\Models\Upload;
 use App\Models\User;
 use App\Transformers\ActivityTransformer;
 
@@ -15,7 +15,7 @@ class ActivitiesController extends Controller
     {
         $activity->user_id = $this->user()->id;
         $activity->content = $request->input('content');
-        $activity->photo_urls = Image::findMany($request->photo_image_ids)->pluck('path');
+        $activity->photo_urls = Upload::findMany($request->photo_image_ids)->pluck('path');
         $activity->save();
         $activity->load('user'); // 因为关联关系是延迟加载，所以要手动加载一下该属性
         return $this->response->item($activity, new ActivityTransformer())->setStatusCode(201);

@@ -7,12 +7,12 @@
 
 namespace App\Transformers;
 
-use App\Models\Image;
+use App\Models\Upload;
 use League\Fractal\TransformerAbstract;
 
 class ImageTransformer extends TransformerAbstract
 {
-    public function transform(Image $image)
+    public function transform(Upload $image)
     {
         return [
             'id'         => $image->id,

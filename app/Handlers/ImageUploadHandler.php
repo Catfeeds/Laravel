@@ -1,14 +1,14 @@
 <?php
-/**
- * User: ZhuKaihao
- * Date: 2018/7/30
- * Time: 上午11:42
- */
 
 namespace App\Handlers;
 
 use Intervention\Image\Facades\Image;
 
+/**
+ * 处理图片：裁剪大小
+ * Class ImageUploadHandler
+ * @package App\Handlers
+ */
 class ImageUploadHandler
 {
     protected $allowed_ext = ["png", "jpg", "gif", 'jpeg'];

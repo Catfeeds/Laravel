@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-class Image extends Model
+class Upload extends Model
 {
     protected $fillable = ['type', 'path'];
 

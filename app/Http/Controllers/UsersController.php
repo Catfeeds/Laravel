@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Models\Follow;
-use App\Models\Image;
+use App\Models\Upload;
 use App\Models\User;
 use App\Transformers\CurrentUserTransformer;
 use App\Transformers\UserTransformer;
@@ -62,7 +62,7 @@ class UsersController extends Controller
         $user = $this->user();
         $attributes = $request->only(['name', 'title', 'introduction']);
         if ($request->avatar_image_id) {
-            $image = Image::find($request->avatar_image_id);
+            $image = Upload::find($request->avatar_image_id);
             if (!$image) {
                 return $this->response()->errorNotFound('图片id不存在');
             }

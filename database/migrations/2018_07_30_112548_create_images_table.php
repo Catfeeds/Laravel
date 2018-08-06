@@ -13,10 +13,10 @@ class CreateImagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('images', function (Blueprint $table) {
+        Schema::create('uploads', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned()->default(0)->index()->comment('谁上传的图片');
-            $table->enum('type', ['avatar', 'activity'])->index()->comment('图片类型：头像、动态');
+            $table->enum('type', ['avatar', 'activity_photo', 'project_file'])->index()->comment('头像；动态图片；项目附件');
             $table->string('path')->index();
             $table->timestamps();
         });

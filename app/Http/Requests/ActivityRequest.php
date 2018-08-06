@@ -10,7 +10,7 @@ class ActivityRequest extends FormRequest
         return [
             'content' => 'required_without:photo_image_ids|max:200',
             'photo_image_ids' => 'required_without:content|array',
-            'photo_image_ids.*' => 'distinct|exists:images,id,type,activity,user_id,'.$userId
+            'photo_image_ids.*' => 'distinct|exists:uploads,id,type,activity_photo,user_id,'.$userId
         ];
     }
 
