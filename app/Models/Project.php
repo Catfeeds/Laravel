@@ -7,7 +7,8 @@ class Project extends Model
     protected $guarded = [];
     protected $casts = [
         'types' => 'array',
-        'features' => 'array'
+        'features' => 'array',
+        'canceled_at' => 'datetime'
     ];
     protected $with=['user'];
 

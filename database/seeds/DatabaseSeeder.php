@@ -14,7 +14,8 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         $this->call(UploadSeeder::class);
         $this->call(ActivitySeeder::class);
-        $this->call(ReplySeeder::class);
-        $this->call(ReviewSeeder::class);
+//        $this->call(ReplySeeder::class);
+//        $this->call(ReviewSeeder::class);
+        $this->call(ProjectSeeder::class);
     }
 }

@@ -19,6 +19,14 @@ class UserSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now()
         ]);
+        \App\Models\User::insert( [
+            'name' => 'Zhu222',
+            'phone' => '15650753236',
+            'type' => 'designer',
+            'password' => bcrypt('123123'),
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
         factory(App\Models\User::class, 20)->create();
     }
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Activity;
 use App\Models\ActivityLike;
 use App\Transformers\ActivityTransformer;
-use Illuminate\Http\Request;
 
 class ActivityLikesController extends Controller
 {

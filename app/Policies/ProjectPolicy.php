@@ -24,4 +24,9 @@ class ProjectPolicy
     {
         return  $user->isAuthorOf($project);
     }
+
+    public function favorite(User $user)
+    {
+        return  $user->type === 'designer';
+    }
 }

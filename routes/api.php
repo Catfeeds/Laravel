@@ -176,6 +176,12 @@ $api->version('v1', [
         // 取消项目
         $api->get('user/projects', 'ProjectsController@userIndex')
             ->name('api.user.projects.index');
+        // 收藏项目
+        $api->put('user/favoriting/projects/{project}', 'ProjectFavoritesController@store')
+            ->name('api.user.projects.favorite');
+        // 取消收藏
+        $api->delete('user/favoriting/projects/{project}', 'ProjectFavoritesController@destroy')
+            ->name('api.user.projects.unfavorite');
 
         /**
          * 通知相关
