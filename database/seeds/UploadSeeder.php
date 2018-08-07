@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class ImageSeeder extends Seeder
+class UploadSeeder extends Seeder
 {
     /**
      * Run the database seeds.

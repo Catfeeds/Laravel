@@ -8,9 +8,6 @@
 namespace App\Transformers;
 
 use App\Models\Reply;
-use App\Models\User;
-use App\Transformers\Resources\NullResource;
-use League\Fractal\Resource\Item;
 use League\Fractal\TransformerAbstract;
 
 class ReplyTransformer extends TransformerAbstract

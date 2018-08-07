@@ -11,13 +11,11 @@ class UploadRequest extends FormRequest
         ];
         switch ($this->type) {
             case 'avatar':
-                $rules['file'] = 'required|mimes:jpeg,jpg,bmp,png,gif';
-                break;
             case 'activity_photo':
-                $rules['file'] = 'required|mimes:jpeg,jpg,bmp,png,gif';
+                $rules['file'] = 'required|image';
                 break;
             case 'project_file':
-                // TODO
+                $rules['file'] = 'required|file|max:10240';
                 break;
         }
         return $rules;
@@ -26,7 +24,8 @@ class UploadRequest extends FormRequest
     public function messages()
     {
         return [
-            // 'image.dimensions' => '图片的清晰度不够，宽和高需要 200px 以上',
+            // 'file.dimensions' => '图片的清晰度不够，宽和高需要 200px 以上',
+            'file.max' => '文件大小不得超过10M'
         ];
     }
 }
