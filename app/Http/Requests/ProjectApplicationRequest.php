@@ -8,8 +8,8 @@ class ProjectApplicationRequest extends FormRequest
     {
         $userId = \Auth::guard('api')->id();
         return [
-            'remark' => 'nullable|string|max:300',
-            'application_file_id'     => 'nullable|integer|exists:uploads,id,type,application_file,user_id,' . $userId,
+            'remark'              => 'nullable|string|max:300',
+            'application_file_id' => 'nullable|integer|exists:uploads,id,type,application_file,user_id,' . $userId,
         ];
     }
 

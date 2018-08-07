@@ -16,11 +16,6 @@ class ProjectApplicationPolicy
         return $user->type === 'designer';
     }
 
-    public function destroy(User $user, ProjectApplication $projectApplication)
-    {
-        return $user->isAuthorOf($projectApplication) || $user->isAuthorOf($projectApplication->project);
-    }
-
     public function retrieve(User $user, ProjectApplication $projectApplication)
     {
         return $user->isAuthorOf($projectApplication) || $user->isAuthorOf($projectApplication->project);

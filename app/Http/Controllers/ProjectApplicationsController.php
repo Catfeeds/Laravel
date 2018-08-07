@@ -34,13 +34,12 @@ class ProjectApplicationsController extends Controller
     }
 
     // 取消报名
-    public function destroy(Project $project, ProjectApplication $projectApplication)
+    public function destroy(Project $project)
     {
-        if ($project->id !== $projectApplication->project_id) {
-            return $this->response->errorBadRequest();
-        }
-        $this->authorize('destroy', $projectApplication);
-        $projectApplication->delete();
+        ProjectApplication::where([
+            'project_id' => $project->id,
+            'user_id'    => $this->user()->id
+        ])->delete();
         return $this->response->noContent();
     }
 
