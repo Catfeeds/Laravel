@@ -30,6 +30,8 @@ class ProjectTransformer extends TransformerAbstract
             'supplement_file_url'    => $project->supplement_file_url,
             'supplement_at'          => $project->supplement_at,
             'find_time'              => $project->find_time,
+            'favoriting'             => (boolean)$project->favoriting,
+            'applying'               => (boolean)$project->applying,
             'created_at'             => $project->created_at->toDateTimeString(),
             'updated_at'             => $project->updated_at->toDateTimeString(),
             'canceled_at'            => $project->canceled_at ? $project->canceled_at->toDateTimeString() : '',

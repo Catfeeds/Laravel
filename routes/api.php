@@ -182,6 +182,15 @@ $api->version('v1', [
         // 取消收藏
         $api->delete('user/favoriting/projects/{project}', 'ProjectFavoritesController@destroy')
             ->name('api.user.projects.unfavorite');
+        // 报名项目
+        $api->post('projects/{project}/applications', 'ProjectApplicationsController@store')
+            ->name('api.user.projects.apply');
+        // 取消报名
+        $api->delete('projects/{project}/applications/{projectApplication}', 'ProjectApplicationsController@destroy')
+            ->name('api.user.projects.cancelApply');
+        // 获取报名项目详情
+        $api->get('projects/{project}/applications/{projectApplication}', 'ProjectApplicationsController@index')
+            ->name('api.projects.applications.index');
 
         /**
          * 通知相关

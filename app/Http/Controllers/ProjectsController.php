@@ -29,6 +29,7 @@ class ProjectsController extends Controller
     // 获取项目详情
     public function index(Project $project)
     {
+        $project->setExtraAttributes($this->user());
         return $this->response->item($project, new ProjectTransformer());
     }
 

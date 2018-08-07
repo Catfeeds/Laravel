@@ -5,5 +5,6 @@
   "The validation code is expired": "验证码已失效",
   "Wrong phone number or password": "用户名或密码错误",
   "Allow only supplement the project once": "每个项目只能补充一次",
-  "The project cannot be canceled": "该项目无法取消"
+  "The project cannot be canceled": "该项目无法取消",
+  "Has already applied for the project": "已报名该项目"
 }

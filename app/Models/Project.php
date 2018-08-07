@@ -21,4 +21,48 @@ class Project extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    // 报名
+    public function applications() {
+        return $this->hasMany(ProjectApplication::class);
+    }
+
+    // 收藏者
+    public function favoriteUser() {
+        return $this->hasMany(ProjectFavorite::class);
+    }
+
+    // 一次性设置所有的额外属性
+    public function setExtraAttributes($user) {
+        $this->setApplying($user);
+        $this->setFavoriting($user);
+    }
+
+    // 用户是否报名了该项目
+    public function setApplying($user)
+    {
+        if ($user instanceof User) {
+            $user = $user->id;
+        }
+        if (!$user) {
+            return $this->attributes['applying'] = false;
+        }
+        $this->attributes['applying'] = $this->applications()
+            ->where('user_id', $user)
+            ->exists();
+    }
+
+    // 用户是否收藏了该项目
+    public function setFavoriting($user)
+    {
+        if ($user instanceof User) {
+            $user = $user->id;
+        }
+        if (!$user) {
+            return $this->attributes['favoriting'] = false;
+        }
+        $this->attributes['favoriting'] = $this->favoriteUser()
+            ->where('user_id', $user)
+            ->exists();
+    }
 }
