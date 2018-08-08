@@ -25,7 +25,7 @@ class UploadRequest extends FormRequest
     {
         return [
             // 'file.dimensions' => '图片的清晰度不够，宽和高需要 200px 以上',
-            'file.max' => '文件大小不得超过10M'
+            'file.max' => '头像大小不得超过2M，项目文件大小不得超过10M'
         ];
     }
 }

@@ -21,7 +21,7 @@ class UserRequest extends FormRequest
                     'name' => ['between:1,200', 'regex:/^(?:[\x{4e00}-\x{9fa5}]+)(?:·[\x{4e00}-\x{9fa5}]+)*$|^[a-zA-Z0-9]+\s?[\.·\-()a-zA-Z]*[a-zA-Z]+$/u'],
                     'title' => 'max:50',
                     'introduction' => 'max:200',
-                    'avatar_image_id' => 'exists:uploads,id,type,avatar,user_id,'.$userId,
+                    'avatar_image_id' => 'nullable|exists:uploads,id,type,avatar,user_id,'.$userId,
                 ];
         }
     }

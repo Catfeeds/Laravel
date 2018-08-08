@@ -62,11 +62,7 @@ class UsersController extends Controller
         $user = $this->user();
         $attributes = $request->only(['name', 'title', 'introduction']);
         if ($request->avatar_image_id) {
-            $image = Upload::find($request->avatar_image_id);
-            if (!$image) {
-                return $this->response()->errorNotFound('图片id不存在');
-            }
-            $attributes['avatar_url'] = $image->path;
+            $attributes['avatar_url'] = Upload::find($request->avatar_image_id)->path;
         }
         $user->update($attributes);
         return $this->response->item($user, new UserTransformer());
