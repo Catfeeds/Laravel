@@ -77,11 +77,14 @@ class ProjectsController extends Controller
         }
 
         $status = $this->getStatusFromRequest($request);
-        $projets = Project::where('user_id', $user->id)
+        $query = Project::where('user_id', $user->id)
             ->whereIn('status', $status)
-            ->recent()
-            ->paginate(20);
-        return $this->response->paginator($projets, new ProjectTransformer());
+            ->recent();
+        if (is_string($request->keyword)) {
+            $query = $query->where('title', 'like', "%$request->keyword%");
+        }
+        $projects = $query->paginate(20);
+        return $this->response->paginator($projects, new ProjectTransformer());
     }
 
     // 当前登录用户的项目
@@ -96,11 +99,14 @@ class ProjectsController extends Controller
 
         // 当前用户是设计师：返回报名的项目
         $status = $this->getStatusFromRequest($request);
-        $projects = Project::whereHas('applications', function ($query) use ($currentUser) {
+        $query = Project::whereHas('applications', function ($query) use ($currentUser) {
             $query->where('user_id', $currentUser->id);
         })->whereIn('status', $status)
-            ->recent()
-            ->paginate(20);
+            ->recent();
+        if (is_string($request->keyword)) {
+            $query = $query->where('title', 'like', "%$request->keyword%");
+        }
+        $projects = $query->paginate(20);
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 

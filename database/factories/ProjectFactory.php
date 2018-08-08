@@ -4,7 +4,7 @@ use Faker\Generator as Faker;
 
 $factory->define(\App\Models\Project::class, function (Faker $faker) {
     return [
-        'user_id'                => $faker->randomElement([1, 2]),
+        'user_id'                => $faker->randomElement([1]),
         'status'                 => $faker->randomElement([500, 1000, 1100, 1200]),
         'title'                  => $faker->sentence,
         'types'                  => $faker->randomElements(['城市设计', '概念规划', '建筑设计', '景观设计', '室内设计'], 3),
