@@ -29,4 +29,9 @@ class ProjectPolicy
     {
         return  $user->type === 'designer';
     }
+
+    public function retrieve(User $user) {
+        dd(1);
+        return true;
+    }
 }

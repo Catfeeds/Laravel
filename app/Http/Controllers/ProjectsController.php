@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProjectRequest;
 use App\Http\Requests\ProjectSupplementRequest;
 use App\Models\Project;
+use App\Models\ProjectApplication;
+use App\Models\Reply;
 use App\Models\Upload;
+use App\Models\User;
 use App\Transformers\ProjectTransformer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -66,31 +69,60 @@ class ProjectsController extends Controller
         return $this->response->noContent();
     }
 
-    // 当前登录用户发布的项目
+    // 某个业主发布的项目
+    public function partyIndex(User $user, Request $request)
+    {
+        if ($user->type !== 'party') {
+            return $this->response->errorUnauthorized('公开接口只能访问甲方发布的项目');
+        }
+
+        $status = $this->getStatusFromRequest($request);
+        $projets = Project::where('user_id', $user->id)
+            ->whereIn('status', $status)
+            ->recent()
+            ->paginate(20);
+        return $this->response->paginator($projets, new ProjectTransformer());
+    }
+
+    // 当前登录用户的项目
     public function userIndex(Request $request)
     {
-        // 验证status: string或array
+        $currentUser = $this->user();
+
+        // 当前用户是甲方：返回发布的项目
+        if ($currentUser->type == 'party') {
+            return $this->partyIndex($currentUser, $request);
+        }
+
+        // 当前用户是设计师：返回报名的项目
+        $status = $this->getStatusFromRequest($request);
+        $projects = Project::whereHas('applications', function ($query) use ($currentUser) {
+            $query->where('user_id', $currentUser->id);
+        })->whereIn('status', $status)
+            ->recent()
+            ->paginate(20);
+        return $this->response->paginator($projects, new ProjectTransformer());
+    }
+
+    // 根据request初始化status数组
+    private function getStatusFromRequest($request)
+    {
         $allStatus = [
             Project::STATUS_CANCELED,
             Project::STATUS_TENDERING,
             Project::STATUS_WORKING,
             Project::STATUS_COMPLETED
         ];
+        $status = [];
         if ($request->status) {
             if (is_array($request->status)) {
-                foreach ($request->status as $status) {
-                    if (!in_array($status, $allStatus))
-                        return $this->response->errorBadRequest('Wrong status field');
-                }
-            } else if (!in_array($request->status, $allStatus)) {
-                return $this->response->errorBadRequest('Wrong status field');
+                $status = $request->status;
+            } else {
+                $status[] = $request->status;
             }
+        } else {
+            $status = $allStatus;
         }
-
-        $projets = Project::where('user_id', $this->user()->id)
-            ->whereIn('status', $request->status)
-            ->recent()
-            ->paginate(20);
-        return $this->response->paginator($projets, new ProjectTransformer());
+        return $status;
     }
 }

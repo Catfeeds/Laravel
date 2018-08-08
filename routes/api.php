@@ -55,6 +55,7 @@ $api->version('v1', [
      */
     // 获取某名用户的基本信息
     $api->get('users/{user}', 'UsersController@index')
+        ->where('user', '[0-9]+')
         ->name('api.users.index');
 
     /**
@@ -66,9 +67,11 @@ $api->version('v1', [
         ->name('api.activities.index');
     // 某个用户发布的动态
     $api->get('users/{user}/activities', 'ActivitiesController@userIndex')
+        ->where('user', '[0-9]+')
         ->name('api.users.activities.index');
     // 动态回复列表
     $api->get('activities/{activity}/replies', 'RepliesController@index')
+        ->where('user', '[0-9]+')
         ->name('api.activities.replies.index');
 
     /**
@@ -76,9 +79,11 @@ $api->version('v1', [
      */
     // 某个用户关注的人
     $api->get('users/{user}/following', 'UsersController@following')
+        ->where('user', '[0-9]+')
         ->name('api.users.following');
     // 某个用户的粉丝
     $api->get('users/{user}/followers', 'UsersController@follower')
+        ->where('user', '[0-9]+')
         ->name('api.users.follower');
 
     /**
@@ -86,6 +91,7 @@ $api->version('v1', [
      */
     // 某个用户收到的评价
     $api->get('users/{user}/reviews', 'UserReviewsController@index')
+        ->where('user', '[0-9]+')
         ->name('api.users.reviews.index');
 
     /**
@@ -94,6 +100,10 @@ $api->version('v1', [
     // 获取项目详情
     $api->get('projects/{project}', 'ProjectsController@index')
         ->name('api.projects.index');
+    // 某个业主发布的项目
+    $api->get('users/{user}/projects', 'ProjectsController@partyIndex')
+        ->where('user', '[0-9]+')
+        ->name('api.users.projects.partyIndex');
 
     /**
      * 需要 token 验证的接口
@@ -173,9 +183,6 @@ $api->version('v1', [
         // 取消项目
         $api->put('user/canceled/projects/{project}', 'ProjectsController@cancel')
             ->name('api.user.projects.cancel');
-        // 取消项目
-        $api->get('user/projects', 'ProjectsController@userIndex')
-            ->name('api.user.projects.index');
         // 收藏项目
         $api->put('user/favoriting/projects/{project}', 'ProjectFavoritesController@store')
             ->name('api.user.projects.favorite');
@@ -191,6 +198,9 @@ $api->version('v1', [
         // 获取报名项目详情
         $api->get('projects/{project}/applications/{projectApplication}', 'ProjectApplicationsController@index')
             ->name('api.projects.applications.index');
+        // 当前登录用户发布或报名的项目
+        $api->get('user/projects', 'ProjectsController@userIndex')
+            ->name('api.user.projects.index');
 
         /**
          * 通知相关
