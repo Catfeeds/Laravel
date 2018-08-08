@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Project extends Model
 {
+    use softDeletes;
     protected $guarded = [];
     protected $casts = [
         'types' => 'array',

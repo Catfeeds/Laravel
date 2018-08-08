@@ -7,8 +7,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Activity extends Model
 {
+    use softDeletes;
     protected $fillable = ['content', 'photo_urls'];
     protected $casts = [
         'photo_urls' => 'array'

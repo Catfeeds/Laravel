@@ -21,7 +21,12 @@ class UserRequest extends FormRequest
                     'name' => ['between:1,200', 'regex:/^(?:[\x{4e00}-\x{9fa5}]+)(?:·[\x{4e00}-\x{9fa5}]+)*$|^[a-zA-Z0-9]+\s?[\.·\-()a-zA-Z]*[a-zA-Z]+$/u'],
                     'title' => 'max:50',
                     'introduction' => 'max:200',
-                    'avatar_image_id' => 'nullable|exists:uploads,id,type,avatar,user_id,'.$userId,
+                    'company_name' => 'string',
+                    'id_number' => 'string',
+                    'registration_number' => 'string',
+                    'avatar_id' => 'exists:uploads,id,type,avatar,user_id,'.$userId,
+                    'business_license_id' => 'exists:uploads,id,type,business_license,user_id,'.$userId,
+                    'id_card_id' => 'exists:uploads,id,type,id_card,user_id,'.$userId
                 ];
         }
     }
@@ -29,7 +34,9 @@ class UserRequest extends FormRequest
     public function messages()
     {
         return [
-            'avatar_image_id.exists' => '图片id不存在'
+            'avatar_id.exists' => '图片id不存在',
+            'business_license_id.exists' => '图片id不存在',
+            'id_card_id.exists' => '图片id不存在'
         ];
     }
 }

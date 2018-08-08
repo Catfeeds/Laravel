@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Auth;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,6 +12,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
+    use softDeletes;
     use Notifiable {
         notify as protected laravelNotify;
     }
@@ -30,9 +32,7 @@ class User extends Authenticatable implements JWTSubject
      * The attributes that are mass assignable.
      * @var array
      */
-    protected $fillable = [
-        'name', 'phone', 'email', 'password', 'type', 'avatar_url', 'title', 'introduction', 'birthday', 'sex'
-    ];
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for arrays.

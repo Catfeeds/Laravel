@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Review extends Model
 {
+    use softDeletes;
     protected $with=['reviewer'];
 
     // 被评价的人
