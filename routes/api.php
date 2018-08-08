@@ -201,6 +201,9 @@ $api->version('v1', [
         // 当前登录用户发布或报名的项目
         $api->get('user/projects', 'ProjectsController@userIndex')
             ->name('api.user.projects.index');
+        // 当前登录用户收藏的项目
+        $api->get('user/favoriting/projects', 'ProjectsController@favorite')
+            ->name('api.user.projects.favorite');
 
         /**
          * 通知相关

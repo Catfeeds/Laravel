@@ -75,15 +75,10 @@ class ProjectsController extends Controller
         if ($user->type !== 'party') {
             return $this->response->errorUnauthorized('公开接口只能访问甲方发布的项目');
         }
-
-        $status = $this->getStatusFromRequest($request);
-        $query = Project::where('user_id', $user->id)
-            ->whereIn('status', $status)
-            ->recent();
-        if (is_string($request->keyword)) {
-            $query = $query->where('title', 'like', "%$request->keyword%");
-        }
-        $projects = $query->paginate(20);
+        $projects = $this->getBasicQuery($request)
+            ->where('user_id', $user->id)
+            ->recent()
+            ->paginate(20);
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 
@@ -98,20 +93,33 @@ class ProjectsController extends Controller
         }
 
         // 当前用户是设计师：返回报名的项目
-        $status = $this->getStatusFromRequest($request);
-        $query = Project::whereHas('applications', function ($query) use ($currentUser) {
-            $query->where('user_id', $currentUser->id);
-        })->whereIn('status', $status)
-            ->recent();
-        if (is_string($request->keyword)) {
-            $query = $query->where('title', 'like', "%$request->keyword%");
-        }
-        $projects = $query->paginate(20);
+        $projects = $this->getBasicQuery($request)
+            ->whereHas('applications', function ($query) use ($currentUser) {
+                $query->where('user_id', $currentUser->id);
+            })
+            ->recent()
+            ->paginate(20);
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 
-    // 根据request初始化status数组
-    private function getStatusFromRequest($request)
+    // 当前登录用户收藏的项目
+    public function favorite(Request $request)
+    {
+        $currentUser = $this->user();
+        $projects = $this->getBasicQuery($request)
+            ->whereHas('favoriteUser', function ($query) use ($currentUser) {
+                $query->where('user_id', $currentUser->id);
+            })
+            ->recent()
+            ->paginate(20);
+        $projects->each(function ($project) use ($currentUser) {
+            $project->setExtraAttributes($currentUser);
+        });
+        return $this->response->paginator($projects, new ProjectTransformer());
+    }
+
+    // 根据query中的参数初始化查询器
+    private function getBasicQuery(Request $request)
     {
         $allStatus = [
             Project::STATUS_CANCELED,
@@ -121,14 +129,19 @@ class ProjectsController extends Controller
         ];
         $status = [];
         if ($request->status) {
+            // status可以是字符串也可以是数组
             if (is_array($request->status)) {
                 $status = $request->status;
             } else {
                 $status[] = $request->status;
             }
         } else {
-            $status = $allStatus;
+            $status = $allStatus; // 如果没有设置status，则默认搜索所有项目
         }
-        return $status;
+        $query = Project::whereIn('status', $status)->recent();
+        if (is_string($request->keyword)) {
+            $query = $query->where('title', 'like', "%$request->keyword%");
+        }
+        return $query;
     }
 }
