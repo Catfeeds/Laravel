@@ -135,6 +135,7 @@ class UsersController extends Controller
     {
         $currentUser = $this->user();
         $users = User::where('type', 'designer')
+            ->where('id', '!=', $currentUser->id)
             ->whereDoesntHave('followers', function ($query) use ($currentUser) {
                 $query->where('follower_id', $currentUser->id);
             })
