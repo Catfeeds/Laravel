@@ -104,6 +104,9 @@ $api->version('v1', [
     $api->get('users/{user}/projects', 'ProjectsController@partyIndex')
         ->where('user', '[0-9]+')
         ->name('api.users.projects.partyIndex');
+    // 搜索项目
+    $api->get('projects', 'ProjectsController@search')
+        ->name('api.projects.search');
 
     /**
      * 需要 token 验证的接口

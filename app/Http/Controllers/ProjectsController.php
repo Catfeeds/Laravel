@@ -118,6 +118,15 @@ class ProjectsController extends Controller
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 
+    // 搜索项目
+    public function search(Request $request) {
+        $projects = $this->getBasicQuery($request)
+            ->where('status', '!=', Project::STATUS_CANCELED)
+            ->recent()
+            ->paginate(20);
+        return $this->response->paginator($projects, new ProjectTransformer());
+    }
+
     // 根据query中的参数初始化查询器
     private function getBasicQuery(Request $request)
     {
