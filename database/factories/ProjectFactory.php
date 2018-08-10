@@ -13,7 +13,7 @@ $factory->define(\App\Models\Project::class, function (Faker $faker) {
         'description'            => $faker->realText(),
         'project_file_url'       => $faker->randomElement([null, $faker->url]),
         'delivery_time'          => $faker->randomElement(['三个月', '六个月', '其他']),
-        'payment'                => '200万',
+        'payment'                => $faker->numberBetween(50, 200) . '万',
         'supplement_description' => $faker->text,
         'supplement_at'          =>  $faker->randomElement([null, \Carbon\Carbon::now()]),
         'find_time'              => $faker->randomElement(['9~12天', '12~15天', '一个月内']),

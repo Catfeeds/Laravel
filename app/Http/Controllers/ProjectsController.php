@@ -32,7 +32,16 @@ class ProjectsController extends Controller
     // 获取项目详情
     public function index(Project $project)
     {
-        $project->setExtraAttributes($this->user());
+        $currentUser = $this->user();
+        $project->setExtraAttributes($currentUser);
+
+        // 添加当前用户的报名信息
+        if ($currentUser->type === 'designer') {
+            $project['application'] = $project
+                ->applications()
+                ->where('user_id', $currentUser->id)
+                ->first();
+        }
         return $this->response->item($project, new ProjectTransformer());
     }
 
@@ -119,7 +128,8 @@ class ProjectsController extends Controller
     }
 
     // 搜索项目
-    public function search(Request $request) {
+    public function search(Request $request)
+    {
         $projects = $this->getBasicQuery($request)
             ->where('status', '!=', Project::STATUS_CANCELED)
             ->recent()

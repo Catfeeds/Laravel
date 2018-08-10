@@ -52,4 +52,12 @@ class ProjectApplicationsController extends Controller
         $this->authorize('retrieve', $projectApplication);
         return $this->response->item($projectApplication, new ProjectApplicationTransformer());
     }
+
+    // 获取某个项目的报名列表
+    public function applications(Project $project) {
+        if($this->user()->id != $project->user_id) {
+            return $this->response->errorForbidden('非项目所有者');
+        }
+        return $this->response->paginator($project->applications()->paginate(20), new ProjectApplicationTransformer());
+    }
 }

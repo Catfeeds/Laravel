@@ -131,25 +131,33 @@ class UsersController extends Controller
     }
 
     // 某个用户关注的人
-    public function following(User $user)
+    public function following(Request $request, User $user)
     {
         $currentUser = $this->user();
-        $following = $user->followings()->paginate(20);
-        $following->each(function ($user) use ($currentUser) {
+        $query = $user->followings();
+        if($request->type) {
+            $query = $query->where('type', $request->type);
+        }
+        $users = $query->paginate(20);
+        $users->each(function ($user) use ($currentUser) {
             $user->setFollowing($currentUser);
         });
-        return $this->response->paginator($following, new UserTransformer());
+        return $this->response->paginator($users, new UserTransformer());
     }
 
     // 某个用户的粉丝
-    public function follower(User $user)
+    public function follower(Request $request, User $user)
     {
         $currentUser = $this->user();
-        $follower = $user->followers()->paginate(20);
-        $follower->each(function ($user) use ($currentUser) {
+        $query = $user->followers();
+        if($request->type) {
+            $query = $query->where('type', $request->type);
+        }
+        $users = $query->paginate(20);
+        $users->each(function ($user) use ($currentUser) {
             $user->setFollowing($currentUser);
         });
-        return $this->response->paginator($follower, new UserTransformer());
+        return $this->response->paginator($users, new UserTransformer());
     }
 
     public function recommend()
@@ -163,5 +171,18 @@ class UsersController extends Controller
             ->limit(10)
             ->get();
         return $this->response->collection($users, new UserTransformer());
+    }
+
+    public function search(Request $request) {
+        $currentUser = $this->user();
+        $query = User::where('name', 'like', "%$request->keyword%");
+        if($request->type) {
+            $query = $query->where('type', $request->type);
+        }
+        $users = $query->paginate(20);
+        $users->each(function ($user) use ($currentUser) {
+            $user->setFollowing($currentUser);
+        });
+        return $this->response->paginator($users, new UserTransformer());
     }
 }

@@ -53,6 +53,9 @@ $api->version('v1', [
     /**
      * 用户信息相关
      */
+    // 搜索用户
+    $api->get('users', 'UsersController@search')
+        ->name('api.users.search');
     // 获取某名用户的基本信息
     $api->get('users/{user}', 'UsersController@index')
         ->where('user', '[0-9]+')
@@ -198,9 +201,12 @@ $api->version('v1', [
         // 取消报名
         $api->delete('user/applying/projects/{project}', 'ProjectApplicationsController@destroy')
             ->name('api.user.projects.cancelApply');
+        // 获取项目报名列表
+        $api->get('projects/{project}/applications', 'ProjectApplicationsController@applications')
+            ->name('api.projects.applications.index');
         // 获取报名项目详情
         $api->get('projects/{project}/applications/{projectApplication}', 'ProjectApplicationsController@index')
-            ->name('api.projects.applications.index');
+            ->name('api.applications.index');
         // 当前登录用户发布或报名的项目
         $api->get('user/projects', 'ProjectsController@userIndex')
             ->name('api.user.projects.index');
