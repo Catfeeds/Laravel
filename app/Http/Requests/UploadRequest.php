@@ -7,7 +7,7 @@ class UploadRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'type' => 'required|string|in:avatar,activity_photo,project_file,application_file,business_license,id_card',
+            'type' => 'required|string|in:avatar,activity_photo,project_file,application_file,business_license,id_card,work_photo',
         ];
         switch ($this->type) {
             case 'avatar':

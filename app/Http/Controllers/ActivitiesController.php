@@ -15,7 +15,7 @@ class ActivitiesController extends Controller
     {
         $activity->user_id = $this->user()->id;
         $activity->content = $request->input('content');
-        $activity->photo_urls = Upload::findMany($request->photo_image_ids)->pluck('path');
+        $activity->photo_urls = Upload::findMany($request->photo_ids)->pluck('path');
         $activity->save();
         $activity->load('user'); // 因为关联关系是延迟加载，所以要手动加载一下该属性
         return $this->response->item($activity, new ActivityTransformer())->setStatusCode(201);

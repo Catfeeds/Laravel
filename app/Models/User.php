@@ -68,6 +68,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasManyThrough('App\Models\Activity', 'App\Models\Follow', 'follower_id', 'user_id', 'id', 'user_id');
     }
 
+    public function works() {
+        return $this->hasMany(Work::class);
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();

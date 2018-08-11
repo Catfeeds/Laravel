@@ -229,5 +229,18 @@ $api->version('v1', [
         // 标记单个通知为已读
         $api->put('user/read/notifications/{notification_id}', 'NotificationsController@readOne')
             ->name('api.user.notifications.readOne');
+
+        /**
+         * 作品集相关
+         */
+        // 创建作品
+        $api->post('works', 'WorksController@store')
+            ->name('api.works.store');
+        // 修改作品内容
+        $api->patch('works/{work}', 'WorksController@update')
+            ->name('api.works.update');
+        // 删除作品
+        $api->delete('works/{work}', 'WorksController@destroy')
+            ->name('api.works.destroy');
     });
 });
