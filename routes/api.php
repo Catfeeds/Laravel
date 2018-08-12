@@ -112,6 +112,13 @@ $api->version('v1', [
         ->name('api.projects.search');
 
     /**
+     * 作品相关
+     */
+    // 获取某个用户的作品集
+    $api->get('users/{user}/works', 'WorksController@userIndex')
+        ->name('api.users.works.userIndex');
+
+    /**
      * 需要 token 验证的接口
      */
     $api->group(['middleware' => 'api.auth'], function ($api) {

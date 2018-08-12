@@ -15,6 +15,7 @@ class WorksController extends Controller
         $work->user_id = $this->user()->id;
         $work->title = $request->input('title');
         $work->description = $request->input('description');
+        $work->visible_range = $request->input('visible_range');
         $work->photo_urls = Upload::findMany($request->photo_ids)->pluck('path');
         $work->save();
         return $this->response->item($work, new WorkTransformer());
@@ -36,7 +37,12 @@ class WorksController extends Controller
 
     // 某个用户的作品集
     public function userIndex(User $user) {
-        $works = $user->works()->recent()->paginate(20);
+        $currentUser = $this->user();
+        if ($currentUser && $user->id === $currentUser->id) {
+            $works = $user->works()->recent()->paginate(20);
+        } else {
+            $works = $user->works()->public()->recent()->paginate(20);
+        }
         return $this->response->paginator($works, new WorkTransformer());
     }
 }

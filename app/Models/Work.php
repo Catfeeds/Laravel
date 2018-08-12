@@ -2,9 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
 class Work extends Model
 {
-    //
+    protected $casts = [
+        'photo_urls' => 'array'
+    ];
+
+    public function scopePublic($query) {
+        return $query->where('visible_range', 'public');
+    }
 }
