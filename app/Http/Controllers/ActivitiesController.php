@@ -7,6 +7,7 @@ use App\Models\Activity;
 use App\Models\Upload;
 use App\Models\User;
 use App\Transformers\ActivityTransformer;
+use Carbon\Carbon;
 
 class ActivitiesController extends Controller
 {
@@ -58,6 +59,25 @@ class ActivitiesController extends Controller
     {
         $currentUser = $this->user();
         $activities = $user->activities()->recent()->paginate(20);
+        $activities->each(function ($activity) use ($currentUser) {
+            $activity->setLiked($currentUser);
+            $activity->user->setFollowing($currentUser);
+        });
+        return $this->response->paginator($activities, new ActivityTransformer());
+    }
+
+    // 近一个月的热门微博：仅有设计师的
+    public function trending() {
+        // 加权：点赞数+评论数*2
+        $activities = Activity::select(\DB::raw('*, like_count + reply_count * 2 as weight'))
+                ->where('created_at', '>=', Carbon::now()->subMonths(1))
+                ->whereHas('user', function ($query) {
+                    $query->where('type', 'designer');
+                })
+                ->orderBy('weight', 'desc')
+                ->recent()
+                ->paginate(20);
+        $currentUser = $this->user();
         $activities->each(function ($activity) use ($currentUser) {
             $activity->setLiked($currentUser);
             $activity->user->setFollowing($currentUser);

@@ -76,6 +76,9 @@ $api->version('v1', [
     $api->get('activities/{activity}/replies', 'RepliesController@index')
         ->where('user', '[0-9]+')
         ->name('api.activities.replies.index');
+    // 热门动态
+    $api->get('activities/trending', 'ActivitiesController@trending')
+        ->name('api.activities.trending');
 
     /**
      * 关注列表相关
@@ -116,6 +119,9 @@ $api->version('v1', [
      */
     // 获取某个用户的作品集
     $api->get('users/{user}/works', 'WorksController@userIndex')
+        ->name('api.users.works.userIndex');
+    // 获取所有用户的作品集
+    $api->get('works', 'WorksController@index')
         ->name('api.users.works.userIndex');
 
     /**

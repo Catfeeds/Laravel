@@ -45,4 +45,14 @@ class WorksController extends Controller
         }
         return $this->response->paginator($works, new WorkTransformer());
     }
+
+    // 所有作品集
+    public function index() {
+        $works = Work::public()->recent()->paginate(20);
+        $currentUser = $this->user();
+        $works->each(function ($work) use ($currentUser) {
+            $work->user->setFollowing($currentUser);
+        });
+        return $this->response->paginator($works, new WorkTransformer());
+    }
 }

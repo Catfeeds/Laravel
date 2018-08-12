@@ -21,7 +21,8 @@ class WorkTransformer extends TransformerAbstract
             'description' => $work->description,
             'photo_urls'  => $work->photo_urls ?? [],
             'created_at'  => $work->created_at->toDateTimeString(),
-            'updated_at'  => $work->updated_at->toDateTimeString()
+            'updated_at'  => $work->updated_at->toDateTimeString(),
+            'user'        => (new UserTransformer())->transform($work->user)
         ];
     }
 }

@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
 //        $this->call(ReplySeeder::class);
 //        $this->call(ReviewSeeder::class);
         $this->call(ProjectSeeder::class);
+        $this->call(WorkSeeder::class);
     }
 }
