@@ -8,6 +8,11 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
+/**
+ * 自己发表在动态下的评论收到了他人的回复
+ * Class ReplyReplied
+ * @package App\Notifications
+ */
 class ReplyReplied extends Notification
 {
     use Queueable;
@@ -31,7 +36,9 @@ class ReplyReplied extends Notification
         return [
             'type' => 'reply_replied',
             'activity_id' => $activity->id,
+            'activity_content' => $activity->content,
             'reply_id' => $this->reply->id, // 收到的评论的id
+            'reply_content' => $this->reply->content, // 收到的评论内容
             'target_reply_id' => $this->reply->reply_id, // 被回复的评论的id
             'user_id' => $this->reply->user->id, // 发布评论的用户的信息
             'user_name' => $this->reply->user->name

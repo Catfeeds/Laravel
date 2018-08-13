@@ -8,9 +8,13 @@ use Illuminate\Http\Request;
 
 class NotificationsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $notifications = $this->user->notifications()->paginate(20);
+        if($request->type === 'unread') {
+            $notifications = $this->user->unreadNotifications()->paginate(20);
+        } else {
+            $notifications = $this->user->notifications()->paginate(20);
+        }
         return $this->response->paginator($notifications, new NotificationTransformer());
     }
 

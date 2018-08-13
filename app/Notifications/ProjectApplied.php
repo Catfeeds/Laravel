@@ -6,6 +6,11 @@ use App\Models\ProjectApplication;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
+/**
+ * 项目收到了新报名
+ * Class ProjectApplied
+ * @package App\Notifications
+ */
 class ProjectApplied extends Notification
 {
     use Queueable;
@@ -30,7 +35,9 @@ class ProjectApplied extends Notification
         return [
             'type' => 'project_applied',
             'project_id' => $project->id,
+            'project_title' => $project->title,
             'application_id' => $this->application->id, // 报名id
+            'application_remark' => $this->application->remark,
             'user_id' =>$designer->id, // 报名的设计师的信息
             'user_name' => $designer->name
         ];
