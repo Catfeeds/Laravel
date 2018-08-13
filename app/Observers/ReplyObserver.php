@@ -4,18 +4,23 @@ namespace App\Observers;
 
 use App\Models\Reply;
 use App\Notifications\ActivityReplied;
+use App\Notifications\ReplyReplied;
 
 class ReplyObserver
 {
-    // 每有一条评论创建成功后，动态评论数+1，通知用户
+    // 每有一条评论创建成功后，动态的评论数+1，通知用户
     public function created(Reply $reply)
     {
         $activity = $reply->activity;
         $activity->increment('reply_count');
 
-        // 如果评论的作者不是动态的作者，需要通知
+        // 通知动态的作者
         if (!$reply->user->isAuthorOf($activity)) {
             $activity->user->notify(new ActivityReplied($reply));
+        }
+        // 有可能是回复某条评论，还需要通知该评论的作者
+        if ($reply->targetReply && !$reply->targetReply->user->isAuthorOf($reply)) {
+            $reply->targetReply->user->notify(new ReplyReplied($reply));
         }
     }
 

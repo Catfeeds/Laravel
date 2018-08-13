@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Faker\Generator as Faker;
 
 $factory->define(\App\Models\Work::class, function (Faker $faker) {
@@ -16,6 +17,6 @@ $factory->define(\App\Models\Work::class, function (Faker $faker) {
         'user_id'     => $faker->randomElement(User::pluck('id')),
         'title'       => $faker->sentence,
         'description' => $faker->text,
-        'photo_urls'  => $faker->randomElements($photoUrls, 5)
+        'photo_urls'  => $faker->randomElements($photoUrls, 4)
     ];
 });

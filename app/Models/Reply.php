@@ -4,7 +4,7 @@ namespace App\Models;
 
 class Reply extends Model
 {
-    protected $with = ['user', 'replyee'];
+    protected $with = ['user', 'targetReply'];
 
     public function activity()
     {
@@ -16,7 +16,8 @@ class Reply extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function replyee(){
-        return $this->belongsTo(User::class);
+    // 回复了哪条评论
+    public function targetReply(){
+        return $this->belongsTo(Reply::class, 'reply_id' ,'id');
     }
 }

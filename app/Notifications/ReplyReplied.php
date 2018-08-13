@@ -5,8 +5,10 @@ namespace App\Notifications;
 use App\Models\Reply;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 
-class ActivityReplied extends Notification
+class ReplyReplied extends Notification
 {
     use Queueable;
 
@@ -27,9 +29,10 @@ class ActivityReplied extends Notification
 
         //存放在数据库里的数据
         return [
-            'type' => 'activity_replied',
+            'type' => 'reply_replied',
             'activity_id' => $activity->id,
             'reply_id' => $this->reply->id, // 收到的评论的id
+            'target_reply_id' => $this->reply->reply_id, // 被回复的评论的id
             'user_id' => $this->reply->user->id, // 发布评论的用户的信息
             'user_name' => $this->reply->user->name
         ];

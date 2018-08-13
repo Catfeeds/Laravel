@@ -22,14 +22,14 @@ class RepliesController extends Controller
         $reply->user_id = $currentUser->id;
         $reply->activity_id = $activity->id;
         $reply->reply_id = $request->reply_id;
-        $reply->replyee_id = $request->replyee_id;
         $reply->save();
         return $this->response->item($reply, new ReplyTransformer())
             ->setStatusCode(201);
     }
 
-    public function destroy(Activity $activity, Reply $reply) {
-        if($activity->id != $reply->activity_id) {
+    public function destroy(Activity $activity, Reply $reply)
+    {
+        if ($activity->id != $reply->activity_id) {
             $this->response->errorBadRequest();
         }
 
@@ -38,12 +38,14 @@ class RepliesController extends Controller
         return $this->response->noContent();
     }
 
-    public function index(Activity $activity) {
+    public function index(Activity $activity)
+    {
         $replies = $activity->replies()->recent()->paginate(10);
         return $this->response->paginator($replies, new ReplyTransformer());
     }
 
-    public function userIndex() {
+    public function userIndex()
+    {
         $replies = $this->user()->replies()->recent()->paginate(20);
         return $this->response->paginator($replies, new ReplyTransformer());
     }

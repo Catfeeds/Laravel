@@ -17,7 +17,6 @@ class CreateRepliesTable extends Migration
             $table->increments('id');
             $table->integer('activity_id')->unsigned()->default(0)->index();
             $table->integer('reply_id')->unsigner()->nullable()->index()->comment('被回复的评论的id');
-            $table->integer('replyee_id')->unsigner()->nullable()->index()->comment('被评论的人');
             $table->integer('user_id')->unsigned()->default(0)->index()->comment('发表评论的人');
             $table->string('content');
             $table->timestamps();

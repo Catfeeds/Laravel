@@ -26,7 +26,6 @@ class ReviewTransformer extends TransformerAbstract
             'reviewer_id'             => (int)$review->reviewer_id,
             'reviewer'                => (new UserTransformer())->transform($review->reviewer),
             'created_at'              => $review->created_at->toDateTimeString(),
-            'created_diff_for_humans' => $review->created_at->diffForHumans(),
             'updated_at'              => $review->updated_at->toDateTimeString()
         ];
     }
