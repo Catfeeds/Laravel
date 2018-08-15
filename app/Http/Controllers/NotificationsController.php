@@ -45,10 +45,10 @@ class NotificationsController extends Controller
         return $this->response->noContent();
     }
 
-    public function destroyAll() {
+    public function destroyAllRead() {
         $currentUser = $this->user();
         $currentUser->markAsRead(); // 删除之前先标记为已读
-        $currentUser->notifications()->delete();
+        $currentUser->readNotifications()->delete();
         return $this->response->noContent();
     }
 }

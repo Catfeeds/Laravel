@@ -245,9 +245,9 @@ $api->version('v1', [
         // 删除某条通知
         $api->delete('notifications/{notification}', 'NotificationsController@destroy')
             ->name('api.notifications.destroy');
-        // 删除所有通知
-        $api->delete('user/notifications', 'NotificationsController@destroyAll')
-            ->name('api.user.notifications.destroy');
+        // 删除所有已读通知
+        $api->delete('user/read/notifications', 'NotificationsController@destroyAllRead')
+            ->name('api.user.notifications.destroyRead');
 
         /**
          * 作品集相关
