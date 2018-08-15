@@ -8,6 +8,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AuthorizationRequest;
+use App\Transformers\CurrentUserTransformer;
 use App\Transformers\UserTransformer;
 use \Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -27,7 +28,7 @@ class AuthorizationsController extends Controller
         }
         JWTAuth::setToken($token);
         $user = JWTAuth::toUser($token);
-        return $this->response->item($user, new UserTransformer())
+        return $this->response->item($user, new CurrentUserTransformer())
             ->setMeta([
                 'token' => $token,
                 'token_type' => 'Bearer',

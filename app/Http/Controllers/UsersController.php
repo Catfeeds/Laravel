@@ -94,6 +94,7 @@ class UsersController extends Controller
         return $this->response->item($this->user(), new CurrentUserTransformer());
     }
 
+    // 某个用户
     public function index(User $user) {
         $user->setFollowing($this->user());
         return $this->response->item($user, new UserTransformer());
