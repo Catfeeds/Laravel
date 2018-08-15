@@ -31,9 +31,24 @@ class NotificationsController extends Controller
         return $this->response->noContent();
     }
 
-    public function readOne(Request $request)
+    public function readOne(Notification $notification)
     {
-        $this->user()->markOneAsRead($request->notification_id);
+        $this->authorize('update', $notification);
+        $this->user()->markOneAsRead($notification);
+        return $this->response->noContent();
+    }
+
+    public function destroy(Notification $notification) {
+        $this->authorize('destroy', $notification);
+        $this->user()->markOneAsRead($notification); // 删除之前先标记为已读
+        $notification->delete();
+        return $this->response->noContent();
+    }
+
+    public function destroyAll() {
+        $currentUser = $this->user();
+        $currentUser->markAsRead(); // 删除之前先标记为已读
+        $currentUser->notifications()->delete();
         return $this->response->noContent();
     }
 }

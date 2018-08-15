@@ -240,8 +240,14 @@ $api->version('v1', [
         $api->patch('user/read/notifications', 'NotificationsController@readAll')
             ->name('api.user.notifications.readAll');
         // 标记单个通知为已读
-        $api->put('user/read/notifications/{notification_id}', 'NotificationsController@readOne')
+        $api->put('user/read/notifications/{notification}', 'NotificationsController@readOne')
             ->name('api.user.notifications.readOne');
+        // 删除某条通知
+        $api->delete('notifications/{notification}', 'NotificationsController@destroy')
+            ->name('api.notifications.destroy');
+        // 删除所有通知
+        $api->delete('user/notifications', 'NotificationsController@destroyAll')
+            ->name('api.user.notifications.destroy');
 
         /**
          * 作品集相关

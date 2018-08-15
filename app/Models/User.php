@@ -5,7 +5,6 @@ namespace App\Models;
 use Auth;
 use Cmgmyr\Messenger\Traits\Messagable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -96,9 +95,8 @@ class User extends Authenticatable implements JWTSubject
         $this->unreadNotifications->markAsRead();
     }
 
-    public function markOneAsRead($notificationId)
+    public function markOneAsRead(Notification $notification)
     {
-        $notification = DatabaseNotification::find($notificationId);
         if ($notification->unread()) {
             $this->decrement('notification_count');
             $notification->markAsRead();
