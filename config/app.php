@@ -163,7 +163,10 @@ return [
         App\Providers\EasySmsServiceProvider::class,
         Propaganistas\LaravelPhone\PhoneServiceProvider::class,
 
-        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class
+        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+
+        // 站内信
+        Cmgmyr\Messenger\MessengerServiceProvider::class
     ],
 
     /*

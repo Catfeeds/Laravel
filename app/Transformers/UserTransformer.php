@@ -14,7 +14,6 @@ class UserTransformer extends TransformerAbstract
             'avatar_url' => (string)$user->avatar_url,
             'title' => (string)$user->title,
             'introduction' => (string)$user->introduction,
-            'notification_count' => (int)$user->notification_count,
             'following_count' => (int)$user->following_count,
             'follower_count' => (int)$user->follower_count,
             'following' => (boolean)$user->following,

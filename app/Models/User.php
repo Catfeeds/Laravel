@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Auth;
+use Cmgmyr\Messenger\Traits\Messagable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Notifiable;
@@ -13,6 +14,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject
 {
     use softDeletes;
+    use Messagable;
     use Notifiable {
         notify as protected laravelNotify;
     }
