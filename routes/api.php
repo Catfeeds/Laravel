@@ -27,15 +27,21 @@ $api->version('v1', [
     // 短信验证码
     $api->group([
         'middleware' => 'api.throttle',
-        'limit'      => 2,
+        'limit'      => 2, // 一分钟只能发送两条短信
         'expires'    => 1
     ], function ($api) {
         $api->post('verificationCode', 'VerificationCodesController@store')
             ->name('api.verificationCode.store');
     });
-    // 用户注册
-    $api->post('users', 'UsersController@store')
-        ->name('api.users.store');
+    $api->group([
+        'middleware' => 'api.throttle',
+        'limit'      => 5,
+        'expires'    => 1
+    ], function ($api) {
+        // 重置密码
+        $api->patch('users/reset', 'UserAuthsController@resetPassword')
+            ->name('api.users.resetPassword');
+    });
 
     /**
      * 登录认证相关
@@ -147,10 +153,10 @@ $api->version('v1', [
             'expires'    => 1
         ], function ($api) {
             // 修改密码
-            $api->patch('user/password', 'UserAuthController@changePassword')
+            $api->patch('user/password', 'UserAuthsController@changePassword')
                 ->name('api.user.password.update');
             // 修改手机号
-            $api->patch('user/phone', 'UserAuthController@changePhone')
+            $api->patch('user/phone', 'UserAuthsController@changePhone')
                 ->name('api.user.phone.update');
         });
 
