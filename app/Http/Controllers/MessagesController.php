@@ -31,7 +31,10 @@ class MessagesController extends Controller
         $threads->each(function ($thread) use ($currentUser) {
             $thread->setExtraAttributes($currentUser);
         });
-        return $this->response->paginator($threads, new ThreadTransformer());
+        return $this->response->paginator($threads, new ThreadTransformer())
+            ->addMeta('extra', [
+                'unread_count' => $currentUser->unreadMessagesCount()
+            ]);
     }
 
     // 给某个用户发送一条私信
@@ -114,7 +117,10 @@ class MessagesController extends Controller
         $messages = $thread->messages()->orderBy('id', 'desc')->paginate(20);
         return $this->response
             ->paginator($messages, new MessageTransformer())
-            ->addMeta('thread', (new ThreadTransformer())->transform($thread));
+            ->addMeta('thread', (new ThreadTransformer())->transform($thread))
+            ->addMeta('extra', [
+                'unread_count' => $currentUser->unreadMessagesCount()
+            ]);
     }
 
 }
