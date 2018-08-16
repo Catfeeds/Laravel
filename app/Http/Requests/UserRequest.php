@@ -12,7 +12,7 @@ class UserRequest extends FormRequest
                     'name' => ['between:1,200', 'regex:/^(?:[\x{4e00}-\x{9fa5}]+)(?:·[\x{4e00}-\x{9fa5}]+)*$|^[a-zA-Z0-9]+\s?[\.·\-()a-zA-Z]*[a-zA-Z]+$/u'],
                     'type' => 'required|string|in:designer,party',
                     'phone' => 'required|phone:CN',
-                    'password' => 'required|string|min:6',
+                    'password' => 'required|string|min:6|max:30',
                     'verification_code' => 'required|string'
                 ];
             case 'PATCH':

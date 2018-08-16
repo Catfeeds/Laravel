@@ -139,6 +139,19 @@ $api->version('v1', [
             ->name('api.user.update');
 
         /**
+         * 用户认证相关
+         */
+        // 修改密码
+        $api->group([
+            'middleware' => 'api.throttle',
+            'limit'      => 5,
+            'expires'    => 1
+        ], function ($api) {
+            $api->patch('user/password', 'UserAuthController@changePassword')
+                ->name('api.user.password.update');
+        });
+
+        /**
          * 关注相关
          */
         // 关注一名用户

@@ -44,9 +44,9 @@ class MessagesController extends Controller
 
         // 看之前有没有发送过私信
         $thread = Thread::whereHas('participants', function ($query) use ($currentUser) {
-            $query->where('id', $currentUser->id);
+            $query->where('user_id', $currentUser->id);
         })->whereHas('participants', function ($query) use ($request) {
-            $query->where('id', $request->to);
+            $query->where('user_id', $request->to);
         })->first();
 
         // 如果没有发送过私信，创建thread，关联用户
