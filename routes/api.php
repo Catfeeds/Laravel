@@ -141,14 +141,17 @@ $api->version('v1', [
         /**
          * 用户认证相关
          */
-        // 修改密码
         $api->group([
             'middleware' => 'api.throttle',
             'limit'      => 5,
             'expires'    => 1
         ], function ($api) {
+            // 修改密码
             $api->patch('user/password', 'UserAuthController@changePassword')
                 ->name('api.user.password.update');
+            // 修改手机号
+            $api->patch('user/phone', 'UserAuthController@changePhone')
+                ->name('api.user.phone.update');
         });
 
         /**

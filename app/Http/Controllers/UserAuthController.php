@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\ChangePhoneRequest;
+use App\Models\User;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class UserAuthController extends Controller
 {
@@ -15,6 +18,28 @@ class UserAuthController extends Controller
         }
         $currentUser->update([
             'password' => bcrypt($request->new_password)
+        ]);
+        return $this->response->noContent();
+    }
+
+    public function changePhone (ChangePhoneRequest $request) {
+        $verifyData = \Cache::get($request->phone);
+        if (!$verifyData) {
+            return $this->response->error(__('The validation code is expired'), 422);
+        }
+        if (!hash_equals($verifyData['code'], $request->code)) {
+            // 返回401
+            return $this->response->errorBadRequest(__('Wrong validation code'));
+        }
+        // 清除验证码缓存
+        \Cache::forget($request->phone);
+        // 检查是否被注册
+        if (User::where('phone', $request->phone)->first()) {
+            throw new ConflictHttpException(__('The phone number has been registered'));
+        }
+        // 更新手机号
+        $this->user()->update([
+            'phone' => $request->phone
         ]);
         return $this->response->noContent();
     }
