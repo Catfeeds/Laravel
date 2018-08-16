@@ -18,12 +18,14 @@ class Thread extends \Cmgmyr\Messenger\Models\Thread
         }
 
         if (!$participant->last_read) {
-            return $messages;
+            return $messages->filter(function ($message) use ($participant) {
+                return $message->user_id != $participant->user_id; // 添加这一行：自己发送的消息不算未读消息
+            });
         }
 
         return $messages->filter(function ($message) use ($participant) {
             return $message->updated_at->gt($participant->last_read) &&
-                $message->user_id != $participant->id; // 添加这一行：自己发送的消息不算未读消息
+                $message->user_id != $participant->user_id; // 添加这一行：自己发送的消息不算未读消息
         });
     }
 
