@@ -8,13 +8,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MessageRequest;
-use App\Models\User;
 use App\Transformers\MessageTransformer;
 use App\Transformers\ThreadTransformer;
 use Carbon\Carbon;
 use Cmgmyr\Messenger\Models\Message;
 use Cmgmyr\Messenger\Models\Participant;
-use Cmgmyr\Messenger\Models\Thread;
+use App\Models\Thread;
+use Illuminate\Http\Request;
 
 class MessagesController extends Controller
 {
@@ -29,14 +29,12 @@ class MessagesController extends Controller
         $currentUser = $this->user();
         $threads = Thread::forUser($currentUser->id)->latest('updated_at')->paginate(20);
         $threads->each(function ($thread) use ($currentUser) {
-            $thread->unread_count = $thread->userUnreadMessagesCount($currentUser->id);
-            $thread->participant = $thread->participants()->where('user_id', '!=', $currentUser->id)
-                ->first()->user;
+            $thread->setExtraAttributes($currentUser);
         });
         return $this->response->paginator($threads, new ThreadTransformer());
     }
 
-    // 发送一条私信
+    // 给某个用户发送一条私信
     public function store(MessageRequest $request)
     {
         $currentUser = $this->user();
@@ -57,14 +55,14 @@ class MessagesController extends Controller
             Participant::create([
                 'thread_id' => $thread->id,
                 'user_id'   => $currentUser->id,
-                'last_read' => new Carbon,
+//                'last_read' => new Carbon,
             ]);
             // Receiver
             $thread->addParticipant($request->to);
         } else {
-            Participant::where('user_id', $currentUser->id)
-                ->first()
-                ->update(['last_read' => new Carbon]);
+//            Participant::where('user_id', $currentUser->id)
+//                ->first()
+//                ->update(['last_read' => new Carbon]);
         }
 
         // Message
@@ -77,19 +75,46 @@ class MessagesController extends Controller
         return $this->response->item($message, new MessageTransformer());
     }
 
+    // 发送一条私信
+    public function storeByThreadId(Request $request, Thread $thread)
+    {
+        if (!is_string($request->body)) {
+            return $this->response->errorBadRequest('消息内容必须是字符串');
+        }
+
+        // 只有私信参与双方可以添加私信
+        $currentUser = $this->user();
+        if (!in_array($currentUser->id, $thread->participantsUserIds())) {
+            return $this->response->errorForbidden('不是私信参与双方');
+        }
+
+        $message = Message::create([
+            'thread_id' => $thread->id,
+            'user_id'   => $currentUser->id,
+            'body'      => $request->body,
+        ]);
+        Participant::where('user_id', $currentUser->id)
+            ->first()
+            ->update(['last_read' => new Carbon]);
+        return $this->response->item($message, new MessageTransformer());
+    }
+
     // 某个私信的消息列表
     public function threadIndex(Thread $thread)
     {
         $currentUser = $this->user();
 
         // 只有私信参与双方可以获取对话内容
-        if(!in_array($currentUser->id, $thread->participantsUserIds())) {
+        if (!in_array($currentUser->id, $thread->participantsUserIds())) {
             return $this->response->errorForbidden();
         }
 
         $thread->markAsRead($currentUser->id);
+        $thread->setExtraAttributes($currentUser);
         $messages = $thread->messages()->orderBy('id', 'desc')->paginate(20);
-        return $this->response->paginator($messages, new MessageTransformer());
+        return $this->response
+            ->paginator($messages, new MessageTransformer())
+            ->addMeta('thread', (new ThreadTransformer())->transform($thread));
     }
 
 }

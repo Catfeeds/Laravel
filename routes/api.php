@@ -268,11 +268,14 @@ $api->version('v1', [
         // 获取当前用户的私信列表
         $api->get('user/messages', 'MessagesController@index')
             ->name('api.user.messages.index');
-        // 发送一条私信
-        $api->post('user/messages', 'MessagesController@store')
-            ->name('api.user.messages.store');
         // 获取某个私信的消息列表
         $api->get('messages/{thread}', 'MessagesController@threadIndex')
             ->name('api.messages.threadIndex');
+        // 发送一条私信
+        $api->post('messages/{thread}', 'MessagesController@storeByThreadId')
+            ->name('api.messages.store');
+        // 给某个用户发送一条私信
+        $api->post('user/messages', 'MessagesController@store')
+            ->name('api.user.messages.store');
     });
 });

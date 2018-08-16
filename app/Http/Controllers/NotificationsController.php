@@ -45,10 +45,9 @@ class NotificationsController extends Controller
         return $this->response->noContent();
     }
 
+    // 删除所有已读通知
     public function destroyAllRead() {
-        $currentUser = $this->user();
-        $currentUser->markAsRead(); // 删除之前先标记为已读
-        $currentUser->readNotifications()->delete();
+        $this->user()->readNotifications()->delete();
         return $this->response->noContent();
     }
 }
