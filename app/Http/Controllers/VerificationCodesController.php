@@ -2,33 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\VerificationCodeRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Overtrue\EasySms\EasySms;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class VerificationCodesController extends Controller
 {
-    /**
-     * @param Request $request
-     * @param EasySms $easySms
-     * @throws \Overtrue\EasySms\Exceptions\InvalidArgumentException
-     */
-    public function store(Request $request, EasySms $easySms)
+    public function store(VerificationCodeRequest $request, EasySms $easySms)
     {
-        // 验证手机号
-        $this->validate($request, [
-            'phone' => 'required|phone:CN'
-        ], [
-            'phone' => '手机号格式不合法'
-        ]);
+        // 重置密码：
+        if ($request->type === 'resetPassword' && !User::where('phone', $request->phone)->exists()) {
+            return $this->response->errorNotFound(__('The phone number is not registered'));
+        } else if (User::where('phone', $request->phone)->exists()) {
+            return $this->response->errorNotFound(__('The phone number has been registered'));
+        }
 
         // 生成6位随机数，左侧补0
         $code = str_pad(random_int(1, 999999), 6, 0, STR_PAD_LEFT);
         $phone = $request->phone;
         try {
             $easySms->send($phone, [
-                'data'     => [
+                'data' => [
                     'code' => $code,
                     'time' => 10
                 ]
@@ -46,7 +41,7 @@ class VerificationCodesController extends Controller
         return $this->response->array([
             'expired_at' => $expiredAt->toDateTimeString(),
 //            'code'       => $code
-            'code' => 'xxxxxx'
+            'code'       => 'xxxxxx'
         ])->setStatusCode(201);
     }
 }
