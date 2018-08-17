@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\ActivateEmail;
 use Auth;
 use Cmgmyr\Messenger\Traits\Messagable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -102,6 +103,13 @@ class User extends Authenticatable implements JWTSubject
             $this->decrement('notification_count');
             $notification->markAsRead();
         }
+    }
+
+    public function sendActiveMail() {
+        $token = bcrypt($this->email.time());
+        $emailToken = EmailToken::firstOrCreate(['email' => $this->email]);
+        $emailToken->update([ 'token' => $token ]);
+        $this->laravelNotify(new ActivateEmail($token));
     }
 
     // 设置following属性：$user用户是否关注了此用户

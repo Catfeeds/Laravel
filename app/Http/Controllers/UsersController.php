@@ -52,8 +52,17 @@ class UsersController extends Controller
     {
         $user = $this->user();
         $attributes = $request->only(['name', 'title', 'introduction', 'company_name', 'id_number', 'registration_number']);
+
         if ($request->avatar_id) {
             $attributes['avatar_url'] = Upload::find($request->avatar_id)->path;
+        }
+
+        // 更改邮箱时，发送激活邮件
+        $needSendMail = false;
+        if($request->email && $request->email != $user->email) {
+            $attributes['email'] = $request->email;
+            $attributes['email_activated'] = false;
+            $needSendMail = true;
         }
 
         // 认证信息只能填写一次
@@ -78,17 +87,12 @@ class UsersController extends Controller
             }
             $attributes['id_card_url'] = Upload::find($request->id_card_id)->path;
         }
-        // 更改邮箱时，发送激活邮件
-        if($request->email && $request->email != $user->email) {
-            $attributes['email'] = $request->email;
-            $attributes['email_activated'] = false;
-            $needSendMail = true;
-        }
 
         $user->update($attributes);
 
+        // 发送激活邮件
         if($needSendMail) {
-            (new UserEmailController())->sendActiveMail($user);
+            $user->sendActiveMail();
         }
 
         return $this->response->item($user, new CurrentUserTransformer());

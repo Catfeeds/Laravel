@@ -18,7 +18,7 @@ class UserEmailController extends Controller
         if (!$user->email) {
             return $this->response->errorBadRequest(__('The user has not bound email yet'));
         }
-        $this->sendActiveMail($user);
+        $user->sendActiveMail();
         return $this->response->noContent();
     }
 
@@ -33,12 +33,5 @@ class UserEmailController extends Controller
         ]);
         $emailToken->delete(); // 删除使用过的token
         return '激活成功';
-    }
-
-    public function sendActiveMail(User $user) {
-        $token = bcrypt($user->email.time());
-        $emailToken = EmailToken::firstOrCreate(['email' => $user->email]);
-        $emailToken->update([ 'token' => $token ]);
-        $user->laravelNotify(new ActivateEmail($token));
     }
 }
