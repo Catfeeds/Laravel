@@ -60,6 +60,10 @@ class UsersController extends Controller
         // 更改邮箱时，发送激活邮件
         $needSendMail = false;
         if($request->email && $request->email != $user->email) {
+            // 检测是否重复
+            if(User::where('email', $request->email)->exists()) {
+                return $this->response->errorBadRequest(__('The email address has been bound'));
+            }
             $attributes['email'] = $request->email;
             $attributes['email_activated'] = false;
             $needSendMail = true;
