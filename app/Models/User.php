@@ -15,10 +15,11 @@ class User extends Authenticatable implements JWTSubject
     use softDeletes;
     use Messagable;
     use Notifiable {
-        notify as protected laravelNotify;
+        notify as public laravelNotify;
     }
 
     // 重写的主要目的是每次通知时通知数+1
+    // 这里要注意，发送邮件的时候不需要增加通知数，应该调用laravelNotify
     public function notify($instance)
     {
         // 不能自己通知自己

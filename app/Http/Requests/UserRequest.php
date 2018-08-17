@@ -20,6 +20,7 @@ class UserRequest extends FormRequest
                 return [
                     'name' => ['between:1,200', 'regex:/^(?:[\x{4e00}-\x{9fa5}]+)(?:·[\x{4e00}-\x{9fa5}]+)*$|^[a-zA-Z0-9]+\s?[\.·\-()a-zA-Z]*[a-zA-Z]+$/u'],
                     'title' => 'max:50',
+                    'email' => 'email',
                     'introduction' => 'max:200',
                     'company_name' => 'string',
                     'id_number' => 'string',

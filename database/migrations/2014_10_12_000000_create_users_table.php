@@ -18,6 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('name')->index();
             $table->string('phone')->unique();
             $table->string('email')->unique()->nullable();
+            $table->boolean('email_activated')->default(false);
             $table->string('password');
             $table->enum('type', ['party', 'designer', 'expert'])->comment('用户类型：party、designer、expert');
             $table->string('avatar_url')->nullable();

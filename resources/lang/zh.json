@@ -9,5 +9,6 @@
   "The project cannot be canceled": "该项目无法取消",
   "Has already applied for the project": "已报名该项目",
   "Can only set authentication information once": "认证信息只能设置一次，不能再次更改",
-  "Wrong original password": "原密码错误"
+  "Wrong original password": "原密码错误",
+  "The user has not bound email yet": "该用户还未绑定邮箱"
 }

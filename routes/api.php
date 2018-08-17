@@ -19,7 +19,7 @@ $api->version('v1', [
     'middleware' => ['serializer:array', 'bindings', 'change-locale']
 ], function ($api) {
     /**
-     * 注册相关
+     * 账号相关
      */
     // 检查手机号是否被注册
     $api->post('checkPhone/{phone}', 'UsersController@checkPhone')
@@ -39,12 +39,15 @@ $api->version('v1', [
         'expires'    => 1
     ], function ($api) {
         // 重置密码
-        $api->patch('users/reset', 'UserAuthsController@resetPassword')
+        $api->patch('users/reset', 'UserPasswordController@resetPassword')
             ->name('api.users.resetPassword');
     });
+    // 激活邮箱
+    $api->get('/activate_email', 'UserEmailController@activate')
+        ->name('api.user.email.activate');
 
     /**
-     * 登录认证相关
+     * Token相关
      */
     // 登录
     $api->post('authorizations', 'AuthorizationsController@store')
@@ -143,6 +146,9 @@ $api->version('v1', [
         // 编辑登录用户信息
         $api->patch('user', 'UsersController@update')
             ->name('api.user.update');
+        // 发送激活邮件
+        $api->post('user/mails', 'UserEmailController@send')
+            ->name('api.user.mails.send');
 
         /**
          * 用户认证相关
@@ -153,10 +159,10 @@ $api->version('v1', [
             'expires'    => 1
         ], function ($api) {
             // 修改密码
-            $api->patch('user/password', 'UserAuthsController@changePassword')
+            $api->patch('user/password', 'UserPasswordController@changePassword')
                 ->name('api.user.password.update');
             // 修改手机号
-            $api->patch('user/phone', 'UserAuthsController@changePhone')
+            $api->patch('user/phone', 'UserPasswordController@changePhone')
                 ->name('api.user.phone.update');
         });
 

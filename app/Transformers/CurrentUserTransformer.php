@@ -23,6 +23,7 @@ class CurrentUserTransformer extends TransformerAbstract
             // 隐私信息
             'phone' => (string)$user->phone,
             'email' => (string)$user->email,
+            'email_activated' => (boolean)$user->email_activated,
             'company_name' => (string)$user->company_name,
             'registration_number' => (string)$user->registration_number,
             'id_number' => (string)$user->id_number,

@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Handlers\VerificationCodeHandler;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ChangePhoneRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Models\User;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
-class UserAuthsController extends Controller
+/**
+ * 用户认证信息：密码、邮箱
+ * Class UserAuthsController
+ * @package App\Http\Controllers
+ */
+class UserPasswordController extends Controller
 {
     public function changePassword(ChangePasswordRequest $request) {
         $currentUser = $this->user();
@@ -23,21 +29,14 @@ class UserAuthsController extends Controller
         return $this->response->noContent();
     }
 
-    public function changePhone (ChangePhoneRequest $request) {
-        $verifyData = \Cache::get($request->phone);
-        if (!$verifyData) {
-            return $this->response->error(__('The validation code is expired'), 422);
-        }
-        if (!hash_equals($verifyData['code'], $request->code)) {
-            // 返回401
-            return $this->response->errorBadRequest(__('Wrong validation code'));
-        }
-        // 清除验证码缓存
-        \Cache::forget($request->phone);
+    public function changePhone (ChangePhoneRequest $request, VerificationCodeHandler $handler) {
         // 检查是否被注册
         if (User::where('phone', $request->phone)->first()) {
             throw new ConflictHttpException(__('The phone number has been registered'));
         }
+
+        $handler->validateCode($request->phone, $request->code);
+
         // 更新手机号
         $this->user()->update([
             'phone' => $request->phone
@@ -45,22 +44,13 @@ class UserAuthsController extends Controller
         return $this->response->noContent();
     }
 
-    public function resetPassword(ResetPasswordRequest $request) {
+    public function resetPassword(ResetPasswordRequest $request, VerificationCodeHandler $handler) {
         $user = User::where('phone', $request->phone)->first();
         if(!$user) {
             return $this->response->errorNotFound(__('The phone number is not registered'));
         }
 
-        $verifyData = \Cache::get($request->phone);
-        if (!$verifyData) {
-            return $this->response->error(__('The validation code is expired'), 422);
-        }
-        if (!hash_equals($verifyData['code'], $request->code)) {
-            // 返回401
-            return $this->response->errorBadRequest(__('Wrong validation code'));
-        }
-        // 清除验证码缓存
-        \Cache::forget($request->phone);
+        $handler->validateCode($request->phone, $request->code);
 
         $user->update([
             'password' => bcrypt($request->password)

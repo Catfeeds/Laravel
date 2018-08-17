@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Handlers\VerificationCodeHandler;
 use App\Http\Requests\UserRequest;
 use App\Models\Follow;
 use App\Models\Upload;
@@ -23,27 +24,21 @@ class UsersController extends Controller
         }
     }
 
-    public function store(UserRequest $request)
+    public function store(UserRequest $request, VerificationCodeHandler $handler)
     {
         if (User::where('phone', $request->phone)->first()) {
             throw new ConflictHttpException(__('The phone number has been registered'));
         }
-        $verifyData = \Cache::get($request->phone);
-        if (!$verifyData) {
-            return $this->response->error(__('The validation code is expired'), 422);
-        }
-        if (!hash_equals($verifyData['code'], $request->verification_code)) {
-            // 返回401
-            return $this->response->errorBadRequest(__('Wrong validation code'));
-        }
+
+        // 检验验证码
+        $handler->validateCode($request->phone, $request->code);
+
         $user = User::create([
             'name'     => $request->name,
             'type'     => $request->type,
             'phone'    => $request->phone,
             'password' => bcrypt($request->password),
         ]);
-        // 清除验证码缓存
-        \Cache::forget($request->phone);
         return $this->response->item($user, new CurrentUserTransformer())
             ->setMeta([
                 'token'      => \Auth::guard('api')->fromUser($user),
@@ -83,8 +78,19 @@ class UsersController extends Controller
             }
             $attributes['id_card_url'] = Upload::find($request->id_card_id)->path;
         }
+        // 更改邮箱时，发送激活邮件
+        if($request->email && $request->email != $user->email) {
+            $attributes['email'] = $request->email;
+            $attributes['email_activated'] = false;
+            $needSendMail = true;
+        }
 
         $user->update($attributes);
+
+        if($needSendMail) {
+            (new UserEmailController())->sendActiveMail($user);
+        }
+
         return $this->response->item($user, new CurrentUserTransformer());
     }
 
