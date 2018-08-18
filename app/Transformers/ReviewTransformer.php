@@ -17,11 +17,11 @@ class ReviewTransformer extends TransformerAbstract
     {
         return [
             'id'                      => $review->id,
-            'rate'                    => (integer)$review->rate,
+//            'rate'                    => (integer)$review->rate,
             'content'                 => (string)$review->content,
-            'additional_content'      => (string)$review->additional_content,
-            'order_id'                => (int)$review->user_id,
-            'requirement_id'          => (int)$review->user_id,
+//            'additional_content'      => (string)$review->additional_content,
+//            'order_id'                => (int)$review->user_id,
+//            'requirement_id'          => (int)$review->user_id,
             'user_id'                 => (int)$review->user_id,
             'reviewer_id'             => (int)$review->reviewer_id,
             'reviewer'                => (new UserTransformer())->transform($review->reviewer),

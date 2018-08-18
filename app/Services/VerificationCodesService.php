@@ -5,12 +5,12 @@
  * Time: 上午9:57
  */
 
-namespace App\Handlers;
+namespace App\Services;
 
 
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class VerificationCodeHandler
+class VerificationCodesService
 {
     /**
      * 检查验证码是否正确

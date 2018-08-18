@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Validation\ValidationException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,6 +17,7 @@ class AppServiceProvider extends ServiceProvider
         Carbon::setLocale('zh');
         \App\Models\Reply::observe(\App\Observers\ReplyObserver::class);
         \App\Models\ProjectApplication::observe(\App\Observers\ProjectApplicationObserver::class);
+        \App\Models\Invitation::observe(\App\Observers\InvitationObserver::class);
     }
 
     /**
@@ -31,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
             abort(404);
         });
         \API::error(function (\Illuminate\Auth\Access\AuthorizationException $exception) {
+            abort(403, $exception->getMessage());
+        });
+        \API::error(function (\Symfony\Component\Finder\Exception\AccessDeniedException $exception) {
             abort(403, $exception->getMessage());
         });
     }

@@ -15,13 +15,13 @@ class CreateReviewsTable extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('order_id')->unsigned()->default(0)->index();
-            $table->integer('requirement_id')->unsigned()->default(0)->index();
-            $table->integer('rate')->unsigned()->default(0)->comment('评分，1~5');
+//            $table->integer('order_id')->unsigned()->default(0)->index();
+//            $table->integer('requirement_id')->unsigned()->default(0)->index();
+//            $table->integer('rate')->unsigned()->default(0)->comment('评分，1~5');
             $table->integer('user_id')->unsigned()->default(0)->index()->comment('被评价的用户');
             $table->integer('reviewer_id')->unsigned()->default(0)->index()->comment('写评价的用户');
             $table->string('content')->comment('评价内容');
-            $table->string('additional_content')->nullable()->comment('追加评价');
+//            $table->string('additional_content')->nullable()->comment('追加评价');
             $table->timestamps();
             $table->softDeletes();
         });

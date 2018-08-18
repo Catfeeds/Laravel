@@ -13,10 +13,6 @@ class ProjectApplicationObserver
     {
         $party = $application->project->user;
         $party->notify(new ProjectAppliedViaDatabase($application));
-
-        // 甲方邮箱激活时才通知
-        if ($party->email_activated) {
-            $party->notify(new ProjectAppliedViaEmail($application));
-        }
+        $party->notifyViaEmail(new ProjectAppliedViaEmail($application));
     }
 }

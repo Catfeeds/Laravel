@@ -19,28 +19,7 @@ class User extends Authenticatable implements JWTSubject
         notify as public laravelNotify;
     }
 
-    // 重写的主要目的是每次通知时通知数+1
-    // 这里要注意，发送邮件的时候不需要增加通知数，应该调用laravelNotify
-    public function notify($instance)
-    {
-        // 不能自己通知自己
-        if ($this->id == Auth::id()) {
-            return;
-        }
-        $this->laravelNotify($instance);  // $instance 就是 Notifications\ActivityReplied 等对象
-        $this->increment('notification_count');
-    }
-
-    /**
-     * The attributes that are mass assignable.
-     * @var array
-     */
     protected $guarded = [];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     * @var array
-     */
     protected $hidden = [
         'password'
     ];
@@ -71,8 +50,51 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasManyThrough('App\Models\Activity', 'App\Models\Follow', 'follower_id', 'user_id', 'id', 'user_id');
     }
 
+    // 作品集
     public function works() {
         return $this->hasMany(Work::class);
+    }
+
+    // 发出的邀请
+    public function invitations() {
+        return $this->hasMany(Invitation::class);
+    }
+
+    // 收到的邀请
+    public function receivedInvitations() {
+        return $this->hasMany(Invitation::class, 'invited_user_id');
+    }
+
+    // 收到的评价
+    public function reviews(){
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * 发送数据库通知，每次通知时通知数+1
+     * 发送邮件的时候不需要增加通知数，应该调用notifyByEmail
+     * 数据库存的是其他用户对该用户的通知，如评论了动态等，因此这类通知不能自己通知自己
+     */
+    public function notify($instance)
+    {
+        // 不能自己通知自己
+        if ($this->id == Auth::id()) {
+            return;
+        }
+        $this->laravelNotify($instance);  // $instance 就是 Notifications\ActivityReplied 等对象
+        $this->increment('notification_count');
+    }
+
+    /**
+     * 发送邮件通知，相当于系统向该用户发送通知
+     * @param $instance
+     * @param bool $checkActivated 邮箱激活时才发送通知
+     */
+    public function notifyViaEmail($instance, $checkActivated = true) {
+        if ($checkActivated && !$this->email_activated) {
+            return;
+        }
+        $this->laravelNotify($instance);
     }
 
     public function getJWTIdentifier()
@@ -103,13 +125,6 @@ class User extends Authenticatable implements JWTSubject
             $this->decrement('notification_count');
             $notification->markAsRead();
         }
-    }
-
-    public function sendActiveMail() {
-        $token = bcrypt($this->email.time());
-        $emailToken = EmailToken::firstOrCreate(['email' => $this->email]);
-        $emailToken->update([ 'token' => $token ]);
-        $this->laravelNotify(new ActivateEmail($token));
     }
 
     // 设置following属性：$user用户是否关注了此用户

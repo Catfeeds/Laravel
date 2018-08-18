@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Handlers\VerificationCodeHandler;
+use App\Services\UserMailsService;
+use App\Services\VerificationCodesService;
 use App\Http\Requests\UserRequest;
 use App\Models\Follow;
 use App\Models\Upload;
@@ -24,14 +25,14 @@ class UsersController extends Controller
         }
     }
 
-    public function store(UserRequest $request, VerificationCodeHandler $handler)
+    public function store(UserRequest $request, VerificationCodesService $service)
     {
         if (User::where('phone', $request->phone)->first()) {
             throw new ConflictHttpException(__('The phone number has been registered'));
         }
 
         // 检验验证码
-        $handler->validateCode($request->phone, $request->code);
+        $service->validateCode($request->phone, $request->code);
 
         $user = User::create([
             'name'     => $request->name,
@@ -48,7 +49,7 @@ class UsersController extends Controller
             ->setStatusCode(201);
     }
 
-    public function update(UserRequest $request)
+    public function update(UserRequest $request, UserMailsService $mailsService)
     {
         $user = $this->user();
         $attributes = $request->only(['name', 'title', 'introduction', 'company_name', 'id_number', 'registration_number']);
@@ -96,7 +97,7 @@ class UsersController extends Controller
 
         // 发送激活邮件
         if($needSendMail) {
-            $user->sendActiveMail();
+            $mailsService->sendActivationMail($user);
         }
 
         return $this->response->item($user, new CurrentUserTransformer());

@@ -219,6 +219,20 @@ $api->version('v1', [
             ->name('api.user.replies.index');
 
         /**
+         * 评价相关
+         */
+        // 邀请一名用户评价
+        $api->post('user/reviews/users', 'UserReviewsController@invite');
+        // 评价一名用户
+        $api->post('users/{user}/reviews', 'UserReviewsController@store')
+            ->where('user', '[0-9]+')
+            ->name('api.users.reviews.store');
+        // 删除一条评价
+        $api->delete('reviews/{review}', 'UserReviewsController@destroy')
+            ->where('review', '[0-9]+')
+            ->name('api.reviews.destroy');
+
+        /**
          * 项目相关
          */
         // 发布项目

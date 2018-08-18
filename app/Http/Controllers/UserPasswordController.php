@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Handlers\VerificationCodeHandler;
+use App\Services\VerificationCodesService;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ChangePhoneRequest;
 use App\Http\Requests\ResetPasswordRequest;
@@ -29,13 +29,13 @@ class UserPasswordController extends Controller
         return $this->response->noContent();
     }
 
-    public function changePhone (ChangePhoneRequest $request, VerificationCodeHandler $handler) {
+    public function changePhone (ChangePhoneRequest $request, VerificationCodesService $service) {
         // 检查是否被注册
         if (User::where('phone', $request->phone)->first()) {
             throw new ConflictHttpException(__('The phone number has been registered'));
         }
 
-        $handler->validateCode($request->phone, $request->code);
+        $service->validateCode($request->phone, $request->code);
 
         // 更新手机号
         $this->user()->update([
@@ -44,13 +44,13 @@ class UserPasswordController extends Controller
         return $this->response->noContent();
     }
 
-    public function resetPassword(ResetPasswordRequest $request, VerificationCodeHandler $handler) {
+    public function resetPassword(ResetPasswordRequest $request, VerificationCodesService $service) {
         $user = User::where('phone', $request->phone)->first();
         if(!$user) {
             return $this->response->errorNotFound(__('The phone number is not registered'));
         }
 
-        $handler->validateCode($request->phone, $request->code);
+        $service->validateCode($request->phone, $request->code);
 
         $user->update([
             'password' => bcrypt($request->password)

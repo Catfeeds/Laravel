@@ -6,6 +6,7 @@ use App\Http\Requests\MailRequest;
 use App\Models\EmailToken;
 use App\Models\User;
 use App\Notifications\ActivateEmail;
+use App\Services\UserMailsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -13,12 +14,12 @@ use Illuminate\Notifications\Messages\MailMessage;
 class UserEmailController extends Controller
 {
     // 发送一封激活邮件
-    public function send() {
+    public function send(UserMailsService $mailsService) {
         $user = $this->user();
         if (!$user->email) {
             return $this->response->errorBadRequest(__('The user has not bound email yet'));
         }
-        $user->sendActiveMail();
+        $mailsService->sendActivationMail($user);
         return $this->response->noContent();
     }
 
