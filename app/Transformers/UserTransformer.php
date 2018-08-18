@@ -17,6 +17,7 @@ class UserTransformer extends TransformerAbstract
             'following_count' => (int)$user->following_count,
             'follower_count' => (int)$user->follower_count,
             'following' => (boolean)$user->following,
+            'invitation_status' => $user->invitation_status, // 这个属性不一定有
             'created_at' => $user->created_at->toDateTimeString(),
             'updated_at' => $user->updated_at->toDateTimeString(),
         ];

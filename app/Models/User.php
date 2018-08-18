@@ -140,4 +140,18 @@ class User extends Authenticatable implements JWTSubject
                 ->newPivotStatementForId($user)
                 ->value('follower_id') === $user;
     }
+
+    // 设置invitation_status属性：是否邀请评价、是否已经评价
+    public function setInvitationStatus($user) {
+        if (!$user) {
+            return $this->attributes['invitation_status'] = null;
+        }
+        if($this->receivedInvitations()->where('user_id', $user->id)->exists()) {
+            $this->attributes['invitation_status'] = 'inviting'; // 已邀请
+        } else if($user->reviews()->where('reviewer_id', $this->id)->exists()) {
+            $this->attributes['invitation_status'] = 'reviewed'; // 已评价
+        } else {
+            $this->attributes['invitation_status'] = null; // 未邀请
+        }
+    }
 }

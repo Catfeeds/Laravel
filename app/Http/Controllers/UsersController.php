@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Invitation;
 use App\Services\UserMailsService;
 use App\Services\VerificationCodesService;
 use App\Http\Requests\UserRequest;
@@ -192,13 +193,27 @@ class UsersController extends Controller
     public function search(Request $request) {
         $currentUser = $this->user();
         $query = User::where('name', 'like', "%$request->keyword%");
-        if($request->type) {
-            $query = $query->where('type', $request->type);
+
+        // 如果搜索用户是为了邀请用户评价，则不显示当前登录用户，并设置'invite_status'属性
+        if($request->is_inviting) {
+            if($currentUser) {
+                $query = $query->where('id', '!=', $currentUser->id);
+            }
+            $users = $query->paginate(20);
+            $users->each(function ($user) use ($currentUser) {
+                $user->setFollowing($currentUser);
+                $user->setInvitationStatus($currentUser);
+            });
         }
-        $users = $query->paginate(20);
-        $users->each(function ($user) use ($currentUser) {
-            $user->setFollowing($currentUser);
-        });
+        else {
+            if ($request->type) {
+                $query = $query->where('type', $request->type);
+            }
+            $users = $query->paginate(20);
+            $users->each(function ($user) use ($currentUser) {
+                $user->setFollowing($currentUser);
+            });
+        }
         return $this->response->paginator($users, new UserTransformer());
     }
 }

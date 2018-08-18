@@ -15,7 +15,7 @@ class UserReviewsController extends Controller
 {
     // 某个用户的评价列表
     public function index(User $user, Request $request) {
-        $reviews = $user->reviews()->recent()->paginate($request->per_page ?? 1);
+        $reviews = $user->reviews()->recent()->paginate($request->per_page ?? 20);
         return $this->response->paginator($reviews, new ReviewTransformer());
     }
 
