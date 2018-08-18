@@ -26,7 +26,7 @@ class UserEmailController extends Controller
     public function activate(Request $request) {
         $emailToken = EmailToken::where('token', $request->token)->first();
         if(!$emailToken || $emailToken->updated_at->addDay() < Carbon::now()) {
-            return 'token无效或已过期';
+            return '激活链接无效或已过期';
         }
         User::where('email', $emailToken->email)->update([
             'email_activated' => true

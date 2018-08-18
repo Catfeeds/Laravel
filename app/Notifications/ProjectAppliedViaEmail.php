@@ -13,7 +13,7 @@ use Illuminate\Notifications\Notification;
  * Class ProjectApplied
  * @package App\Notifications
  */
-class ProjectApplied extends Notification implements ShouldQueue
+class ProjectAppliedViaEmail extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -27,24 +27,7 @@ class ProjectApplied extends Notification implements ShouldQueue
     public function via($notifiable)
     {
         // 开启通知的频道
-        return ['database', 'mail'];
-    }
-
-    public function toDatabase($notifiable)
-    {
-        $project = $this->application->project;
-        $designer = $this->application->user;
-
-        //存放在数据库里的数据
-        return [
-            'type' => 'project_applied',
-            'project_id' => $project->id,
-            'project_title' => $project->title,
-            'application_id' => $this->application->id, // 报名id
-            'application_remark' => $this->application->remark,
-            'user_id' =>$designer->id, // 报名的设计师的信息
-            'user_name' => $designer->name
-        ];
+        return ['mail'];
     }
 
     public function toMail($notifiable)
