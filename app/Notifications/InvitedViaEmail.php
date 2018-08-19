@@ -6,6 +6,7 @@ use App\Models\Invitation;
 use App\Models\ProjectApplication;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Action;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -29,14 +30,16 @@ class InvitedViaEmail extends Notification implements ShouldQueue
 
     public function toMail($notifiable)
     {
+        // TODO 判断邀请类型
         $user = $this->invitation->user;
         return (new MailMessage)
             ->subject($user->name . ' 邀请您评价')
             ->greeting('您好！')
             ->line("$user->name 邀请您评价Ta，您的评价将展示在Ta的个人主页")
-            ->action('查看Ta的个人主页', url(env('APP_FRONT_URL') . "#/profile?uid=$user->id"))
             ->action('发表评价', url(env('APP_FRONT_URL') . "#/review/post?uid=$user->id"))
+            ->line('查看Ta的个人主页: ')
+            ->line(url(env('APP_FRONT_URL') . "#/profile?uid=$user->id"))
             ->line('（这是一封自动产生的邮件，请勿回复）')
-            ->salutation( null);
+            ->salutation(null);
     }
 }
