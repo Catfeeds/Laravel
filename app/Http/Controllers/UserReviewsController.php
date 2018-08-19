@@ -7,15 +7,19 @@ use App\Http\Requests\ReviewRequest;
 use App\Models\Invitation;
 use App\Models\Review;
 use App\Models\User;
-use App\Models\Work;
 use App\Transformers\ReviewTransformer;
+use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
 
 class UserReviewsController extends Controller
 {
     // 某个用户的评价列表
     public function index(User $user, Request $request) {
-        $reviews = $user->reviews()->recent()->paginate($request->per_page ?? 20);
+        if($request->type === 'posted') { // 发表的评价
+            $reviews = $user->postedReviews()->recent()->paginate($request->per_page ?? 20);
+        } else { // 收到的评价
+            $reviews = $user->reviews()->recent()->paginate($request->per_page ?? 20);
+        }
         return $this->response->paginator($reviews, new ReviewTransformer());
     }
 
@@ -71,5 +75,13 @@ class UserReviewsController extends Controller
         $this->authorize('destroy', $review);
         $review->delete();
         return $this->response->noContent();
+    }
+
+    // 当前登录用户对另一个用户的评价状态
+    public function status(Request $request) {
+        $user = User::findOrFail($request->uid);
+        $currentUser = $this->user();
+        $currentUser->setReviewStatus($user);
+        return $this->response->item($currentUser, new UserTransformer());
     }
 }

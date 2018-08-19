@@ -29,6 +29,6 @@ class ReviewPolicy
     public function destroy(User $user, Review $review)
     {
         // 只有被评价的人与发出评价的人可以删除
-        return  $user->isAuthorOf($review) || $user->id == $review->user->id;
+        return  $user->id == $review->user_id || $user->id == $review->reviewer_id;
     }
 }

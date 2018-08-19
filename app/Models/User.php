@@ -70,6 +70,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Review::class);
     }
 
+    // 发表的评价
+    public function postedReviews() {
+        return $this->hasMany(Review::class, 'reviewer_id');
+    }
+
     /**
      * 发送数据库通知，每次通知时通知数+1
      * 发送邮件的时候不需要增加通知数，应该调用notifyByEmail
@@ -141,17 +146,19 @@ class User extends Authenticatable implements JWTSubject
                 ->value('follower_id') === $user;
     }
 
-    // 设置invitation_status属性：是否邀请评价、是否已经评价
-    public function setInvitationStatus($user) {
+    // 设置review_status属性：此用户对另一个用户$user的评价状态
+    // inviting: $user邀请此用户评价
+    // reviewed: 此用户已经评价$user
+    public function setReviewStatus($user) {
         if (!$user) {
-            return $this->attributes['invitation_status'] = null;
+            return $this->attributes['review_status'] = null;
         }
         if($this->receivedInvitations()->where('user_id', $user->id)->exists()) {
-            $this->attributes['invitation_status'] = 'inviting'; // 已邀请
+            $this->attributes['review_status'] = 'inviting'; // 已邀请
         } else if($user->reviews()->where('reviewer_id', $this->id)->exists()) {
-            $this->attributes['invitation_status'] = 'reviewed'; // 已评价
+            $this->attributes['review_status'] = 'reviewed'; // 已评价
         } else {
-            $this->attributes['invitation_status'] = null; // 未邀请
+            $this->attributes['review_status'] = null; // 未邀请
         }
     }
 }

@@ -231,6 +231,9 @@ $api->version('v1', [
         $api->delete('reviews/{review}', 'UserReviewsController@destroy')
             ->where('review', '[0-9]+')
             ->name('api.reviews.destroy');
+        // 获取评价状态：是否评价了某个用户
+        $api->get('user/reviews/status', 'UserReviewsController@status')
+            ->name('api.user.reviews.status');
 
         /**
          * 项目相关

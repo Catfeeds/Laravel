@@ -61,9 +61,9 @@ class UsersController extends Controller
 
         // 更改邮箱时，发送激活邮件
         $needSendMail = false;
-        if($request->email && $request->email != $user->email) {
+        if ($request->email && $request->email != $user->email) {
             // 检测是否重复
-            if(User::where('email', $request->email)->exists()) {
+            if (User::where('email', $request->email)->exists()) {
                 return $this->response->errorBadRequest(__('The email address has been bound'));
             }
             $attributes['email'] = $request->email;
@@ -82,13 +82,13 @@ class UsersController extends Controller
             throw new BadRequestHttpException(__('Can only set authentication information once'));
         }
         if ($request->business_license_id) {
-            if($user->business_license_url) {
+            if ($user->business_license_url) {
                 throw new BadRequestHttpException(__('Can only set authentication information once'));
             }
             $attributes['business_license_url'] = Upload::find($request->business_license_id)->path;
         }
         if ($request->id_card_id) {
-            if($user->id_card_url) {
+            if ($user->id_card_url) {
                 throw new BadRequestHttpException(__('Can only set authentication information once'));
             }
             $attributes['id_card_url'] = Upload::find($request->id_card_id)->path;
@@ -97,7 +97,7 @@ class UsersController extends Controller
         $user->update($attributes);
 
         // 发送激活邮件
-        if($needSendMail) {
+        if ($needSendMail) {
             $mailsService->sendActivationMail($user);
         }
 
@@ -111,7 +111,8 @@ class UsersController extends Controller
     }
 
     // 某个用户
-    public function index(User $user) {
+    public function index(User $user)
+    {
         $user->setFollowing($this->user());
         return $this->response->item($user, new UserTransformer());
     }
@@ -152,7 +153,7 @@ class UsersController extends Controller
     {
         $currentUser = $this->user();
         $query = $user->followings();
-        if($request->type) {
+        if ($request->type) {
             $query = $query->where('type', $request->type);
         }
         $users = $query->paginate(20);
@@ -167,7 +168,7 @@ class UsersController extends Controller
     {
         $currentUser = $this->user();
         $query = $user->followers();
-        if($request->type) {
+        if ($request->type) {
             $query = $query->where('type', $request->type);
         }
         $users = $query->paginate(20);
@@ -190,30 +191,41 @@ class UsersController extends Controller
         return $this->response->collection($users, new UserTransformer());
     }
 
-    public function search(Request $request) {
+    public function search(Request $request)
+    {
+        if($request->invite_to_review) {
+            return $this->searchToInviteReview($request);
+        }
+
         $currentUser = $this->user();
         $query = User::where('name', 'like', "%$request->keyword%");
 
-        // 如果搜索用户是为了邀请用户评价，则不显示当前登录用户，并设置'invite_status'属性
-        if($request->is_inviting) {
-            if($currentUser) {
-                $query = $query->where('id', '!=', $currentUser->id);
-            }
-            $users = $query->paginate(20);
-            $users->each(function ($user) use ($currentUser) {
-                $user->setFollowing($currentUser);
-                $user->setInvitationStatus($currentUser);
-            });
+        if ($request->type) {
+            $query = $query->where('type', $request->type);
         }
-        else {
-            if ($request->type) {
-                $query = $query->where('type', $request->type);
-            }
-            $users = $query->paginate(20);
-            $users->each(function ($user) use ($currentUser) {
-                $user->setFollowing($currentUser);
-            });
+        $users = $query->paginate(20);
+        $users->each(function ($user) use ($currentUser) {
+            $user->setFollowing($currentUser);
+        });
+
+        return $this->response->paginator($users, new UserTransformer());
+    }
+
+    // 如果搜索用户是为了邀请用户评价，则不显示当前登录用户，并设置'review_status'属性
+    public function searchToInviteReview(Request $request)
+    {
+        $currentUser = $this->user();
+        $query = User::where('name', 'like', "%$request->keyword%");
+
+        if ($currentUser) {
+            $query = $query->where('id', '!=', $currentUser->id);
         }
+        $users = $query->paginate(20);
+        $users->each(function ($user) use ($currentUser) {
+            $user->setFollowing($currentUser);
+            $user->setReviewStatus($currentUser);
+        });
+
         return $this->response->paginator($users, new UserTransformer());
     }
 }

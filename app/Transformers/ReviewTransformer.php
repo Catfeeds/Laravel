@@ -13,20 +13,25 @@ use League\Fractal\TransformerAbstract;
 
 class ReviewTransformer extends TransformerAbstract
 {
+    protected $availableIncludes = ['user', 'reviewer'];
+
     public function transform(Review $review)
     {
         return [
             'id'                      => $review->id,
-//            'rate'                    => (integer)$review->rate,
             'content'                 => (string)$review->content,
-//            'additional_content'      => (string)$review->additional_content,
-//            'order_id'                => (int)$review->user_id,
-//            'requirement_id'          => (int)$review->user_id,
             'user_id'                 => (int)$review->user_id,
             'reviewer_id'             => (int)$review->reviewer_id,
-            'reviewer'                => (new UserTransformer())->transform($review->reviewer),
             'created_at'              => $review->created_at->toDateTimeString(),
             'updated_at'              => $review->updated_at->toDateTimeString()
         ];
+    }
+
+    public function includeUser(Review $review) {
+        return $this->item($review->user, new UserTransformer());
+    }
+
+    public function includeReviewer(Review $review) {
+        return $this->item($review->reviewer, new UserTransformer());
     }
 }

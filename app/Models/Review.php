@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Review extends Model
 {
     use softDeletes;
-    protected $with=['reviewer'];
+//    protected $with=['reviewer'];
 
     // 被评价的人
     public function user(){
