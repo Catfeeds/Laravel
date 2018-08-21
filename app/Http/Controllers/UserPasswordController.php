@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\UsersService;
 use App\Services\VerificationCodesService;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ChangePhoneRequest;
@@ -18,9 +19,11 @@ class UserPasswordController extends Controller
 {
     public function changePassword(ChangePasswordRequest $request) {
         $currentUser = $this->user();
-        $credentials['phone'] = $currentUser->phone;
-        $credentials['password'] = $request->password;
-        if (!\Auth::guard('api')->attempt($credentials)) {
+        if (!\Auth::guard('api')->attempt([
+            'phone' => $currentUser->phone,
+            'type' => $currentUser->type,
+            'password' => $request->password
+        ])) {
             return $this->response->errorBadRequest(__('Wrong original password'));
         }
         $currentUser->update([
@@ -29,23 +32,29 @@ class UserPasswordController extends Controller
         return $this->response->noContent();
     }
 
-    public function changePhone (ChangePhoneRequest $request, VerificationCodesService $service) {
+    public function changePhone (ChangePhoneRequest $request, VerificationCodesService $service, UsersService $usersService) {
+        $currentUser =  $this->user();
+
         // 检查是否被注册
-        if (User::where('phone', $request->phone)->first()) {
+        if ($usersService->isPhoneRegistered($request->phone, $currentUser->type)) {
             throw new ConflictHttpException(__('The phone number has been registered'));
         }
 
         $service->validateCode($request->phone, $request->code);
 
         // 更新手机号
-        $this->user()->update([
+        $currentUser->update([
             'phone' => $request->phone
         ]);
         return $this->response->noContent();
     }
 
     public function resetPassword(ResetPasswordRequest $request, VerificationCodesService $service) {
-        $user = User::where('phone', $request->phone)->first();
+        $user = User::where([
+            'phone' => $request->phone,
+            'type' => $request->type
+        ])->first();
+
         if(!$user) {
             return $this->response->errorNotFound(__('The phone number is not registered'));
         }

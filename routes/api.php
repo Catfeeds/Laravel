@@ -22,7 +22,7 @@ $api->version('v1', [
      * 账号相关
      */
     // 检查手机号是否被注册
-    $api->post('checkPhone/{phone}', 'UsersController@checkPhone')
+    $api->post('users/check', 'UsersController@checkPhone')
         ->name('api.users.checkPhone');
     // 短信验证码
     $api->group([
@@ -45,6 +45,9 @@ $api->version('v1', [
     // 激活邮箱
     $api->get('/activate_email', 'UserEmailController@activate')
         ->name('api.user.email.activate');
+    // 注册账号
+    $api->post('users', 'UsersController@store')
+        ->name('api.users.store');
 
     /**
      * Token相关

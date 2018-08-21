@@ -4,18 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\VerificationCodeRequest;
 use App\Models\User;
+use App\Services\UsersService;
 use Illuminate\Http\Request;
 use Overtrue\EasySms\EasySms;
 
 class VerificationCodesController extends Controller
 {
-    public function store(VerificationCodeRequest $request, EasySms $easySms)
+    public function store(VerificationCodeRequest $request, EasySms $easySms, UsersService $service)
     {
+        $isRegistered = $service->isPhoneRegistered($request->phone, $request->user_type);
+
         // 重置密码：
-        if ($request->type === 'resetPassword' && !User::where('phone', $request->phone)->exists()) {
-            return $this->response->errorNotFound(__('The phone number is not registered'));
-        } else if (User::where('phone', $request->phone)->exists()) {
-            return $this->response->errorNotFound(__('The phone number has been registered'));
+        if ($request->action_type === 'resetPassword') {
+            if (!$isRegistered) {
+                return $this->response->errorNotFound(__('The phone number is not registered'));
+            }
+        } else if ($isRegistered) {
+            return $this->response->error(__('The phone number has been registered'), 409);
         }
 
         // 生成6位随机数，左侧补0
@@ -30,7 +35,7 @@ class VerificationCodesController extends Controller
             ]);
         } catch (\Overtrue\EasySms\Exceptions\NoGatewayAvailableException $exception) {
             $message = $exception->getException('submail')->getMessage(); // submail的错误信息
-            return $this->response->errorInternal('发送短信失败');
+            return $this->response->errorInternal('发送短信失败: ' . $message);
         }
 
         // 缓存验证码，10分钟过期

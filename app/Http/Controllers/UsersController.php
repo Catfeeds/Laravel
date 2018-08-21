@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Invitation;
+use App\Http\Requests\CheckPhoneRequest;
 use App\Services\UserMailsService;
+use App\Services\UsersService;
 use App\Services\VerificationCodesService;
 use App\Http\Requests\UserRequest;
 use App\Models\Follow;
@@ -17,23 +18,23 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class UsersController extends Controller
 {
-    public function checkPhone(Request $request)
+    // 检查手机号是否被注册
+    public function checkPhone(CheckPhoneRequest $request, UsersService $service)
     {
-        if (User::where('phone', $request->phone)->first()) {
+        if($service->isPhoneRegistered($request->phone, $request->type)) {
             throw new ConflictHttpException(__('The phone number has been registered'));
-        } else {
-            return $this->response->noContent();
         }
+        return $this->response->noContent();
     }
 
-    public function store(UserRequest $request, VerificationCodesService $service)
+    public function store(UserRequest $request, VerificationCodesService $service, UsersService $usersService)
     {
-        if (User::where('phone', $request->phone)->first()) {
+        if($usersService->isPhoneRegistered($request->phone, $request->type)) {
             throw new ConflictHttpException(__('The phone number has been registered'));
         }
 
         // 检验验证码
-        $service->validateCode($request->phone, $request->code);
+        $service->validateCode($request->phone, $request->verification_code);
 
         $user = User::create([
             'name'     => $request->name,

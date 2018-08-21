@@ -8,7 +8,8 @@ class AuthorizationRequest extends FormRequest
     {
         return [
             'phone' => 'required|phone:CN',
-            'password' => 'required|string'
+            'password' => 'required|string',
+            'type' => 'required|string|in:designer,party'
         ];
     }
 }

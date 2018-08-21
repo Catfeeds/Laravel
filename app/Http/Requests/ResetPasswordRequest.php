@@ -8,6 +8,7 @@ class ResetPasswordRequest extends FormRequest
     {
         return [
             'phone' => 'required|phone:CN',
+            'type' => 'required|in:designer,party',
             'code' => 'required|size:6',
             'password' => 'required|string'
         ];

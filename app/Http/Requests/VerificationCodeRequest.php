@@ -8,7 +8,8 @@ class VerificationCodeRequest extends FormRequest
     {
         return [
             'phone' => 'required|phone:CN',
-            'type'  => 'required|in:register,resetPassword,changePhone'
+            'user_type' => 'required|in:party,designer',
+            'action_type'  => 'required|in:register,resetPassword,changePhone'
         ];
     }
 

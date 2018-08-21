@@ -15,10 +15,11 @@ use App\Notifications\ActivateEmail;
 class UserMailsService
 {
     // 发送激活邮件
-    public function sendActivationMail(User $user) {
-        $token = bcrypt($user->email.time());
+    public function sendActivationMail(User $user)
+    {
+        $token = bcrypt($user->email . time());
         $emailToken = EmailToken::firstOrCreate(['email' => $user->email]);
-        $emailToken->update([ 'token' => $token ]);
+        $emailToken->update(['token' => $token]);
         $user->notifyViaEmail(new ActivateEmail($token), false);
     }
 }

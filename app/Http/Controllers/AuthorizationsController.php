@@ -21,8 +21,7 @@ class AuthorizationsController extends Controller
 //            $credentials['email'] = $username :
 //            $credentials['phone'] = $username;
 
-        $credentials['phone'] = $request->phone;
-        $credentials['password'] = $request->password;
+        $credentials = $request->only(['phone', 'password', 'type']);
         if (!$token = \Auth::guard('api')->attempt($credentials)) {
             return $this->response->errorBadRequest(__('Wrong phone number or password'));
         }

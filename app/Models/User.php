@@ -132,7 +132,7 @@ class User extends Authenticatable implements JWTSubject
         }
     }
 
-    // 设置following属性：$user用户是否关注了此用户
+    // 设置following属性：当前登录用户$user是否关注了此用户
     public function setFollowing($user)
     {
         if ($user instanceof User) {
@@ -146,7 +146,7 @@ class User extends Authenticatable implements JWTSubject
                 ->value('follower_id') === $user;
     }
 
-    // 设置review_status属性：此用户对另一个用户$user的评价状态
+    // 设置review_status属性：此用户对当前登录用户$user的评价状态
     // inviting: $user邀请此用户评价
     // reviewed: 此用户已经评价$user
     public function setReviewStatus($user) {
@@ -160,5 +160,11 @@ class User extends Authenticatable implements JWTSubject
         } else {
             $this->attributes['review_status'] = null; // 未邀请
         }
+    }
+
+    // 一次性设置所有的额外属性
+    public function setExtraAttributes($user) {
+        $this->setFollowing($user);
+        $this->setReviewStatus($user);
     }
 }

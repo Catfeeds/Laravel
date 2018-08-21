@@ -35,12 +35,6 @@ class Project extends Model
         return $this->hasMany(ProjectFavorite::class);
     }
 
-    // 一次性设置所有的额外属性
-    public function setExtraAttributes($user) {
-        $this->setApplying($user);
-        $this->setFavoriting($user);
-    }
-
     // 用户是否报名了该项目
     public function setApplying($user)
     {
@@ -67,5 +61,11 @@ class Project extends Model
         $this->attributes['favoriting'] = $this->favoriteUser()
             ->where('user_id', $user)
             ->exists();
+    }
+
+    // 一次性设置所有的额外属性
+    public function setExtraAttributes($user) {
+        $this->setApplying($user);
+        $this->setFavoriting($user);
     }
 }
