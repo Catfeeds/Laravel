@@ -11,7 +11,7 @@ class UserSeeder extends Seeder
     public function run()
     {
         \App\Models\User::insert([
-            'name'            => 'Zhu',
+            'name'            => '甲方Zhu',
             'phone'           => '15650753237',
             'type'            => 'party',
             'email'           => 'zhukaihaorj@163.com',
@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
             'updated_at'      => now()
         ]);
         \App\Models\User::insert([
-            'name'            => 'Zhu222',
+            'name'            => '设计师Zhu',
             'phone'           => '15650753236',
             'type'            => 'designer',
             'email'           => 'm15650753237@163.com',

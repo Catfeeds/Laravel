@@ -27,7 +27,7 @@ $api->version('v1', [
     // 短信验证码
     $api->group([
         'middleware' => 'api.throttle',
-        'limit'      => 2, // 一分钟只能发送两条短信
+        'limit'      => 5, // 一分钟只能发送两条短信
         'expires'    => 1
     ], function ($api) {
         $api->post('verificationCode', 'VerificationCodesController@store')
