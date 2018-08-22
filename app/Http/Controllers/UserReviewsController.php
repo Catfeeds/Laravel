@@ -32,12 +32,12 @@ class UserReviewsController extends Controller
             ->where('invited_user_id', $request->invited_user_id)
             ->toReview()
             ->exists()) {
-            return $this->response->errorBadRequest(__('Cannot repeat invitation'));
+            return $this->response->errorBadRequest(__('不能重复邀请'));
         }
         if($user->reviews()
             ->where('reviewer_id', $request->invited_user_id)
             ->exists()) {
-            return $this->response->errorBadRequest(__('Cannot repeat invitation'));
+            return $this->response->errorBadRequest(__('不能重复邀请'));
         }
 
         Invitation::create([

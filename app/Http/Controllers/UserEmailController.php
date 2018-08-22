@@ -17,7 +17,7 @@ class UserEmailController extends Controller
     public function send(UserMailsService $mailsService) {
         $user = $this->user();
         if (!$user->email) {
-            return $this->response->errorBadRequest(__('The user has not bound email yet'));
+            return $this->response->errorBadRequest(__('该用户还未绑定邮箱'));
         }
         $mailsService->sendActivationMail($user);
         return $this->response->noContent();

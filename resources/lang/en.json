@@ -1,0 +1,17 @@
+{
+  "该手机号未注册": "The phone number is not registered",
+  "该手机号已被注册": "The phone number has been registered",
+  "验证码错误": "Wrong validation code",
+  "验证码已失效": "The validation code is expired",
+  "用户名或密码错误": "Wrong phone number or password",
+  "每个项目只能补充一次": "Allow only supplement the project once",
+  "该项目无法取消": "The project cannot be canceled",
+  "已报名该项目": "Has already applied for the project",
+  "认证信息只能设置一次，不能再次更改": "Can only set authentication information once",
+  "原密码错误": "Wrong original password",
+  "该用户还未绑定邮箱": "The user has not bound email yet",
+  "该邮箱已被绑定": "The email address has been bound",
+  "不能重复邀请": "Cannot repeat invitation",
+  "未收到邀请": "Not invited",
+  "已发表过评价": "Already reviewed"
+}

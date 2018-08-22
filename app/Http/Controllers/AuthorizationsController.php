@@ -23,7 +23,7 @@ class AuthorizationsController extends Controller
 
         $credentials = $request->only(['phone', 'password', 'type']);
         if (!$token = \Auth::guard('api')->attempt($credentials)) {
-            return $this->response->errorBadRequest(__('Wrong phone number or password'));
+            return $this->response->errorBadRequest(__('用户名或密码错误'));
         }
         JWTAuth::setToken($token);
         $user = JWTAuth::toUser($token);

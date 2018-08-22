@@ -17,10 +17,10 @@ class VerificationCodesController extends Controller
         // 重置密码：
         if ($request->action_type === 'resetPassword') {
             if (!$isRegistered) {
-                return $this->response->errorNotFound(__('The phone number is not registered'));
+                return $this->response->errorNotFound(__('该手机号未注册'));
             }
         } else if ($isRegistered) {
-            return $this->response->error(__('The phone number has been registered'), 409);
+            return $this->response->error(__('该手机号已被注册'), 409);
         }
 
         // 生成6位随机数，左侧补0

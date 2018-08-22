@@ -21,11 +21,11 @@ class VerificationCodesService
     public function validateCode($phone, $code) {
         $verifyData = \Cache::get($phone);
         if (!$verifyData) {
-            throw new BadRequestHttpException(__('The validation code is expired'));
+            throw new BadRequestHttpException(__('验证码已失效'));
         }
         if (!hash_equals($verifyData['code'], $code)) {
             // 返回400
-            throw new BadRequestHttpException(__('Wrong validation code'));
+            throw new BadRequestHttpException(__('验证码错误'));
         }
         // 清除验证码缓存
         \Cache::forget($phone);

@@ -20,7 +20,7 @@ class ProjectApplicationsController extends Controller
             'project_id' => $project->id,
             'user_id'    => $currentUser->id
         ])->exists()) {
-            throw new ConflictHttpException(__('Has already applied for the project'));
+            throw new ConflictHttpException(__('已报名该项目'));
         } else {
             $projectApplication->user_id = $currentUser->id;
             $projectApplication->project_id = $project->id;

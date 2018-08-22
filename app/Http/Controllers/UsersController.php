@@ -22,7 +22,7 @@ class UsersController extends Controller
     public function checkPhone(CheckPhoneRequest $request, UsersService $service)
     {
         if($service->isPhoneRegistered($request->phone, $request->type)) {
-            throw new ConflictHttpException(__('The phone number has been registered'));
+            throw new ConflictHttpException(__('该手机号已被注册'));
         }
         return $this->response->noContent();
     }
@@ -30,7 +30,7 @@ class UsersController extends Controller
     public function store(UserRequest $request, VerificationCodesService $service, UsersService $usersService)
     {
         if($usersService->isPhoneRegistered($request->phone, $request->type)) {
-            throw new ConflictHttpException(__('The phone number has been registered'));
+            throw new ConflictHttpException(__('该手机号已被注册'));
         }
 
         // 检验验证码
@@ -65,7 +65,7 @@ class UsersController extends Controller
         if ($request->email && $request->email != $user->email) {
             // 检测是否重复
             if (User::where('email', $request->email)->exists()) {
-                return $this->response->errorBadRequest(__('The email address has been bound'));
+                return $this->response->errorBadRequest(__('该邮箱已被绑定'));
             }
             $attributes['email'] = $request->email;
             $attributes['email_activated'] = false;
@@ -74,23 +74,23 @@ class UsersController extends Controller
 
         // 认证信息只能填写一次
         if ($request->company_name && $user->company_name) {
-            throw new BadRequestHttpException(__('Can only set authentication information once'));
+            throw new BadRequestHttpException(__('认证信息只能设置一次，不能再次更改'));
         }
         if ($request->registration_number && $user->registration_number) {
-            throw new BadRequestHttpException(__('Can only set authentication information once'));
+            throw new BadRequestHttpException(__('认证信息只能设置一次，不能再次更改'));
         }
         if ($request->id_number && $user->id_number) {
-            throw new BadRequestHttpException(__('Can only set authentication information once'));
+            throw new BadRequestHttpException(__('认证信息只能设置一次，不能再次更改'));
         }
         if ($request->business_license_id) {
             if ($user->business_license_url) {
-                throw new BadRequestHttpException(__('Can only set authentication information once'));
+                throw new BadRequestHttpException(__('认证信息只能设置一次，不能再次更改'));
             }
             $attributes['business_license_url'] = Upload::find($request->business_license_id)->path;
         }
         if ($request->id_card_id) {
             if ($user->id_card_url) {
-                throw new BadRequestHttpException(__('Can only set authentication information once'));
+                throw new BadRequestHttpException(__('认证信息只能设置一次，不能再次更改'));
             }
             $attributes['id_card_url'] = Upload::find($request->id_card_id)->path;
         }

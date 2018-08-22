@@ -24,7 +24,7 @@ class UserPasswordController extends Controller
             'type' => $currentUser->type,
             'password' => $request->password
         ])) {
-            return $this->response->errorBadRequest(__('Wrong original password'));
+            return $this->response->errorBadRequest(__('原密码错误'));
         }
         $currentUser->update([
             'password' => bcrypt($request->new_password)
@@ -37,7 +37,7 @@ class UserPasswordController extends Controller
 
         // 检查是否被注册
         if ($usersService->isPhoneRegistered($request->phone, $currentUser->type)) {
-            throw new ConflictHttpException(__('The phone number has been registered'));
+            throw new ConflictHttpException(__('该手机号已被注册'));
         }
 
         $service->validateCode($request->phone, $request->code);
@@ -56,7 +56,7 @@ class UserPasswordController extends Controller
         ])->first();
 
         if(!$user) {
-            return $this->response->errorNotFound(__('The phone number is not registered'));
+            return $this->response->errorNotFound(__('该手机号未注册'));
         }
 
         $service->validateCode($request->phone, $request->code);

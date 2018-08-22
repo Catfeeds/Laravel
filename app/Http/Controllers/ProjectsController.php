@@ -50,7 +50,7 @@ class ProjectsController extends Controller
     {
         $this->authorize('update', $project);
         if ($project->supplement_at) {
-            $this->response->errorBadRequest(__('Allow only supplement the project once'));
+            $this->response->errorBadRequest(__('每个项目只能补充一次'));
         }
         $project->supplement_description = $request->supplement_description;
         if ($request->supplement_file_id) {
@@ -70,7 +70,7 @@ class ProjectsController extends Controller
             return $this->response->noContent();
         }
         if ($project->status !== Project::STATUS_TENDERING) {
-            return $this->response->errorBadRequest(__('The project cannot be canceled'));
+            return $this->response->errorBadRequest(__('该项目无法取消'));
         }
         $project->status = Project::STATUS_CANCELED;
         $project->canceled_at = Carbon::now()->toDateTimeString();

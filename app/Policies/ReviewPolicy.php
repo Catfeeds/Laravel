@@ -18,10 +18,10 @@ class ReviewPolicy
             ->toReview()
             ->exists();
         if($reviewed) {
-            throw new AccessDeniedException(__('Already reviewed'));
+            throw new AccessDeniedException(__('已发表过评价'));
         }
         if(!$invited) {
-            throw new AccessDeniedException(__('Not invited'));
+            throw new AccessDeniedException(__('未收到邀请'));
         }
         return true;
     }
