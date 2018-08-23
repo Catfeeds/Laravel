@@ -23,8 +23,7 @@ class UserController extends Controller
     public function index(Content $content)
     {
         return $content
-            ->header('Index')
-            ->description('description')
+            ->header('用户列表')
             ->body($this->grid());
     }
 
@@ -38,8 +37,7 @@ class UserController extends Controller
     public function show($id, Content $content)
     {
         return $content
-            ->header('Detail')
-            ->description('description')
+            ->header('用户信息')
             ->body($this->detail($id));
     }
 
@@ -53,8 +51,7 @@ class UserController extends Controller
     public function edit($id, Content $content)
     {
         return $content
-            ->header('Edit')
-            ->description('description')
+            ->header('编辑用户信息')
             ->body($this->form()->edit($id));
     }
 
@@ -67,8 +64,7 @@ class UserController extends Controller
     public function create(Content $content)
     {
         return $content
-            ->header('Create')
-            ->description('description')
+            ->header('创建用户')
             ->body($this->form());
     }
 
@@ -82,8 +78,12 @@ class UserController extends Controller
         $grid = new Grid(new User());
 
         $grid->id('ID')->sortable();
-        $grid->created_at('Created at');
-        $grid->updated_at('Updated at');
+        $grid->name('姓名');
+        $grid->type('用户类型')->display(function ($type) {
+            return $type === 'designer' ? '设计师' : '甲方';
+        });
+        $grid->phone('手机号');
+        $grid->created_at('注册时间');
 
         return $grid;
     }
@@ -114,9 +114,17 @@ class UserController extends Controller
     {
         $form = new Form(new User());
 
-        $form->display('id', 'ID');
-        $form->display('created_at', 'Created At');
-        $form->display('updated_at', 'Updated At');
+        $form->text('name', '姓名');
+        $form->select('type', '用户类型')->options([
+            'designer' => '设计师',
+            'party' => '甲方'
+        ]);
+        $form->text('phone', '手机号');
+        $form->password('password', '密码');
+
+        $form->saving(function ($form) {
+            $form->password = bcrypt($form->password);
+        });
 
         return $form;
     }
