@@ -2,66 +2,74 @@
 
 namespace App\Admin\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
-
+use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\ModelForm;
+use Encore\Admin\Show;
 
 class UserController extends Controller
 {
-    use ModelForm;
+    use HasResourceActions;
 
     /**
      * Index interface.
      *
+     * @param Content $content
      * @return Content
      */
-    public function index()
+    public function index(Content $content)
     {
-        return Admin::content(function (Content $content) {
+        return $content
+            ->header('Index')
+            ->description('description')
+            ->body($this->grid());
+    }
 
-            $content->header('header');
-            $content->description('description');
-
-            $content->body($this->grid());
-        });
+    /**
+     * Show interface.
+     *
+     * @param mixed   $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->header('Detail')
+            ->description('description')
+            ->body($this->detail($id));
     }
 
     /**
      * Edit interface.
      *
-     * @param $id
+     * @param mixed   $id
+     * @param Content $content
      * @return Content
      */
-    public function edit($id)
+    public function edit($id, Content $content)
     {
-        return Admin::content(function (Content $content) use ($id) {
-
-            $content->header('header');
-            $content->description('description');
-
-            $content->body($this->form()->edit($id));
-        });
+        return $content
+            ->header('Edit')
+            ->description('description')
+            ->body($this->form()->edit($id));
     }
 
     /**
      * Create interface.
      *
+     * @param Content $content
      * @return Content
      */
-    public function create()
+    public function create(Content $content)
     {
-        return Admin::content(function (Content $content) {
-
-            $content->header('header');
-            $content->description('description');
-
-            $content->body($this->form());
-        });
+        return $content
+            ->header('Create')
+            ->description('description')
+            ->body($this->form());
     }
 
     /**
@@ -71,13 +79,30 @@ class UserController extends Controller
      */
     protected function grid()
     {
-        return Admin::grid(User::class, function (Grid $grid) {
+        $grid = new Grid(new User());
 
-            $grid->id('ID')->sortable();
+        $grid->id('ID')->sortable();
+        $grid->created_at('Created at');
+        $grid->updated_at('Updated at');
 
-            $grid->created_at();
-            $grid->updated_at();
-        });
+        return $grid;
+    }
+
+    /**
+     * Make a show builder.
+     *
+     * @param mixed   $id
+     * @return Show
+     */
+    protected function detail($id)
+    {
+        $show = new Show(User::findOrFail($id));
+
+        $show->id('ID');
+        $show->created_at('Created at');
+        $show->updated_at('Updated at');
+
+        return $show;
     }
 
     /**
@@ -87,12 +112,12 @@ class UserController extends Controller
      */
     protected function form()
     {
-        return Admin::form(User::class, function (Form $form) {
+        $form = new Form(new User());
 
-            $form->display('id', 'ID');
+        $form->display('id', 'ID');
+        $form->display('created_at', 'Created At');
+        $form->display('updated_at', 'Updated At');
 
-            $form->display('created_at', 'Created At');
-            $form->display('updated_at', 'Updated At');
-        });
+        return $form;
     }
 }
