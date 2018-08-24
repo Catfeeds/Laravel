@@ -37,7 +37,7 @@ class UserController extends Controller
     public function show($id, Content $content)
     {
         return $content
-            ->header('用户信息')
+            ->header('用户详情')
             ->body($this->detail($id));
     }
 
@@ -78,6 +78,7 @@ class UserController extends Controller
         $grid = new Grid(new User());
 
         $grid->id('ID')->sortable();
+        $grid->avatar_url('头像')->image(null, 30, 30);
         $grid->name('姓名');
         $grid->type('用户类型')->display(function ($type) {
             return $type === 'designer' ? '设计师' : '甲方';
@@ -96,11 +97,42 @@ class UserController extends Controller
      */
     protected function detail($id)
     {
-        $show = new Show(User::findOrFail($id));
+        $user = User::findOrFail($id);
+        $show = new Show($user);
 
         $show->id('ID');
-        $show->created_at('Created at');
-        $show->updated_at('Updated at');
+        $show->name('姓名');
+        if($user->avatar_url) {
+            $show->avatar_url('头像')->image(null, 100, 100);
+        } else {
+            $show->avatar_url('头像');
+        }
+        $show->type('用户类型')->using( [
+            'designer' => '设计师',
+            'party' => '甲方'
+        ]);
+        $show->phone('手机号');
+        $show->email( '邮箱');
+        $show->title('职位/公司');
+        $show->introduction('简介');
+        $show->company_name('公司名');
+        $show->registration_number('注册号');
+        if($user->business_license_url) {
+            $show->business_license_url('营业执照')->image(null, 500, 500);
+        } else {
+            $show->business_license_url('营业执照');
+        }
+        $show->id_number('身份证号');
+        if($user->id_card_url) {
+            $show->id_card_url('身份证照片')->image(null, 300, 300);
+        } else {
+            $show->id_card_url('身份证照片');
+        }
+        $show->email_activated('邮箱是否激活')->using([
+            1  => '是',
+            0 => '否'
+        ])->label($user->email_activated ? 'success' : 'danger');
+        $show->created_at('注册时间');
 
         return $show;
     }
@@ -114,17 +146,27 @@ class UserController extends Controller
     {
         $form = new Form(new User());
 
-        $form->text('name', '姓名');
+        $form->text('name', '姓名')->rules('required');
         $form->select('type', '用户类型')->options([
             'designer' => '设计师',
             'party' => '甲方'
-        ]);
-        $form->text('phone', '手机号');
-        $form->password('password', '密码');
+        ])->rules('required');
+        $form->text('phone', '手机号')->rules('required');
+        $form->email('email', '邮箱')->rules('nullable');
+        $form->text('title', '职位/公司');
+        $form->textarea('introduction', '简介');
+        $form->text('company_name', '公司名');
+        $form->text('registration_number', '注册号');
+        $form->text('id_number', '身份证号');
+        $form->switch('email_activated', '邮箱是否激活')->states([
+            'on'  => ['value' => 1, 'text' => '是', 'color' => 'success'],
+            'off' => ['value' => 0, 'text' => '否', 'color' => 'default']
+        ])->rules('required');
 
-        $form->saving(function ($form) {
-            $form->password = bcrypt($form->password);
-        });
+//        $form->password('password', '密码');
+//        $form->saving(function ($form) {
+//            $form->password = bcrypt($form->password);
+//        });
 
         return $form;
     }
