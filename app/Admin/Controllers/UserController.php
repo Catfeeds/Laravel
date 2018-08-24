@@ -86,6 +86,19 @@ class UserController extends Controller
         $grid->phone('手机号');
         $grid->created_at('注册时间');
 
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->disableIdFilter();
+            $filter->like('phone', '手机号');
+            $filter->like('name', '姓名');
+            $filter->equal('type', '用户类型')
+                ->select([
+                    'designer' => '设计师',
+                    'party' => '甲方'
+                ]);
+            $filter->scope('designer', '设计师')->where('type', 'designer');
+            $filter->scope('party', '甲方')->where('type', 'party');
+        });
+
         return $grid;
     }
 
