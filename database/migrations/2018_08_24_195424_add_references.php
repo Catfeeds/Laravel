@@ -37,6 +37,7 @@ class AddReferences extends Migration
         Schema::table('reviews', function (Blueprint $table) {
             // 当 user_id 对应的 users 表数据被删除时，删除此条数据
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('reviewer_id')->references('id')->on('users')->onDelete('cascade');
         });
         Schema::table('projects', function (Blueprint $table) {
             // 当 user_id 对应的 users 表数据被删除时，删除此条数据
@@ -60,6 +61,10 @@ class AddReferences extends Migration
             // 当 user_id 对应的 users 表数据被删除时，删除此条数据
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('invited_user_id')->references('id')->on('projects')->onDelete('cascade');
+        });
+        Schema::table('uploads', function (Blueprint $table) {
+            // 当 user_id 对应的 users 表数据被删除时，删除此条数据
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -88,6 +93,7 @@ class AddReferences extends Migration
         });
         Schema::table('reviews', function (Blueprint $table) {
             $table->dropForeign(['user_id']);
+            $table->dropForeign(['reviewer_id']);
         });
         Schema::table('projects', function (Blueprint $table) {
             $table->dropForeign(['user_id']);
@@ -106,6 +112,9 @@ class AddReferences extends Migration
         Schema::table('invitations', function (Blueprint $table) {
             $table->dropForeign(['user_id']);
             $table->dropForeign(['invited_user_id']);
+        });
+        Schema::table('uploads', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
         });
     }
 }

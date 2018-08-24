@@ -164,7 +164,7 @@ class UserController extends Controller
             'designer' => '设计师',
             'party' => '甲方'
         ])->rules('required');
-        $form->text('phone', '手机号')->rules('required');
+        $form->text('phone', '手机号')->prepend('<i class="fa fa-phone fa-fw"></i>')->rules('required');
         $form->email('email', '邮箱')->rules('nullable');
         $form->text('title', '职位/公司');
         $form->textarea('introduction', '简介');
