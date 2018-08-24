@@ -16,6 +16,8 @@ class Project extends Model
     protected $with=['user'];
 
     const STATUS_CANCELED = 500; // 已取消
+    const STATUS_REVIEW_FAILED = 600; // 审核未通过
+    const STATUS_REVIEWING = 900; // 审核中
     const STATUS_TENDERING = 1000; // 招标中
     const STATUS_WORKING = 1100; // 作标中
     const STATUS_COMPLETED = 1200; // 已完成

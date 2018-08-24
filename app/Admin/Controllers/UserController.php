@@ -75,7 +75,7 @@ class UserController extends Controller
      */
     protected function grid()
     {
-        $grid = new Grid(new User());
+        $grid = new Grid(new User);
 
         $grid->id('ID')->sortable();
         $grid->avatar_url('头像')->image(null, 30, 30);
@@ -84,7 +84,7 @@ class UserController extends Controller
             return $type === 'designer' ? '设计师' : '甲方';
         });
         $grid->phone('手机号');
-        $grid->created_at('注册时间');
+        $grid->created_at('注册时间')->sortable();
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();

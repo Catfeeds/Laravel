@@ -12,6 +12,7 @@ Route::group([
 
     $router->get('/', 'HomeController@index');
     $router->resource('users', UserController::class);
+    $router->resource('projects', ProjectController::class);
 
 });
 
