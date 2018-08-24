@@ -58,7 +58,7 @@ class ProjectController extends Controller
     {
         return $content
             ->header('编辑项目信息')
-            ->body($this->form()->edit($id));
+            ->body($this->form($id)->edit($id));
     }
 
     /**
@@ -100,7 +100,7 @@ class ProjectController extends Controller
 
             return "<span class='label label-{$styles[$status]}'>$texts[$status]</span>";
         });
-        
+
         $grid->title('标题');
         $grid->types('类型')->implode('/');
         $grid->features('功能')->implode('/');
@@ -149,34 +149,41 @@ class ProjectController extends Controller
      * Make a form builder.
      * @return Form
      */
-    protected function form()
+    protected function form($id = null)
     {
         $form = new Form(new Project);
 
-        $form->tab('1', function (Form $form) {
-            $form->display('user.name', '发布者');
-        })->tab('2', function (Form $form) {
-            $form->number('status', 'Status');
-            $form->disableSubmit()->disableReset();
-        });
+        $project = Project::find($id);
 
+        $form->text('title', '项目标题')->rules('required|string|max:200')->value(123);
         $form->display('user.name', '发布者');
-        $form->number('status', 'Status');
-        $form->text('types', 'Types');
-        $form->text('title', 'Title');
-        $form->text('features', 'Features');
-        $form->textarea('area', 'Area');
-        $form->textarea('description', 'Description');
-        $form->text('project_file_url', 'Project file url');
-        $form->text('delivery_time', 'Delivery time');
-        $form->text('payment', 'Payment');
-        $form->textarea('supplement_description', 'Supplement description');
-        $form->text('supplement_file_url', 'Supplement file url');
-        $form->text('supplement_at', 'Supplement at');
-        $form->text('find_time', 'Find time');
-        $form->textarea('remark', 'Remark');
-        $form->text('canceled_at', 'Canceled at');
-        $form->number('favorite_count', 'Favorite count');
+
+        // 如果是一个待审核订单
+        if ($project && $project->status == Project::STATUS_REVIEWING) {
+            $form->select('status', '审核状态')->options([
+                Project::STATUS_REVIEW_FAILED => '未通过', Project::STATUS_TENDERING => '通过'
+            ])->rules('required|in:' . Project::STATUS_REVIEW_FAILED . ',' . Project::STATUS_TENDERING);
+            $form->text('review_message', '审核结果说明')
+                ->help('审核未通过时，向用户说明未通过的原因')
+                ->rules('max:500');
+        } else {
+            $form->select('status', '项目状态')
+                ->options($this->statusTexts)
+                ->default(900)
+                ->rules('required');
+        }
+
+        $form->textarea('area', '项目面积')->rules('required');
+        $form->textarea('description', '项目描述与需求')->rules('required');
+        $form->file('project_file_url', '项目附件');
+        $form->text('delivery_time', '交付时间')->rules('required|max:50');
+        $form->text('payment', '希望付给设计师的费用')->rules('required|max:200');
+        $form->textarea('supplement_description', '补充需求');
+        $form->file('supplement_file_url', '补充附件');
+        $form->text('find_time', '希望用多长时间找设计师')->rules('required|max:50');;
+        $form->textarea('remark', '申请备注');
+        $form->display('created_at', '发布于');
+        $form->display('updated_at', '更新于');
 
         return $form;
     }

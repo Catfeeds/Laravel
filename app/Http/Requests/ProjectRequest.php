@@ -8,7 +8,7 @@ class ProjectRequest extends FormRequest
     {
         $userId = \Auth::guard('api')->id();
         return [
-            'title'           => 'required|string|max:50',
+            'title'           => 'required|string|max:200',
             'types'           => 'required|array',
             'types.*'         => 'string|max:50',
             'features'        => 'required|array',
