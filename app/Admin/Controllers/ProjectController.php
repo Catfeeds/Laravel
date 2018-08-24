@@ -108,6 +108,21 @@ class ProjectController extends Controller
         $grid->find_time('希望用多长时间找设计师');
         $grid->updated_at('更新于')->sortable();
 
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->equal('id', '项目ID');
+            $filter->like('user.name', '甲方姓名');
+            $filter->like('user.phone', '甲方手机号');
+            $filter->equal('status', '项目状态')->multipleSelect($this->statusTexts);
+            $filter->between('created_at', '发布时间')->date();
+            $filter->scope('reviewing', '待审核')->where('status', Project::STATUS_REVIEWING);
+            $filter->scope('canceled', '已取消')->where('status', Project::STATUS_CANCELED);
+            $filter->scope('review_failed', '审核未通过')->where('status', Project::STATUS_REVIEW_FAILED);
+            $filter->scope('tendering', '招标中')->where('status', Project::STATUS_TENDERING);
+            $filter->scope('working', '作标中')->where('status', Project::STATUS_WORKING);
+            $filter->scope('completed', '已完成')->where('status', Project::STATUS_COMPLETED);
+
+        });
+
         return $grid;
     }
 
