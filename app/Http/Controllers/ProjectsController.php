@@ -21,7 +21,7 @@ class ProjectsController extends Controller
         $this->authorize('store', Project::class);
         $attrubutes = $request->only(['title', 'types', 'features', 'area', 'description', 'delivery_time', 'payment', 'find_time', 'remark']);
         $attrubutes['user_id'] = $this->user()->id;
-        $attrubutes['status'] = Project::STATUS_TENDERING;
+        $attrubutes['status'] = Project::STATUS_REVIEWING;
         if ($request->project_file_id) {
             $attrubutes['project_file_url'] = Upload::find($request->project_file_id)->path;
         }
