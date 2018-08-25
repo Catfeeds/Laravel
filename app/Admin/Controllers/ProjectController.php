@@ -225,6 +225,34 @@ class ProjectController extends Controller
             });
         });
 
+        $show->applications('报名列表', function ($grid) {
+            $grid->id('ID')->sortable();
+            $grid->user('设计师')->display(function ($user) {
+                $route = 'users/' . $user['id'];
+                return "<a href='{$route}'>{$user['name']}</a>";
+            });
+            $grid->remark('备注');
+            $grid->application_file_url('附件')->display(function ($url) {
+                return "<a href='{$url}' target='_blank'>下载</a>";
+            });
+            $grid->created_at('报名时间');
+
+            $grid->actions(function ($actions) {
+                $actions->disableDelete();
+                $actions->disableEdit();
+                $actions->disableView();
+            });
+
+            $grid->filter(function (Grid\Filter $filter) {
+                $filter->disableIdFilter();
+                $filter->like('user.name', '设计师姓名');
+                $filter->like('user.phone', '设计师手机号');
+                $filter->between('created_at', '报名时间')->date();
+            });
+
+            $grid->disableCreateButton();
+        });
+
         return $show;
     }
 

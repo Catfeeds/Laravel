@@ -32,7 +32,7 @@ class ProjectApplicationsController extends Controller
             $projectApplication->project_id = $project->id;
             $projectApplication->remark = $request->remark;
             if ($request->application_file_id) {
-                $project->application_file_url = Upload::find($request->application_file_id)->path;
+                $projectApplication->application_file_url = Upload::find($request->application_file_id)->path;
             }
             $projectApplication->save();
             return $this->response->item($projectApplication, new ProjectApplicationTransformer());
