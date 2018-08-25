@@ -65,16 +65,24 @@ class ProjectsController extends Controller
     public function cancel(Project $project)
     {
         $this->authorize('cancel', $project);
+
         // 已取消，直接返回
         if ($project->status == Project::STATUS_CANCELED) {
             return $this->response->noContent();
         }
-        if ($project->status !== Project::STATUS_TENDERING) {
+
+        if (!in_array($project->status, [
+            Project::STATUS_REVIEWING,
+            Project::STATUS_REVIEW_FAILED,
+            Project::STATUS_TENDERING,
+        ])) {
             return $this->response->errorBadRequest(__('该项目无法取消'));
         }
+
         $project->status = Project::STATUS_CANCELED;
         $project->canceled_at = Carbon::now()->toDateTimeString();
         $project->save();
+
         return $this->response->noContent();
     }
 
@@ -84,10 +92,12 @@ class ProjectsController extends Controller
         if ($user->type !== 'party') {
             return $this->response->errorUnauthorized('公开接口只能访问甲方发布的项目');
         }
+
         $projects = $this->getBasicQuery($request)
             ->where('user_id', $user->id)
             ->recent()
             ->paginate(20);
+
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 
@@ -102,12 +112,13 @@ class ProjectsController extends Controller
         }
 
         // 当前用户是设计师：返回报名的项目
-        $projects = $this->getBasicQuery($request)
+        $projects = $this->getBasicQuery($request, true)
             ->whereHas('applications', function ($query) use ($currentUser) {
                 $query->where('user_id', $currentUser->id);
             })
             ->recent()
             ->paginate(20);
+
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 
@@ -115,15 +126,18 @@ class ProjectsController extends Controller
     public function favorite(Request $request)
     {
         $currentUser = $this->user();
-        $projects = $this->getBasicQuery($request)
+
+        $projects = $this->getBasicQuery($request, true)
             ->whereHas('favoriteUser', function ($query) use ($currentUser) {
                 $query->where('user_id', $currentUser->id);
             })
             ->recent()
             ->paginate(20);
+
         $projects->each(function ($project) use ($currentUser) {
             $project->setExtraAttributes($currentUser);
         });
+
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 
@@ -131,22 +145,33 @@ class ProjectsController extends Controller
     public function search(Request $request)
     {
         $projects = $this->getBasicQuery($request)
-            ->where('status', '!=', Project::STATUS_CANCELED)
             ->recent()
             ->paginate(20);
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 
-    // 根据query中的参数初始化查询器
-    private function getBasicQuery(Request $request)
+    /**
+     * 根据query中的参数初始化查询器
+     * @params $request
+     * @params $withPrivate 是否包含私有项目（审核中、审核失败、已取消）
+     */
+    private function getBasicQuery(Request $request, $withPrivate = false)
     {
+        $status = [];
         $allStatus = [
-            Project::STATUS_CANCELED,
             Project::STATUS_TENDERING,
             Project::STATUS_WORKING,
             Project::STATUS_COMPLETED
         ];
-        $status = [];
+
+        if($withPrivate) {
+            $allStatus = array_merge($allStatus, [
+                Project::STATUS_REVIEWING,
+                Project::STATUS_REVIEW_FAILED,
+                Project::STATUS_CANCELED
+            ]);
+        }
+
         if ($request->status) {
             // status可以是字符串也可以是数组
             if (is_array($request->status)) {
@@ -157,10 +182,13 @@ class ProjectsController extends Controller
         } else {
             $status = $allStatus; // 如果没有设置status，则默认搜索所有项目
         }
+
         $query = Project::whereIn('status', $status)->recent();
+
         if (is_string($request->keyword)) {
             $query = $query->where('title', 'like', "%$request->keyword%");
         }
+
         return $query;
     }
 }

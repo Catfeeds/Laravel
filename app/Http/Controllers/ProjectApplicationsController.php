@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\ProjectApplication;
 use App\Models\Upload;
 use App\Transformers\ProjectApplicationTransformer;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class ProjectApplicationsController extends Controller
@@ -16,6 +17,11 @@ class ProjectApplicationsController extends Controller
     {
         $this->authorize('store', ProjectApplication::class);
         $currentUser = $this->user();
+
+        if($project->status != Project::STATUS_TENDERING) {
+            throw new BadRequestHttpException('该项目不可报名');
+        }
+
         if (ProjectApplication::where([
             'project_id' => $project->id,
             'user_id'    => $currentUser->id
@@ -58,6 +64,7 @@ class ProjectApplicationsController extends Controller
         if($this->user()->id != $project->user_id) {
             return $this->response->errorForbidden('非项目所有者');
         }
-        return $this->response->paginator($project->applications()->paginate(20), new ProjectApplicationTransformer());
+        return $this->response->paginator($project->applications()
+            ->paginate(20), new ProjectApplicationTransformer());
     }
 }
