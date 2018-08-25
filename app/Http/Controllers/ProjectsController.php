@@ -108,16 +108,19 @@ class ProjectsController extends Controller
 
         // 当前用户是甲方：返回发布的项目
         if ($currentUser->type == 'party') {
-            return $this->partyIndex($currentUser, $request);
+            $projects = $this->getBasicQuery($request, true)
+                ->where('user_id', $currentUser->id)
+                ->recent()
+                ->paginate(20);
+        } else {
+            // 当前用户是设计师：返回报名的项目
+            $projects = $this->getBasicQuery($request, true)
+                ->whereHas('applications', function ($query) use ($currentUser) {
+                    $query->where('user_id', $currentUser->id);
+                })
+                ->recent()
+                ->paginate(20);
         }
-
-        // 当前用户是设计师：返回报名的项目
-        $projects = $this->getBasicQuery($request, true)
-            ->whereHas('applications', function ($query) use ($currentUser) {
-                $query->where('user_id', $currentUser->id);
-            })
-            ->recent()
-            ->paginate(20);
 
         return $this->response->paginator($projects, new ProjectTransformer());
     }
@@ -164,7 +167,7 @@ class ProjectsController extends Controller
             Project::STATUS_COMPLETED
         ];
 
-        if($withPrivate) {
+        if ($withPrivate) {
             $allStatus = array_merge($allStatus, [
                 Project::STATUS_REVIEWING,
                 Project::STATUS_REVIEW_FAILED,

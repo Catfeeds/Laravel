@@ -178,10 +178,9 @@ class UserController extends Controller
 
         $form->ignore('password');
 
-
         $form->saving(function ($form) {
             if(request('password')) {
-                $form->password = bcrypt($form->password);
+                $form->password = bcrypt(request('password'));
             }
         });
         $form->saved(function ($form) {
