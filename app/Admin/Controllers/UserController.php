@@ -104,7 +104,7 @@ class UserController extends Controller
      * @param mixed $id
      * @return Show
      */
-    protected function detail($id)
+    public function detail($id)
     {
         $user = User::findOrFail($id);
         $show = new Show($user);
@@ -157,6 +157,7 @@ class UserController extends Controller
         $form->text('name', '姓名')->rules('required');
         $form->image('avatar_url', '头像')
             ->uniqueName()
+            ->removable()
             ->rules('max:2048', ['max' => '头像最大是2MB']);
         $form->select('type', '用户类型')->options([
             'designer' => '设计师',
@@ -184,8 +185,8 @@ class UserController extends Controller
             }
         });
         $form->saved(function ($form) {
-            if(request('avatar_url')) {
-                $user = $form->model();
+            $user = $form->model();
+            if(request('avatar_url') && $user->avatar_url) {
                 $user->update(['avatar_url' => UploadService::getFullUrlByPath($user->avatar_url)]);
             }
         });

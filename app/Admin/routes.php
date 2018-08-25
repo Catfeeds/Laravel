@@ -12,7 +12,9 @@ Route::group([
 
     $router->get('/', 'HomeController@index');
     $router->resource('users', UserController::class);
-    $router->resource('projects', ProjectController::class);
+    $router->resource('projects', ProjectController::class, [
+        'except' => ['create', 'store']
+    ]);
 
 });
 

@@ -221,8 +221,6 @@ class ProjectController extends Controller
             $show->panel()->tools(function ($tools) use ($user) {
                 $tools->disableEdit();
                 $tools->disableDelete();
-                $tools->append("<a class='btn btn-sm btn-info' style='margin-right: 5px' href='/admin/users/$user->id'>
-                <i class='fa fa-eye'></i>查看</a>");
             });
         });
 
