@@ -115,9 +115,6 @@ $api->version('v1', [
     /**
      * 项目相关
      */
-    // 获取项目详情
-    $api->get('projects/{project}', 'ProjectsController@index')
-        ->name('api.projects.index');
     // 某个业主发布的项目
     $api->get('users/{user}/projects', 'ProjectsController@partyIndex')
         ->where('user', '[0-9]+')
@@ -241,12 +238,21 @@ $api->version('v1', [
         /**
          * 项目相关
          */
+        // 获取项目详情
+        $api->get('projects/{project}', 'ProjectsController@index')
+            ->name('api.projects.index');
         // 发布项目
         $api->post('projects', 'ProjectsController@store')
             ->name('api.projects.store');
+        // 删除项目
+        $api->delete('projects/{project}', 'ProjectsController@destroy')
+            ->name('api.projects.destroy');
         // 补充项目
         $api->patch('projects/{project}', 'ProjectsController@update')
             ->name('api.projects.update');
+        // 申请重新审核项目
+        $api->put('user/reviewing/projects/{project}', 'ProjectsController@reReview')
+            ->name('api.projects.reReview');
         // 取消项目
         $api->put('user/canceled/projects/{project}', 'ProjectsController@cancel')
             ->name('api.user.projects.cancel');

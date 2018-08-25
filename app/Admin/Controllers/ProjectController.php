@@ -149,6 +149,7 @@ class ProjectController extends Controller
 
             return "<span class='label label-{$styles[$status]}'>$texts[$status]</span>";
         });
+        $show->review_message('审核结果说明');
         $show->types('类型')->as(function ($types) {
             return implode('/', $types);
         });
@@ -245,9 +246,6 @@ class ProjectController extends Controller
             $form->select('status', '审核状态')->options([
                 Project::STATUS_REVIEW_FAILED => '未通过', Project::STATUS_TENDERING => '通过'
             ])->rules('required|in:' . Project::STATUS_REVIEW_FAILED . ',' . Project::STATUS_TENDERING);
-            $form->text('review_message', '审核结果说明')
-                ->help('审核未通过时，向用户说明未通过的原因')
-                ->rules('max:500');
         } else {
             // 如果是一个已审核订单，则显示所有动态
             $form->select('status', '项目状态')
@@ -255,6 +253,9 @@ class ProjectController extends Controller
                 ->default(900)
                 ->rules('required');
         }
+        $form->text('review_message', '审核结果说明')
+            ->help('审核未通过时，向用户说明未通过的原因')
+            ->rules('max:500');
 
         $form->textarea('area', '项目面积')->rules('required');
         $form->textarea('description', '项目描述与需求')->rules('required');

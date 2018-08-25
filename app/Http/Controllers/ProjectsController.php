@@ -32,6 +32,7 @@ class ProjectsController extends Controller
     // 获取项目详情
     public function index(Project $project)
     {
+        $this->authorize('retrieve', $project);
         $currentUser = $this->user();
         $project->setExtraAttributes($currentUser);
 
@@ -50,7 +51,7 @@ class ProjectsController extends Controller
     {
         $this->authorize('update', $project);
         if ($project->supplement_at) {
-            $this->response->errorBadRequest(__('每个项目只能补充一次'));
+            return $this->response->errorBadRequest(__('每个项目只能补充一次'));
         }
         $project->supplement_description = $request->supplement_description;
         if ($request->supplement_file_id) {
@@ -59,6 +60,25 @@ class ProjectsController extends Controller
         $project->supplement_at = Carbon::now()->toDateTimeString();
         $project->save();
         return $this->response->item($project, new ProjectTransformer());
+    }
+
+    // 删除项目
+    public function destroy(Project $project)
+    {
+        $this->authorize('destroy', $project);
+        $project->delete();
+        return $this->response->noContent();
+    }
+
+    //申请重新审核
+    public function reReview(Project $project) {
+        $this->authorize('update', $project);
+        if ($project->status != Project::STATUS_REVIEW_FAILED) {
+            return $this->response->errorBadRequest(__('只有未通过审核的订单才能申请重新审核'));
+        } else {
+            $project->status = Project::STATUS_REVIEWING;
+            return $this->response->item($project, new ProjectTransformer());
+        }
     }
 
     // 取消项目
