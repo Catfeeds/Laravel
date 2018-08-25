@@ -11,6 +11,9 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Encore\Admin\Widgets\Tab;
+use Encore\Admin\Widgets\Table;
+use Illuminate\Support\Facades\Input;
 
 class ProjectController extends Controller
 {
@@ -125,29 +128,103 @@ class ProjectController extends Controller
      */
     protected function detail($id)
     {
-        $show = new Show(Project::findOrFail($id));
+        $project = Project::findOrFail($id);
 
-        $show->id('ID');
-        $show->user_id('User id');
-        $show->status('Status');
-        $show->types('Types');
-        $show->title('Title');
-        $show->features('Features');
-        $show->area('Area');
-        $show->description('Description');
-        $show->project_file_url('Project file url');
-        $show->delivery_time('Delivery time');
-        $show->payment('Payment');
-        $show->supplement_description('Supplement description');
-        $show->supplement_file_url('Supplement file url');
-        $show->supplement_at('Supplement at');
-        $show->find_time('Find time');
-        $show->remark('Remark');
-        $show->canceled_at('Canceled at');
-        $show->favorite_count('Favorite count');
-        $show->created_at('Created at');
-        $show->updated_at('Updated at');
-        $show->deleted_at('Deleted at');
+        $show = new Show($project);
+
+        $show->id('项目ID');
+        $show->title('项目标题');
+        $show->user()->name('发布者');
+        $show->favorite_count('收藏人数');
+        $texts = $this->statusTexts;
+        $show->status('项目状态')->as(function ($status) use ($texts) {
+            $styles = [
+                Project::STATUS_CANCELED      => 'default',
+                Project::STATUS_REVIEW_FAILED => 'default',
+                Project::STATUS_REVIEWING     => 'warning',
+                Project::STATUS_TENDERING     => 'info',
+                Project::STATUS_WORKING       => 'primary',
+                Project::STATUS_COMPLETED     => 'default'
+            ];
+
+            return "<span class='label label-{$styles[$status]}'>$texts[$status]</span>";
+        });
+        $show->types('类型')->as(function ($types) {
+            return implode('/', $types);
+        });
+        $show->features('功能')->as(function ($features) {
+            return implode('/', $features);
+        });
+        $show->payment('希望付给设计师的费用');
+        $show->find_time('希望用多长时间找设计师');
+        $show->area('项目面积');
+        $show->description('项目描述');
+
+        if($project->project_file_url) {
+            $show->project_file_url('项目附件')->file();
+        } else {
+            $show->project_file_url('项目附件');
+        }
+
+        $show->delivery_time('交付时间');
+        $show->remark('申请备注');
+        $show->supplement_description('补充需求');
+
+        if($project->supplement_file_url) {
+            $show->supplement_file_url('补充附件')->file();
+        } else {
+            $show->supplement_file_url('补充附件');
+        }
+        $show->created_at('发布于');
+        $show->supplement_at('补充于');
+        $show->canceled_at('取消于');
+        $show->updated_at('上次更新');
+
+
+        $show->user('甲方信息', function ($show) {
+            $show->setResource('/admin/users');
+            $user = $show->getModel();
+            $show->id('ID');
+            $show->name('姓名');
+            if ($user->avatar_url) {
+                $show->avatar_url('头像')->image(null, 100, 100);
+            } else {
+                $show->avatar_url('头像');
+            }
+            $show->type('用户类型')->using([
+                'designer' => '设计师',
+                'party'    => '甲方'
+            ]);
+            $show->phone('手机号');
+            $show->email('邮箱');
+            $show->title('职位/公司');
+            $show->introduction('简介');
+            $show->company_name('公司名');
+            $show->registration_number('注册号');
+            if ($user->business_license_url) {
+                $show->business_license_url('营业执照')->image(null, 500, 500);
+            } else {
+                $show->business_license_url('营业执照');
+            }
+            $show->id_number('身份证号');
+            if ($user->id_card_url) {
+                $show->id_card_url('身份证照片')->image(null, 300, 300);
+            } else {
+                $show->id_card_url('身份证照片');
+            }
+            $show->email_activated('邮箱是否激活')->using([
+                1 => '是',
+                0 => '否'
+            ])->label($user->email_activated ? 'success' : 'danger');
+            $show->created_at('注册时间');
+
+            $show->panel()->tools(function ($tools) use ($user) {
+                $tools->disableEdit();
+                $tools->disableDelete();
+                $tools->append("<a class='btn btn-sm btn-info' style='margin-right: 5px' href='/admin/users/$user->id'>
+                <i class='fa fa-eye'></i>查看</a>");
+            });
+        });
 
         return $show;
     }
@@ -183,11 +260,11 @@ class ProjectController extends Controller
 
         $form->textarea('area', '项目面积')->rules('required');
         $form->textarea('description', '项目描述与需求')->rules('required');
-        $form->file('project_file_url', '项目附件')->uniqueName();
+        $form->file('project_file_url', '项目附件')->uniqueName()->removable();;
         $form->text('delivery_time', '交付时间')->rules('required|max:50');
         $form->text('payment', '希望付给设计师的费用')->rules('required|max:200');
         $form->textarea('supplement_description', '补充需求');
-        $form->file('supplement_file_url', '补充附件')->uniqueName();
+        $form->file('supplement_file_url', '补充附件')->uniqueName()->removable();;
         $form->text('find_time', '希望用多长时间找设计师')->rules('required|max:50');;
         $form->textarea('remark', '申请备注');
         $form->display('created_at', '发布于');
@@ -195,18 +272,18 @@ class ProjectController extends Controller
         $form->display('updated_at', '上次更新');
 
         $form->saving(function (Form $form) {
-           // 如果用户没有补充过项目，而管理员新增了"补充内容"，则设置supplement_at字段
+            // 如果用户没有补充过项目，而管理员新增了"补充内容"，则设置supplement_at字段
             $project = $form->model();
-            if(!$project->supplement_at && (request('supplement_description') || request('supplement_file_url'))) {
+            if (!$project->supplement_at && (request('supplement_description') || request('supplement_file_url'))) {
                 $project->supplement_at = new Carbon;
             }
         });
         $form->saved(function ($form) {
             $project = $form->model();
-            if(request('project_file_url')) {
+            if (request('project_file_url') && $project->project_file_url) {
                 $project->project_file_url = UploadService::getFullUrlByPath($project->project_file_url);
             }
-            if(request('supplement_file_url')) {
+            if (request('supplement_file_url') && $project->supplement_file_url) {
                 $project->supplement_file_url = UploadService::getFullUrlByPath($project->supplement_file_url);
             }
             $project->save();
