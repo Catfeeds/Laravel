@@ -2,8 +2,10 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\UploadService;
 use App\Models\Project;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -62,18 +64,6 @@ class ProjectController extends Controller
     }
 
     /**
-     * Create interface.
-     * @param Content $content
-     * @return Content
-     */
-    public function create(Content $content)
-    {
-        return $content
-            ->header('发布项目')
-            ->body($this->form());
-    }
-
-    /**
      * Make a grid builder.
      * @return Grid
      */
@@ -123,6 +113,8 @@ class ProjectController extends Controller
 
         });
 
+        $grid->disableCreateButton();
+
         return $grid;
     }
 
@@ -170,10 +162,10 @@ class ProjectController extends Controller
 
         $project = Project::find($id);
 
-        $form->text('title', '项目标题')->rules('required|string|max:200')->value(123);
+        $form->text('title', '项目标题')->rules('required|string|max:200');
         $form->display('user.name', '发布者');
 
-        // 如果是一个待审核订单
+        // 如果是一个待审核订单，只显示审核通过与未通过，要求审核该订单
         if ($project && $project->status == Project::STATUS_REVIEWING) {
             $form->select('status', '审核状态')->options([
                 Project::STATUS_REVIEW_FAILED => '未通过', Project::STATUS_TENDERING => '通过'
@@ -182,6 +174,7 @@ class ProjectController extends Controller
                 ->help('审核未通过时，向用户说明未通过的原因')
                 ->rules('max:500');
         } else {
+            // 如果是一个已审核订单，则显示所有动态
             $form->select('status', '项目状态')
                 ->options($this->statusTexts)
                 ->default(900)
@@ -190,15 +183,34 @@ class ProjectController extends Controller
 
         $form->textarea('area', '项目面积')->rules('required');
         $form->textarea('description', '项目描述与需求')->rules('required');
-        $form->file('project_file_url', '项目附件');
+        $form->file('project_file_url', '项目附件')->uniqueName();
         $form->text('delivery_time', '交付时间')->rules('required|max:50');
         $form->text('payment', '希望付给设计师的费用')->rules('required|max:200');
         $form->textarea('supplement_description', '补充需求');
-        $form->file('supplement_file_url', '补充附件');
+        $form->file('supplement_file_url', '补充附件')->uniqueName();
         $form->text('find_time', '希望用多长时间找设计师')->rules('required|max:50');;
         $form->textarea('remark', '申请备注');
         $form->display('created_at', '发布于');
-        $form->display('updated_at', '更新于');
+        $form->display('supplement_at', '补充于');
+        $form->display('updated_at', '上次更新');
+
+        $form->saving(function (Form $form) {
+           // 如果用户没有补充过项目，而管理员新增了"补充内容"，则设置supplement_at字段
+            $project = $form->model();
+            if(!$project->supplement_at && (request('supplement_description') || request('supplement_file_url'))) {
+                $project->supplement_at = new Carbon;
+            }
+        });
+        $form->saved(function ($form) {
+            $project = $form->model();
+            if(request('project_file_url')) {
+                $project->project_file_url = UploadService::getFullUrlByPath($project->project_file_url);
+            }
+            if(request('supplement_file_url')) {
+                $project->supplement_file_url = UploadService::getFullUrlByPath($project->supplement_file_url);
+            }
+            $project->save();
+        });
 
         return $form;
     }

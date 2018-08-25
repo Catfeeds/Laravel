@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\UploadService;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -185,8 +186,7 @@ class UserController extends Controller
         $form->saved(function ($form) {
             if(request('avatar_url')) {
                 $user = $form->model();
-                $url = env('APP_URL') . '/uploads/' . $user->avatar_url;
-                $user->update(['avatar_url' => $url]);
+                $user->update(['avatar_url' => UploadService::getFullUrlByPath($user->avatar_url)]);
             }
         });
 
