@@ -19,8 +19,8 @@ class ReplyObserver
             $activity->user->notify(new ActivityReplied($reply));
         }
         // 有可能是回复某条评论，还需要通知该评论的作者
-        if ($reply->targetReply && !$reply->targetReply->user->isAuthorOf($reply)) {
-            $reply->targetReply->user->notify(new ReplyReplied($reply));
+        if ($reply->replyee && !$reply->replyee->isAuthorOf($reply)) {
+            $reply->replyee->notify(new ReplyReplied($reply));
         }
     }
 

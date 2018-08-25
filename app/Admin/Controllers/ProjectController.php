@@ -11,9 +11,6 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Encore\Admin\Widgets\Tab;
-use Encore\Admin\Widgets\Table;
-use Illuminate\Support\Facades\Input;
 
 class ProjectController extends Controller
 {
@@ -183,46 +180,7 @@ class ProjectController extends Controller
 
 
         $show->user('甲方信息', function ($show) {
-            $show->setResource('/admin/users');
-            $user = $show->getModel();
-            $show->id('ID');
-            $show->name('姓名');
-            if ($user->avatar_url) {
-                $show->avatar_url('头像')->image(null, 100, 100);
-            } else {
-                $show->avatar_url('头像');
-            }
-            $show->type('用户类型')->using([
-                'designer' => '设计师',
-                'party'    => '甲方'
-            ]);
-            $show->phone('手机号');
-            $show->email('邮箱');
-            $show->title('职位/公司');
-            $show->introduction('简介');
-            $show->company_name('公司名');
-            $show->registration_number('注册号');
-            if ($user->business_license_url) {
-                $show->business_license_url('营业执照')->image(null, 500, 500);
-            } else {
-                $show->business_license_url('营业执照');
-            }
-            $show->id_number('身份证号');
-            if ($user->id_card_url) {
-                $show->id_card_url('身份证照片')->image(null, 300, 300);
-            } else {
-                $show->id_card_url('身份证照片');
-            }
-            $show->email_activated('邮箱是否激活')->using([
-                1 => '是',
-                0 => '否'
-            ])->label($user->email_activated ? 'success' : 'danger');
-            $show->created_at('注册时间');
-
-            $show->panel()->tools(function ($tools) use ($user) {
-                $tools->disableEdit();
-                $tools->disableDelete();
-            });
+            (new UserController())->showInRelation($show);
         });
 
         $show->applications('报名列表', function ($grid) {

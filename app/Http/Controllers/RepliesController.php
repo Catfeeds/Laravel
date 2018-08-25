@@ -22,6 +22,7 @@ class RepliesController extends Controller
         $reply->user_id = $currentUser->id;
         $reply->activity_id = $activity->id;
         $reply->reply_id = $request->reply_id;
+        $reply->replied_user_id = $request->replied_user_id;
         $reply->save();
         return $this->response->item($reply, new ReplyTransformer())
             ->setStatusCode(201);

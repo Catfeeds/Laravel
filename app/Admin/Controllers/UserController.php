@@ -104,7 +104,7 @@ class UserController extends Controller
      * @param mixed $id
      * @return Show
      */
-    public function detail($id)
+    protected function detail($id)
     {
         $user = User::findOrFail($id);
         $show = new Show($user);
@@ -179,17 +179,62 @@ class UserController extends Controller
         $form->ignore('password');
 
         $form->saving(function ($form) {
-            if(request('password')) {
+            if (request('password')) {
                 $form->password = bcrypt(request('password'));
             }
         });
         $form->saved(function ($form) {
             $user = $form->model();
-            if(request('avatar_url') && $user->avatar_url) {
+            if (request('avatar_url') && $user->avatar_url) {
                 $user->update(['avatar_url' => UploadService::getFullUrlByPath($user->avatar_url)]);
             }
         });
 
         return $form;
+    }
+
+    // 用于关联关系中的show
+    public function showInRelation(&$show)
+    {
+        $show->setResource('/admin/users');
+        $user = $show->getModel();
+        $show->id('ID');
+        $show->name('姓名');
+        if ($user->avatar_url) {
+            $show->avatar_url('头像')->image(null, 100, 100);
+        } else {
+            $show->avatar_url('头像');
+        }
+        $show->type('用户类型')->using([
+            'designer' => '设计师',
+            'party'    => '甲方'
+        ]);
+        $show->phone('手机号');
+        $show->email('邮箱');
+        $show->title('职位/公司');
+        $show->introduction('简介');
+        $show->company_name('公司名');
+        $show->registration_number('注册号');
+        if ($user->business_license_url) {
+            $show->business_license_url('营业执照')->image(null, 500, 500);
+        } else {
+            $show->business_license_url('营业执照');
+        }
+        $show->id_number('身份证号');
+        if ($user->id_card_url) {
+            $show->id_card_url('身份证照片')->image(null, 300, 300);
+        } else {
+            $show->id_card_url('身份证照片');
+        }
+        $show->email_activated('邮箱是否激活')->using([
+            1 => '是',
+            0 => '否'
+        ])->label($user->email_activated ? 'success' : 'danger');
+        $show->created_at('注册时间');
+
+        $show->panel()->tools(function ($tools) use ($user) {
+            $tools->disableEdit();
+            $tools->disableDelete();
+        });
     }
 }

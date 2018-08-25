@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Reply extends Model
 {
-    protected $with = ['user', 'targetReply'];
+    protected $with = ['user', 'replyee'];
 
     public function activity()
     {
@@ -16,8 +18,8 @@ class Reply extends Model
         return $this->belongsTo(User::class);
     }
 
-    // 回复了哪条评论
-    public function targetReply(){
-        return $this->belongsTo(Reply::class, 'reply_id' ,'id');
+    // 回复了哪个用户
+    public function replyee(){
+        return $this->belongsTo(User::class, 'replied_user_id' ,'id');
     }
 }
