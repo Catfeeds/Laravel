@@ -50,6 +50,16 @@ $api->version('v1', [
         ->name('api.users.store');
 
     /**
+     * 首页展示内容
+     */
+    // 设计师列表
+    $api->get('/index/designers', 'IndexController@designers')
+        ->name('api.index.designers');
+    // 作品列表
+    $api->get('/index/works', 'IndexController@works')
+        ->name('api.index.works');
+
+    /**
      * Token相关
      */
     // 登录
