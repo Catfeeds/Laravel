@@ -71,6 +71,7 @@ class ProjectController extends Controller
     {
         $grid = new Grid(new Project);
 
+        $grid->model()->recent();
         $grid->id('ID')->sortable();
         $grid->user('发布者')->display(function ($user) {
             $route = 'users/' . $user['id'];
@@ -96,6 +97,7 @@ class ProjectController extends Controller
         $grid->features('功能')->implode('/');
         $grid->payment('价格');
         $grid->find_time('希望用多长时间找设计师');
+        $grid->created_at('发布于')->sortable();
         $grid->updated_at('更新于')->sortable();
 
         $grid->filter(function (Grid\Filter $filter) {

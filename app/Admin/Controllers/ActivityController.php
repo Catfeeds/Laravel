@@ -16,122 +16,95 @@ class ActivityController extends Controller
 
     /**
      * Index interface.
-     *
      * @param Content $content
      * @return Content
      */
     public function index(Content $content)
     {
         return $content
-            ->header('Index')
-            ->description('description')
+            ->header('动态列表')
             ->body($this->grid());
     }
 
     /**
      * Show interface.
-     *
-     * @param mixed   $id
+     * @param mixed $id
      * @param Content $content
      * @return Content
      */
     public function show($id, Content $content)
     {
         return $content
-            ->header('Detail')
-            ->description('description')
+            ->header('动态详情')
             ->body($this->detail($id));
     }
 
     /**
-     * Edit interface.
-     *
-     * @param mixed   $id
-     * @param Content $content
-     * @return Content
-     */
-    public function edit($id, Content $content)
-    {
-        return $content
-            ->header('Edit')
-            ->description('description')
-            ->body($this->form()->edit($id));
-    }
-
-    /**
-     * Create interface.
-     *
-     * @param Content $content
-     * @return Content
-     */
-    public function create(Content $content)
-    {
-        return $content
-            ->header('Create')
-            ->description('description')
-            ->body($this->form());
-    }
-
-    /**
      * Make a grid builder.
-     *
      * @return Grid
      */
     protected function grid()
     {
         $grid = new Grid(new Activity);
 
-        $grid->id('Id');
-        $grid->content('Content');
-        $grid->photo_urls('Photo urls');
-        $grid->user_id('User id');
-        $grid->like_count('Like count');
-        $grid->reply_count('Reply count');
-        $grid->created_at('Created at');
-        $grid->updated_at('Updated at');
-        $grid->deleted_at('Deleted at');
+        $grid->model()->recent();
+        $grid->id('ID')->sortable();
+        $grid->user('作者')->display(function ($user) {
+            $route = 'users/' . $user['id'];
+            return "<a href='{$route}'>{$user['name']}</a>";
+        });
+        $grid->content('内容');
+        $grid->photo_urls('图片')->image(null, 50, 50);
+        $grid->like_count('点赞数');
+        $grid->reply_count('评论数');
+        $grid->created_at('发布于')->sortable();
+
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->disableIdFilter();
+            $filter->like('user.name', '用户名');
+            $filter->like('user.phone', '用户手机号');
+            $filter->like('content', '动态内容');
+            $filter->between('created_at', '发布时间')->date();
+        });
+        $grid->actions(function ($actions) {
+            $actions->disableEdit();
+        });
+        $grid->disableCreateButton();
 
         return $grid;
     }
 
     /**
      * Make a show builder.
-     *
-     * @param mixed   $id
+     * @param mixed $id
      * @return Show
      */
     protected function detail($id)
     {
         $show = new Show(Activity::findOrFail($id));
 
-        $show->id('Id');
-        $show->content('Content');
-        $show->photo_urls('Photo urls');
-        $show->user_id('User id');
-        $show->like_count('Like count');
-        $show->reply_count('Reply count');
-        $show->created_at('Created at');
-        $show->updated_at('Updated at');
-        $show->deleted_at('Deleted at');
+        $show->id('ID');
+        $show->user()->name('作者');
+        $show->content('内容');
+        $show->photo_urls('图片')->as(function ($urls) {
+            if(!is_array($urls)) {
+                return null;
+            }
+            
+            $res = '';
+            foreach ($urls as $url) {
+                $res .= "<img src='$url' style='max-width:200px;max-height:200px;margin:0 8px 8px 0;' class='img' />";
+            }
+            return $res;
+        });
+        $show->like_count('点赞数');
+        $show->reply_count('评论数');
+        $show->created_at('发布于');
 
         return $show;
     }
 
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-    protected function form()
-    {
-        $form = new Form(new Activity);
-
-        $form->text('content', 'Content');
-        $form->textarea('photo_urls', 'Photo urls');
-        $form->number('user_id', 'User id');
-        $form->number('like_count', 'Like count');
-        $form->number('reply_count', 'Reply count');
-
-        return $form;
+    protected function form() {
+        return new Form(new Activity);
     }
 }

@@ -74,6 +74,7 @@ class UserController extends Controller
     {
         $grid = new Grid(new User);
 
+        $grid->model()->orderBy('id', 'desc');
         $grid->id('ID')->sortable();
         $grid->avatar_url('头像')->image(null, 30, 30);
         $grid->name('姓名');

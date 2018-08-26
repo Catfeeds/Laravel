@@ -15,6 +15,9 @@ Route::group([
     $router->resource('projects', ProjectController::class, [
         'except' => ['create', 'store']
     ]);
+    $router->resource('activities', ActivityController::class, [
+        'only' => ['index', 'show', 'destroy']
+    ]);
 
 });
 
