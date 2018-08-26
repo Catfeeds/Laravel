@@ -18,6 +18,9 @@ Route::group([
     $router->resource('activities', ActivityController::class, [
         'only' => ['index', 'show', 'destroy']
     ]);
+    $router->resource('replies', ReplyController::class, [
+        'only' => ['index',  'destroy']
+    ]);
 
 });
 

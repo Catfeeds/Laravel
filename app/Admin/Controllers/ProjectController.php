@@ -197,11 +197,7 @@ class ProjectController extends Controller
             });
             $grid->created_at('报名时间');
 
-            $grid->actions(function ($actions) {
-                $actions->disableDelete();
-                $actions->disableEdit();
-                $actions->disableView();
-            });
+            $grid->disableActions();
 
             $grid->filter(function (Grid\Filter $filter) {
                 $filter->disableIdFilter();

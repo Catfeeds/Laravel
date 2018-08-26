@@ -90,7 +90,7 @@ class ActivityController extends Controller
             if(!is_array($urls)) {
                 return null;
             }
-            
+
             $res = '';
             foreach ($urls as $url) {
                 $res .= "<img src='$url' style='max-width:200px;max-height:200px;margin:0 8px 8px 0;' class='img' />";
@@ -100,6 +100,32 @@ class ActivityController extends Controller
         $show->like_count('点赞数');
         $show->reply_count('评论数');
         $show->created_at('发布于');
+
+        $show->replies('评论列表', function ($grid) {
+            $grid->setResource('/admin/replies');
+            $grid->id('ID')->sortable();
+            $grid->user('作者')->display(function ($user) {
+                $route = 'users/' . $user['id'];
+                return "<a href='{$route}'>{$user['name']}</a>";
+            });
+            $grid->content('内容');
+            $grid->created_at('发表于');
+
+            $grid->actions(function ($actions) {
+                $actions->disableEdit();
+                $actions->disableView();
+            });
+
+            $grid->filter(function (Grid\Filter $filter) {
+                $filter->disableIdFilter();
+                $filter->like('user.name', '用户姓名');
+                $filter->like('user.phone', '用户手机号');
+                $filter->like('content', '评论内容');
+                $filter->between('created_at', '发表时间')->date();
+            });
+
+            $grid->disableCreateButton();
+        });
 
         return $show;
     }
