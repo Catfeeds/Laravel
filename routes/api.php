@@ -58,6 +58,9 @@ $api->version('v1', [
     // 作品列表
     $api->get('/index/works', 'IndexController@works')
         ->name('api.index.works');
+    // 项目列表
+    $api->get('/index/projects', 'IndexController@projects')
+        ->name('api.index.projects');
 
     /**
      * Token相关
