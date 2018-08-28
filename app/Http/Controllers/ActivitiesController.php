@@ -14,11 +14,15 @@ class ActivitiesController extends Controller
     // 发表动态
     public function store(ActivityRequest $request, Activity $activity)
     {
+        $this->authorize('store', Activity::class);
+
         $activity->user_id = $this->user()->id;
         $activity->content = $request->input('content');
         $activity->photo_urls = Upload::findMany($request->photo_ids)->pluck('path');
         $activity->save();
+
         $activity->load('user'); // 因为关联关系是延迟加载，所以要手动加载一下该属性
+
         return $this->response->item($activity, new ActivityTransformer())->setStatusCode(201);
     }
 

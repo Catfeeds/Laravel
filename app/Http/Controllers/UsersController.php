@@ -199,11 +199,12 @@ class UsersController extends Controller
         }
 
         $currentUser = $this->user();
-        $query = User::where('name', 'like', "%$request->keyword%");
+        $query = User::where('name', 'like', "%$request->keyword%")
+            ->where('type', 'designer'); // 只能搜索设计师
 
-        if ($request->type) {
-            $query = $query->where('type', $request->type);
-        }
+//        if ($request->type) {
+//        $query = $query->where('type', 'designer');
+//        }
         $users = $query->paginate(20);
         $users->each(function ($user) use ($currentUser) {
             $user->setFollowing($currentUser);
@@ -216,11 +217,13 @@ class UsersController extends Controller
     public function searchToInviteReview(Request $request)
     {
         $currentUser = $this->user();
-        $query = User::where('name', 'like', "%$request->keyword%");
+        $query = User::where('name', 'like', "%$request->keyword%")
+            ->where('type', 'designer'); // 只能搜索设计师
 
         if ($currentUser) {
             $query = $query->where('id', '!=', $currentUser->id);
         }
+
         $users = $query->paginate(20);
         $users->each(function ($user) use ($currentUser) {
             $user->setFollowing($currentUser);
