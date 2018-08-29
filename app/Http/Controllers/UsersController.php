@@ -120,6 +120,10 @@ class UsersController extends Controller
 
     public function follow(User $user)
     {
+        if($user->type === 'party') {
+            return $this->response->errorBadRequest('只能关注设计师');
+        }
+
         $currentUser = $this->user();
         if ($currentUser->id == $user->id) {
             return $this->response->errorBadRequest();
@@ -154,9 +158,6 @@ class UsersController extends Controller
     {
         $currentUser = $this->user();
         $query = $user->followings();
-        if ($request->type) {
-            $query = $query->where('type', $request->type);
-        }
         $users = $query->paginate(20);
         $users->each(function ($user) use ($currentUser) {
             $user->setFollowing($currentUser);

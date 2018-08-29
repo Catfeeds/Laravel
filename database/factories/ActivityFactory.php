@@ -9,7 +9,7 @@ $factory->define(\App\Models\Activity::class, function (Faker $faker) {
         $photoUrls[] = $faker->imageUrl(500, 300);
     }
     return [
-        'user_id' => $faker->randomElement(User::pluck('id')),
+        'user_id' => $faker->randomElement(User::where('type', 'designer')->pluck('id')),
         'content' => $faker->text,
 //        'photo_urls' => $faker->randomElements($photoUrls, 5)
     ];

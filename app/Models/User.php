@@ -50,6 +50,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasManyThrough('App\Models\Activity', 'App\Models\Follow', 'follower_id', 'user_id', 'id', 'user_id');
     }
 
+    // 发布的项目
+    public function projects() {
+        return $this->hasMany(Project::class);
+    }
+
     // 作品集
     public function works() {
         return $this->hasMany(Work::class);

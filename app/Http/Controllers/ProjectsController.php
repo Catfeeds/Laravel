@@ -71,7 +71,8 @@ class ProjectsController extends Controller
     }
 
     //申请重新审核
-    public function reReview(Project $project) {
+    public function reReview(Project $project)
+    {
         $this->authorize('update', $project);
         if ($project->status != Project::STATUS_REVIEW_FAILED) {
             return $this->response->errorBadRequest(__('只有未通过审核的订单才能申请重新审核'));
@@ -140,6 +141,30 @@ class ProjectsController extends Controller
                 })
                 ->recent()
                 ->paginate(20);
+        }
+
+        return $this->response->paginator($projects, new ProjectTransformer());
+    }
+
+    // 当前登录的业主进行中的项目
+    public function processing(Request $request)
+    {
+        $currentUser = $this->user();
+
+        // 当前用户是甲方：返回发布的项目
+        if ($currentUser->type == 'party') {
+            $projects = $currentUser->projects()
+                ->whereIn('status', [
+                    Project::STATUS_REVIEWING,
+                    Project::STATUS_REVIEW_FAILED,
+                    Project::STATUS_TENDERING,
+                    Project::STATUS_WORKING
+                ])
+                ->recent()
+                ->paginate(20);
+        } else {
+            // TODO 当前用户是设计师：返回报名的项目
+            $this->response->error('未实现');
         }
 
         return $this->response->paginator($projects, new ProjectTransformer());

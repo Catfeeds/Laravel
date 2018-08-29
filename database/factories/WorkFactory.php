@@ -14,7 +14,7 @@ $factory->define(\App\Models\Work::class, function (Faker $faker) {
 //        $photoUrls[] = $faker->imageUrl(500, 300);
 //    }
     return [
-        'user_id'     => $faker->randomElement(User::pluck('id')),
+        'user_id'     => $faker->randomElement(User::where('type', 'designer')->pluck('id')),
         'title'       => $faker->sentence,
         'description' => $faker->text,
         'photo_urls'  => $faker->randomElements($photoUrls, 4)
