@@ -18,6 +18,9 @@ $api->version('v1', [
     'namespace'  => 'App\Http\Controllers',
     'middleware' => ['serializer:array', 'bindings', 'change-locale']
 ], function ($api) {
+    $api->get('test', 'TestController@test');
+
+
     /**
      * 账号相关
      */

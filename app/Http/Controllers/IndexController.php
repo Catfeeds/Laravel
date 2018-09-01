@@ -19,10 +19,10 @@ class IndexController extends Controller
         return $this->response->collection($users, new UserTransformer());
     }
 
-    // 获取设计师的作品，随机返回20个
+    // 获取设计师的作品，随机返回5个  TODO: 点赞最多的5个
     public function works()
     {
-        $works = Work::inRandomOrder()->limit(20)->get();
+        $works = Work::inRandomOrder()->limit(5)->get();
         return $this->response->collection($works, new WorkTransformer());
     }
 

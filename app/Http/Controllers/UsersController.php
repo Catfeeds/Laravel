@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Handlers\ImageUploadHandler;
 use App\Http\Requests\CheckPhoneRequest;
 use App\Services\UserMailsService;
 use App\Services\UsersService;
@@ -40,6 +41,7 @@ class UsersController extends Controller
             'name'     => $request->name,
             'type'     => $request->type,
             'phone'    => $request->phone,
+            'avatar_url' => (new ImageUploadHandler)->defaultAvatar($request->name[0]),
             'password' => bcrypt($request->password),
         ]);
         return $this->response->item($user, new CurrentUserTransformer())

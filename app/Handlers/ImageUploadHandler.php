@@ -13,6 +13,7 @@ class ImageUploadHandler
 {
     protected $allowed_ext = ["png", "jpg", "gif", 'jpeg'];
 
+    // 存储上传的图片
     public function save($file, $folder, $file_prefix, $max_width = false)
     {
         // 构建存储的文件夹规则，值如：uploads/images/avatars/201709/21/
@@ -40,6 +41,30 @@ class ImageUploadHandler
         return [
             'path' => config('app.url') . "/$folder_name/$filename"
         ];
+    }
+
+    // 生成默认头像
+    public function defaultAvatar($text)
+    {
+        $folder_name = "uploads/images/avatars/default";
+        $upload_path = public_path() . '/' . $folder_name;
+        $filename = str_random(10) . '.png';
+
+        if(!is_dir($upload_path)) { mkdir($upload_path); }
+
+        $fontSize = 20;
+        $width = 40;
+        $height = 40;
+        $image = Image::canvas($width, $height, '#888888')
+            ->text($text, $width / 2, $height / 2, function ($font) use ($fontSize) {
+                $font->file(public_path('font/msyh.ttf'));
+                $font->align('center');
+                $font->valign('middle');
+                $font->size($fontSize);
+                $font->color('#ffffff');
+            });
+        $image->save($upload_path . '/' . $filename);
+        return config('app.url') . "/$folder_name/$filename";
     }
 
     public function reduceSize($file_path, $max_width)

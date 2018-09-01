@@ -1,5 +1,6 @@
 <?php
 
+use App\Handlers\ImageUploadHandler;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -16,6 +17,7 @@ class UserSeeder extends Seeder
             'type'            => 'party',
             'email'           => 'zhukaihaorj@163.com',
             'email_activated' => true,
+            'avatar_url' => (new ImageUploadHandler)->defaultAvatar('Z'),
             'password'        => bcrypt('123123'),
             'created_at'      => now(),
             'updated_at'      => now()
@@ -27,6 +29,7 @@ class UserSeeder extends Seeder
             'email'           => 'm15650753237@163.com',
             'email_activated' => true,
             'password'        => bcrypt('123123'),
+            'avatar_url' => (new ImageUploadHandler)->defaultAvatar('朱'),
             'created_at'      => now(),
             'updated_at'      => now()
         ]);
