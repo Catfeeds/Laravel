@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateWorksTable extends Migration
+class CreateWorkLikesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,10 @@ class CreateWorksTable extends Migration
      */
     public function up()
     {
-        Schema::create('works', function (Blueprint $table) {
+        Schema::create('work_likes', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title');
-            $table->text('description');
-            $table->text('photo_urls')->nullable();
-            $table->integer('like_count')->unsigned()->default(0);
+            $table->integer('work_id')->unsigned()->default(0)->index();
             $table->integer('user_id')->unsigned()->default(0)->index();
-            $table->enum('visible_range', ['public', 'private']);
             $table->timestamps();
         });
     }
@@ -32,6 +28,6 @@ class CreateWorksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('works');
+        Schema::dropIfExists('work_likes');
     }
 }

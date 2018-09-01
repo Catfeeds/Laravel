@@ -55,7 +55,7 @@ class ImageUploadHandler
         $fontSize = 20;
         $width = 40;
         $height = 40;
-        $image = Image::canvas($width, $height, '#888888')
+        $image = Image::canvas($width, $height, '#cccccc')
             ->text($text, $width / 2, $height / 2, function ($font) use ($fontSize) {
                 $font->file(public_path('font/msyh.ttf'));
                 $font->align('center');

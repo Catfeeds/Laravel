@@ -30,6 +30,10 @@ class AddReferences extends Migration
             // 当 topic_id 对应的 topics 表数据被删除时，删除此条数据
             $table->foreign('activity_id')->references('id')->on('activities')->onDelete('cascade');
         });
+        Schema::table('work_likes', function (Blueprint $table) {
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('work_id')->references('id')->on('works')->onDelete('cascade');
+        });
         Schema::table('follow', function (Blueprint $table) {
             // 当 user_id 对应的 users 表数据被删除时，删除此条数据
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
@@ -88,6 +92,10 @@ class AddReferences extends Migration
         Schema::table('activity_likes', function (Blueprint $table) {
             $table->dropForeign(['user_id']);
             $table->dropForeign(['activity_id']);
+        });
+        Schema::table('work_likes', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
+            $table->dropForeign(['work_id']);
         });
         Schema::table('follow', function (Blueprint $table) {
             $table->dropForeign(['user_id']);

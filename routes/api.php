@@ -18,6 +18,7 @@ $api->version('v1', [
     'namespace'  => 'App\Http\Controllers',
     'middleware' => ['serializer:array', 'bindings', 'change-locale']
 ], function ($api) {
+    // TODO 测试
     $api->get('test', 'TestController@test');
 
 
@@ -334,6 +335,12 @@ $api->version('v1', [
         // 删除作品
         $api->delete('works/{work}', 'WorksController@destroy')
             ->name('api.works.destroy');
+        // 点赞
+        $api->post('works/{work}/likes', 'WorkLikesController@store')
+            ->name('api.works.likes.store');
+        // 取消点赞
+        $api->delete('works/{work}/likes', 'WorkLikesController@destroy')
+            ->name('api.works.likes.destroy');
 
         /**
          * 私信相关

@@ -20,9 +20,13 @@ class WorkTransformer extends TransformerAbstract
             'title'       => $work->title,
             'description' => $work->description,
             'photo_urls'  => $work->photo_urls ?? [],
+            'like_count'  => $work->like_count,
             'created_at'  => $work->created_at->toDateTimeString(),
             'updated_at'  => $work->updated_at->toDateTimeString(),
-            'user'        => (new UserTransformer())->transform($work->user)
+            'user'        => (new UserTransformer())->transform($work->user),
+
+            // 附加属性
+            'liked'       => (boolean)$work->liked,
         ];
     }
 }

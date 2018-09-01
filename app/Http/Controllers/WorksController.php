@@ -43,6 +43,9 @@ class WorksController extends Controller
         } else {
             $works = $user->works()->public()->recent()->paginate(20);
         }
+        $works->each(function ($work) use ($currentUser) {
+            $work->setLiked($currentUser);
+        });
         return $this->response->paginator($works, new WorkTransformer());
     }
 
@@ -51,6 +54,7 @@ class WorksController extends Controller
         $works = Work::public()->recent()->paginate(20);
         $currentUser = $this->user();
         $works->each(function ($work) use ($currentUser) {
+            $work->setLiked($currentUser);
             $work->user->setFollowing($currentUser);
         });
         return $this->response->paginator($works, new WorkTransformer());

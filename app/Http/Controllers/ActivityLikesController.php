@@ -20,7 +20,7 @@ class ActivityLikesController extends Controller
             $activity->likes()->save($activityLike);
             $activity->increment('like_count');
         }
-        $activity->setLiked($currentUser);
+        $activity->liked = true;
         return $this->response->item($activity, new ActivityTransformer());
 }
 
@@ -35,7 +35,7 @@ class ActivityLikesController extends Controller
             $activity->likes()->where('user_id', $currentUser->id)->delete();
             $activity->decrement('like_count');
         }
-        $activity->setLiked($currentUser);
+        $activity->liked = false;
         return $this->response->item($activity, new ActivityTransformer());
     }
 }
