@@ -9,6 +9,8 @@ use App\Models\ProjectApplication;
 use App\Models\Reply;
 use App\Models\Upload;
 use App\Models\User;
+use App\Transformers\ProjectForDesignerTransformer;
+use App\Transformers\ProjectForPublisherTransformer;
 use App\Transformers\ProjectTransformer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -33,6 +35,7 @@ class ProjectsController extends Controller
     public function index(Project $project)
     {
         $this->authorize('retrieve', $project);
+
         $currentUser = $this->user();
         $project->setExtraAttributes($currentUser);
 
@@ -42,8 +45,16 @@ class ProjectsController extends Controller
                 ->applications()
                 ->where('user_id', $currentUser->id)
                 ->first();
+            return $this->response->item($project, new ProjectForDesignerTransformer());
+        } else {
+            if($currentUser->isAuthorOf($project)) {
+                return $this->response->item($project, new ProjectForPublisherTransformer());
+            } else {
+                return $this->response->item($project, new ProjectTransformer());
+            }
         }
-        return $this->response->item($project, new ProjectTransformer());
+
+
     }
 
     // 补充项目
