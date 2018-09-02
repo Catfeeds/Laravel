@@ -101,10 +101,14 @@ $api->version('v1', [
     $api->get('users/{user}/activities', 'ActivitiesController@userIndex')
         ->where('user', '[0-9]+')
         ->name('api.users.activities.index');
-    // 动态回复列表
+    // 动态的回复列表
     $api->get('activities/{activity}/replies', 'RepliesController@index')
-        ->where('user', '[0-9]+')
+        ->where('activity', '[0-9]+')
         ->name('api.activities.replies.index');
+    // 动态的某条评论的回复列表
+    $api->get('replies/{reply}/replies', 'RepliesController@replyIndex')
+        ->where('reply', '[0-9]+')
+        ->name('api.replies.index');
     // 热门动态
     $api->get('activities/trending', 'ActivitiesController@trending')
         ->name('api.activities.trending');

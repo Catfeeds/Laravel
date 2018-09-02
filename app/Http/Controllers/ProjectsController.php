@@ -27,7 +27,7 @@ class ProjectsController extends Controller
         if ($request->project_file_id) {
             $attrubutes['project_file_url'] = Upload::find($request->project_file_id)->path;
         }
-        return $this->response->item(Project::create($attrubutes), new ProjectTransformer())
+        return $this->response->item(Project::create($attrubutes), new ProjectForPublisherTransformer())
             ->setStatusCode(201);
     }
 
@@ -70,7 +70,7 @@ class ProjectsController extends Controller
         }
         $project->supplement_at = Carbon::now()->toDateTimeString();
         $project->save();
-        return $this->response->item($project, new ProjectTransformer());
+        return $this->response->item($project, new ProjectForPublisherTransformer());
     }
 
     // 删除项目
@@ -89,7 +89,7 @@ class ProjectsController extends Controller
             return $this->response->errorBadRequest(__('只有未通过审核的订单才能申请重新审核'));
         } else {
             $project->status = Project::STATUS_REVIEWING;
-            return $this->response->item($project, new ProjectTransformer());
+            return $this->response->item($project, new ProjectForPublisherTransformer());
         }
     }
 
@@ -144,6 +144,7 @@ class ProjectsController extends Controller
                 ->where('user_id', $currentUser->id)
                 ->recent()
                 ->paginate(20);
+            return $this->response->paginator($projects, new ProjectForPublisherTransformer());
         } else {
             // 当前用户是设计师：返回报名的项目
             $projects = $this->getBasicQuery($request, true)
@@ -152,9 +153,9 @@ class ProjectsController extends Controller
                 })
                 ->recent()
                 ->paginate(20);
+            return $this->response->paginator($projects, new ProjectForDesignerTransformer());
         }
 
-        return $this->response->paginator($projects, new ProjectTransformer());
     }
 
     // 当前登录的业主进行中的项目
@@ -178,7 +179,7 @@ class ProjectsController extends Controller
             $this->response->error('未实现');
         }
 
-        return $this->response->paginator($projects, new ProjectTransformer());
+        return $this->response->paginator($projects, new ProjectForPublisherTransformer());
     }
 
     // 当前登录用户收藏的项目

@@ -22,8 +22,16 @@ class RepliesController extends Controller
         $reply->user_id = $currentUser->id;
         $reply->activity_id = $activity->id;
         $reply->reply_id = $request->reply_id;
-        $reply->replied_user_id = $request->replied_user_id;
         $reply->save();
+
+        // 构建一个并查集，使所有非一级评论的root_reply_id都指向其所属的一级评论
+        if ($request->reply_id) {
+            $parentReply = Reply::find($request->reply_id);
+            $reply->update(['root_reply_id' => $parentReply->root_reply_id]);
+        } else {
+            $reply->update(['root_reply_id' => $reply->id]); // 根节点的root_reply_id就是自身
+        }
+
         return $this->response->item($reply, new ReplyTransformer())
             ->setStatusCode(201);
     }
@@ -39,15 +47,22 @@ class RepliesController extends Controller
         return $this->response->noContent();
     }
 
+    // 获取某个动态的直接评论
     public function index(Activity $activity)
     {
-        $replies = $activity->replies()->recent()->paginate(10);
+        $replies = $activity->replies()->where('reply_id', null)->recent()->paginate(20);
         return $this->response->paginator($replies, new ReplyTransformer());
     }
 
     public function userIndex()
     {
         $replies = $this->user()->replies()->recent()->paginate(20);
+        return $this->response->paginator($replies, new ReplyTransformer());
+    }
+
+    public function replyIndex(Reply $reply)
+    {
+        $replies = $reply->offspringReplies()->recent()->paginate(20);
         return $this->response->paginator($replies, new ReplyTransformer());
     }
 }
