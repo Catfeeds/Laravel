@@ -9,10 +9,11 @@ namespace App\Http\Controllers;
 
 
 use App\Handlers\ImageUploadHandler;
+use App\Services\UsersService;
 
 class TestController extends Controller
 {
     public function test(){
-        return (new ImageUploadHandler)->defaultAvatar('朱');
+        return (new UsersService())->defaultAvatar('zhu kai');
     }
 }

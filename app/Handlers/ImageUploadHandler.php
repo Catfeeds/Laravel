@@ -43,30 +43,6 @@ class ImageUploadHandler
         ];
     }
 
-    // 生成默认头像
-    public function defaultAvatar($text)
-    {
-        $folder_name = "uploads/images/avatars/default";
-        $upload_path = public_path() . '/' . $folder_name;
-        $filename = str_random(10) . '.png';
-
-        if(!is_dir($upload_path)) { mkdir($upload_path); }
-
-        $fontSize = 20;
-        $width = 40;
-        $height = 40;
-        $image = Image::canvas($width, $height, '#cccccc')
-            ->text($text, $width / 2, $height / 2, function ($font) use ($fontSize) {
-                $font->file(public_path('font/msyh.ttf'));
-                $font->align('center');
-                $font->valign('middle');
-                $font->size($fontSize);
-                $font->color('#ffffff');
-            });
-        $image->save($upload_path . '/' . $filename);
-        return config('app.url') . "/$folder_name/$filename";
-    }
-
     public function reduceSize($file_path, $max_width)
     {
         // 先实例化，传参是文件的磁盘物理路径

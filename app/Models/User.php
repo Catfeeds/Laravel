@@ -100,8 +100,9 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * 发送邮件通知，相当于系统向该用户发送通知
+     * 默认为邮箱激活时才可以发送
      * @param $instance
-     * @param bool $checkActivated 邮箱激活时才发送通知
+     * @param bool $checkActivated
      */
     public function notifyViaEmail($instance, $checkActivated = true) {
         if ($checkActivated && !$this->email_activated) {

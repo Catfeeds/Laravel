@@ -14,8 +14,9 @@ class CreateEmailTokensTable extends Migration
     {
         Schema::create('email_tokens', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('user_id')->index();
             $table->string('email')->index();
-            $table->string('token')->nullable();
+            $table->string('token')->index();
             $table->timestamps();
         });
     }

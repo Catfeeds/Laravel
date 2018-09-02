@@ -14,12 +14,12 @@ class VerificationCodesService
 {
     /**
      * 检查验证码是否正确
-     * @param $phone
+     * @param $key string 可以是phone或email
      * @throws BadRequestHttpException
      * @return bool
      */
-    public function validateCode($phone, $code) {
-        $verifyData = \Cache::get($phone);
+    public function validateCode($key, $code) {
+        $verifyData = \Cache::get($key);
         if (!$verifyData) {
             throw new BadRequestHttpException(__('验证码已失效'));
         }
@@ -28,7 +28,7 @@ class VerificationCodesService
             throw new BadRequestHttpException(__('验证码错误'));
         }
         // 清除验证码缓存
-        \Cache::forget($phone);
+        \Cache::forget($key);
         return true;
     }
 }

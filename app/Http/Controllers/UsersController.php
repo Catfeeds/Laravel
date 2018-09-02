@@ -22,28 +22,35 @@ class UsersController extends Controller
     // 检查手机号是否被注册
     public function checkPhone(CheckPhoneRequest $request, UsersService $service)
     {
-        if($service->isPhoneRegistered($request->phone, $request->type)) {
+        if ($service->isPhoneRegistered($request->phone, $request->type)) {
             throw new ConflictHttpException(__('该手机号已被注册'));
         }
         return $this->response->noContent();
     }
 
+    // 注册：可以用手机号或者邮箱注册
     public function store(UserRequest $request, VerificationCodesService $service, UsersService $usersService)
     {
-        if($usersService->isPhoneRegistered($request->phone, $request->type)) {
+        if ($request->phone && $usersService->isPhoneRegistered($request->phone, $request->type)) {
             throw new ConflictHttpException(__('该手机号已被注册'));
+        }
+        if ($request->email && $usersService->isEmailBound($request->email)) {
+            throw new ConflictHttpException(__('该邮箱已被注册'));
         }
 
         // 检验验证码
-        $service->validateCode($request->phone, $request->verification_code);
+        $service->validateCode($request->phone ?? $request->email, $request->verification_code);
 
         $user = User::create([
-            'name'     => $request->name,
-            'type'     => $request->type,
-            'phone'    => $request->phone,
-            'avatar_url' => (new ImageUploadHandler)->defaultAvatar($request->name[0]),
-            'password' => bcrypt($request->password),
+            'name'       => $request->name,
+            'type'       => $request->type,
+            'phone'      => $request->phone,
+            'email'      => $request->email,
+            'email_activated'      => $request->email ? true : false,
+            'avatar_url' => $usersService->defaultAvatar($request->name),
+            'password'   => bcrypt($request->password),
         ]);
+
         return $this->response->item($user, new CurrentUserTransformer())
             ->setMeta([
                 'token'      => \Auth::guard('api')->fromUser($user),
@@ -53,7 +60,7 @@ class UsersController extends Controller
             ->setStatusCode(201);
     }
 
-    public function update(UserRequest $request, UserMailsService $mailsService)
+    public function update(UserRequest $request, UserMailsService $mailsService, UsersService $usersService)
     {
         $user = $this->user();
         $attributes = $request->only(['name', 'title', 'introduction', 'id_number', 'bank_name', 'bank_card_number', 'account_name', 'qualification_urls']);
@@ -65,8 +72,7 @@ class UsersController extends Controller
         // 更改邮箱时，发送激活邮件
         $needSendMail = false;
         if ($request->email && $request->email != $user->email) {
-            // 检测是否重复
-            if (User::where('email', $request->email)->exists()) {
+            if ($usersService->isEmailBound($request->email)) {
                 return $this->response->errorBadRequest(__('该邮箱已被绑定'));
             }
             $attributes['email'] = $request->email;
@@ -110,7 +116,7 @@ class UsersController extends Controller
 
     public function follow(User $user)
     {
-        if($user->type === 'party') {
+        if ($user->type === 'party') {
             return $this->response->errorBadRequest('只能关注设计师');
         }
 
@@ -185,7 +191,7 @@ class UsersController extends Controller
 
     public function search(Request $request)
     {
-        if($request->invite_to_review) {
+        if ($request->invite_to_review) {
             return $this->searchToInviteReview($request);
         }
 

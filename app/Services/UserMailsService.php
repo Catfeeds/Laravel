@@ -17,9 +17,22 @@ class UserMailsService
     // 发送激活邮件
     public function sendActivationMail(User $user)
     {
+        $emailToken = EmailToken::where([
+            'user_id' => $user->id,
+            'email' => $user->email
+        ])->first();
+
+        if(!$emailToken) {
+            $emailToken = new EmailToken([
+                'user_id' => $user->id,
+                'email' => $user->email
+            ]);
+        }
+
         $token = bcrypt($user->email . time());
-        $emailToken = EmailToken::firstOrCreate(['email' => $user->email]);
-        $emailToken->update(['token' => $token]);
+        $emailToken->token = $token;
+        $emailToken->save();
+
         $user->notifyViaEmail(new ActivateEmail($token), false);
     }
 }
