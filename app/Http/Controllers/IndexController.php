@@ -8,6 +8,7 @@ use App\Models\Work;
 use App\Transformers\ProjectTransformer;
 use App\Transformers\UserTransformer;
 use App\Transformers\WorkTransformer;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class IndexController extends Controller
@@ -19,11 +20,16 @@ class IndexController extends Controller
         return $this->response->collection($users, new UserTransformer());
     }
 
-    // 获取设计师的作品，随机返回5个  TODO: 点赞最多的5个
+    // 获取近一个月点赞最多的设计师的作品
     public function works()
     {
-        $works = Work::inRandomOrder()->limit(5)->get();
-        return $this->response->collection($works, new WorkTransformer());
+        // 先选出20个，然后随机挑5个
+        $works = Work::where('created_at', '>=', Carbon::now()->subMonths(1))
+            ->orderBy('like_count', 'desc')
+            ->limit(20)
+            ->get();
+
+        return $this->response->collection($works->random(5), new WorkTransformer());
     }
 
     // 获取项目，进行中的项目在前面，已完成的项目在后面
