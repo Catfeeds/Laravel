@@ -16,15 +16,19 @@ class AuthorizationsController extends Controller
 {
     public function store(AuthorizationRequest $request)
     {
-        // TODO 邮箱也能登录 见教程4.5
-//        filter_var($username, FILTER_VALIDATE_EMAIL) ?
-//            $credentials['email'] = $username :
-//            $credentials['phone'] = $username;
+        $credentials = $request->only(['password', 'type']);
 
-        $credentials = $request->only(['phone', 'password', 'type']);
+        if(filter_var($request->identifier, FILTER_VALIDATE_EMAIL) ) {
+            $credentials['email'] = $request->identifier;
+            $credentials['email_activated'] = true; // 只有激活邮箱后才能用邮箱登录
+        } else {
+            $credentials['phone'] = $request->identifier;
+        }
+
         if (!$token = \Auth::guard('api')->attempt($credentials)) {
             return $this->response->errorBadRequest(__('用户名或密码错误'));
         }
+
         JWTAuth::setToken($token);
         $user = JWTAuth::toUser($token);
         return $this->response->item($user, new CurrentUserTransformer())

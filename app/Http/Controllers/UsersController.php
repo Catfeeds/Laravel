@@ -42,13 +42,13 @@ class UsersController extends Controller
         $service->validateCode($request->phone ?? $request->email, $request->verification_code);
 
         $user = User::create([
-            'name'       => $request->name,
-            'type'       => $request->type,
-            'phone'      => $request->phone,
-            'email'      => $request->email,
-            'email_activated'      => $request->email ? true : false,
-            'avatar_url' => $usersService->defaultAvatar($request->name),
-            'password'   => bcrypt($request->password),
+            'name'            => $request->name,
+            'type'            => $request->type,
+            'phone'           => $request->phone,
+            'email'           => $request->email,
+            'email_activated' => $request->email ? true : false,
+            'avatar_url'      => $usersService->defaultAvatar($request->name),
+            'password'        => bcrypt($request->password),
         ]);
 
         return $this->response->item($user, new CurrentUserTransformer())
@@ -72,8 +72,12 @@ class UsersController extends Controller
         // 更改邮箱时，发送激活邮件
         $needSendMail = false;
         if ($request->email && $request->email != $user->email) {
+            if (!$user->phone) {
+                $this->response->errorBadRequest(__('您还未绑定手机号，无法更改绑定邮箱'));
+            }
+
             if ($usersService->isEmailBound($request->email)) {
-                return $this->response->errorBadRequest(__('该邮箱已被绑定'));
+                $this->response->errorBadRequest(__('该邮箱已被绑定'));
             }
             $attributes['email'] = $request->email;
             $attributes['email_activated'] = false;

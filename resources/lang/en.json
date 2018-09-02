@@ -5,6 +5,7 @@
   "该邮箱已被注册": "The email has been registered",
   "该邮箱已被绑定": "The email address has been bound",
   "该用户还未设置邮箱": "The user has not set email yet",
+  "您还未绑定手机号，无法更改绑定邮箱": "You have not bound your phone number and cannot change the binding mail",
   "验证码错误": "Wrong validation code",
   "验证码已失效": "The validation code is expired",
   "用户名或密码错误": "Wrong phone number or password",
