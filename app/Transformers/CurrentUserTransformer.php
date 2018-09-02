@@ -23,12 +23,14 @@ class CurrentUserTransformer extends TransformerAbstract
             // 隐私信息
             'phone' => (string)$user->phone,
             'email' => (string)$user->email,
-            'email_activated' => (boolean)$user->email_activated,
-            'company_name' => (string)$user->company_name,
-            'registration_number' => (string)$user->registration_number,
             'id_number' => (string)$user->id_number,
-            'business_license_url' => (string)$user->business_license_url,
             'id_card_url' => (string)$user->id_card_url,
+            'bank_name' => (string)$user->bank_name,
+            'bank_card_number' => (string)$user->bank_card_number,
+            'account_name' => (string)$user->account_name,
+            'qualification_urls' => (array)$user->qualification_urls,
+
+            'email_activated' => (boolean)$user->email_activated,
             'notification_count' => (int)$user->notification_count,
             'unread_message_count' => (int)$user->unreadMessagesCount()
         ];

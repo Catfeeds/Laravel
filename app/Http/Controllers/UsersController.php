@@ -56,7 +56,7 @@ class UsersController extends Controller
     public function update(UserRequest $request, UserMailsService $mailsService)
     {
         $user = $this->user();
-        $attributes = $request->only(['name', 'title', 'introduction', 'company_name', 'id_number', 'registration_number']);
+        $attributes = $request->only(['name', 'title', 'introduction', 'id_number', 'bank_name', 'bank_card_number', 'account_name', 'qualification_urls']);
 
         if ($request->avatar_id) {
             $attributes['avatar_url'] = Upload::find($request->avatar_id)->path;
@@ -74,21 +74,9 @@ class UsersController extends Controller
             $needSendMail = true;
         }
 
-        // 认证信息只能填写一次
-        if ($request->company_name && $user->company_name) {
-            throw new BadRequestHttpException(__('认证信息只能设置一次，不能再次更改'));
-        }
-        if ($request->registration_number && $user->registration_number) {
-            throw new BadRequestHttpException(__('认证信息只能设置一次，不能再次更改'));
-        }
+        // 身份信息只能填写一次
         if ($request->id_number && $user->id_number) {
             throw new BadRequestHttpException(__('认证信息只能设置一次，不能再次更改'));
-        }
-        if ($request->business_license_id) {
-            if ($user->business_license_url) {
-                throw new BadRequestHttpException(__('认证信息只能设置一次，不能再次更改'));
-            }
-            $attributes['business_license_url'] = Upload::find($request->business_license_id)->path;
         }
         if ($request->id_card_id) {
             if ($user->id_card_url) {

@@ -22,12 +22,14 @@ class UserRequest extends FormRequest
                     'title' => 'max:50',
                     'email' => 'email',
                     'introduction' => 'max:200',
-                    'company_name' => 'string',
-                    'id_number' => 'string',
-                    'registration_number' => 'string',
                     'avatar_id' => 'exists:uploads,id,type,avatar,user_id,'.$userId,
-                    'business_license_id' => 'exists:uploads,id,type,business_license,user_id,'.$userId,
-                    'id_card_id' => 'exists:uploads,id,type,id_card,user_id,'.$userId
+                    'id_card_id' => 'exists:uploads,id,type,id_card,user_id,'.$userId,
+                    'id_number' => 'string|max:25',
+                    'bank_name' => 'string|max:100',
+                    'bank_card_number' => 'string|max:100',
+                    'account_name' => 'string|max:100',
+                    'qualification_urls' => 'array',
+                    'qualification_urls.*' => 'distinct|url'
                 ];
         }
     }
@@ -36,7 +38,6 @@ class UserRequest extends FormRequest
     {
         return [
             'avatar_id.exists' => '图片id不存在',
-            'business_license_id.exists' => '图片id不存在',
             'id_card_id.exists' => '图片id不存在'
         ];
     }
