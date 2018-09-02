@@ -7,7 +7,8 @@ class ResetPasswordRequest extends FormRequest
     public function rules()
     {
         return [
-            'phone' => 'required|phone:CN',
+            'phone' => 'required_without:email|phone:CN',
+            'email' => 'required_without:phone|email',
             'type' => 'required|in:designer,party',
             'code' => 'required|size:6',
             'password' => 'required|string'

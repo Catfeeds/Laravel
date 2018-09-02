@@ -18,7 +18,7 @@ class VerificationCodesController extends Controller
         // 6位随机数，左侧补0
         $code = str_pad(random_int(1, 999999), 6, 0, STR_PAD_LEFT);
 
-        if($request->phone) {
+        if ($request->phone) {
             $this->sendViaPhone($request->phone, $code, $easySms);
         } else {
             $this->sendViaEmail($request->email, $code);
@@ -49,17 +49,18 @@ class VerificationCodesController extends Controller
 
         if ($request->action_type === 'resetPassword' && !$isRegistered) {
             $this->response->errorNotFound(
-                $request->phone ?
-                    __('该手机号未注册') :
-                    __('该邮箱未注册'));
+                $request->phone
+                    ? __('该手机号未注册')
+                    : __('该邮箱未被绑定'));
         } else if ($request->action_type != 'resetPassword' && $isRegistered) {
-            $this->response->error($request->phone ?
-                __('该手机号已被注册') :
-                __('该邮箱已被注册'), 409);
+            $this->response->error($request->phone
+                ? __('该手机号已被注册')
+                : __('该邮箱已被注册'), 409);
         }
     }
 
-    private function sendViaPhone($phone, $code, EasySms $easySms) {
+    private function sendViaPhone($phone, $code, EasySms $easySms)
+    {
         try {
             $easySms->send($phone, [
                 'data' => [
@@ -76,9 +77,10 @@ class VerificationCodesController extends Controller
         }
     }
 
-    private function sendViaEmail($email, $code) {
+    private function sendViaEmail($email, $code)
+    {
         \Mail::raw("验证码: $code", function ($message) use ($email) {
-            $message ->to($email)->subject('测试邮件');
+            $message->to($email)->subject('测试邮件');
         });
     }
 }

@@ -17,11 +17,12 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  */
 class UserPasswordController extends Controller
 {
-    public function changePassword(ChangePasswordRequest $request) {
+    public function changePassword(ChangePasswordRequest $request)
+    {
         $currentUser = $this->user();
         if (!\Auth::guard('api')->attempt([
-            'phone' => $currentUser->phone,
-            'type' => $currentUser->type,
+            'phone'    => $currentUser->phone,
+            'type'     => $currentUser->type,
             'password' => $request->password
         ])) {
             return $this->response->errorBadRequest(__('原密码错误'));
@@ -32,8 +33,11 @@ class UserPasswordController extends Controller
         return $this->response->noContent();
     }
 
-    public function changePhone (ChangePhoneRequest $request, VerificationCodesService $service, UsersService $usersService) {
-        $currentUser =  $this->user();
+    public function changePhone(ChangePhoneRequest $request,
+                                VerificationCodesService $service,
+                                UsersService $usersService)
+    {
+        $currentUser = $this->user();
 
         // 检查是否被注册
         if ($usersService->isPhoneRegistered($request->phone, $currentUser->type)) {
@@ -49,21 +53,30 @@ class UserPasswordController extends Controller
         return $this->response->noContent();
     }
 
-    public function resetPassword(ResetPasswordRequest $request, VerificationCodesService $service) {
-        $user = User::where([
-            'phone' => $request->phone,
-            'type' => $request->type
-        ])->first();
-
-        if(!$user) {
-            return $this->response->errorNotFound(__('该手机号未注册'));
+    public function resetPassword(ResetPasswordRequest $request, VerificationCodesService $service)
+    {
+        if ($request->phone) {
+            $user = User::where([
+                'phone' => $request->phone,
+                'type'  => $request->type
+            ])->first();
+        } else {
+            $user = User::where([
+                'email'           => $request->email,
+                'email_activated' => true,
+                'type'            => $request->type
+            ])->first();
+        }
+        if (!$user) {
+            $this->response->errorNotFound($request->phone ?__('该手机号未注册，请确认用户类型选择正确') : __('该邮箱未被绑定，请确认用户类型选择正确且邮箱已激活'));
         }
 
-        $service->validateCode($request->phone, $request->code);
+        $service->validateCode($request->phone ?? $request->email, $request->code);
 
         $user->update([
             'password' => bcrypt($request->password)
         ]);
+
         return $this->response->noContent();
     }
 }
