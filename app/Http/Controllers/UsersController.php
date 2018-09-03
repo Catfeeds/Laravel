@@ -12,6 +12,7 @@ use App\Models\Follow;
 use App\Models\Upload;
 use App\Models\User;
 use App\Transformers\CurrentUserTransformer;
+use App\Transformers\UserForReviewTransformer;
 use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -115,6 +116,7 @@ class UsersController extends Controller
     public function index(User $user)
     {
         $user->setFollowing($this->user());
+        $user->increment('views'); // 浏览量+1
         return $this->response->item($user, new UserTransformer());
     }
 
@@ -231,6 +233,6 @@ class UsersController extends Controller
             $user->setReviewStatus($currentUser);
         });
 
-        return $this->response->paginator($users, new UserTransformer());
+        return $this->response->paginator($users, new UserForReviewTransformer());
     }
 }

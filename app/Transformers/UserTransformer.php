@@ -17,7 +17,7 @@ class UserTransformer extends TransformerAbstract
             'following_count' => (int)$user->following_count,
             'follower_count' => (int)$user->follower_count,
             'following' => (boolean)$user->following,
-            'review_status' => $user->review_status,
+            'views' => (int)$user->views,
             'created_at' => $user->created_at->toDateTimeString(),
             'updated_at' => $user->updated_at->toDateTimeString(),
         ];

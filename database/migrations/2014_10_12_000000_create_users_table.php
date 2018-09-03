@@ -35,6 +35,7 @@ class CreateUsersTable extends Migration
             $table->string('bank_name')->nullable()->comment('开户行');
             $table->string('bank_card_number')->nullable()->comment('卡号');
             $table->string('account_name')->nullable()->comment('开户名');
+            $table->integer('views')->unsigned()->default(0)->comment('浏览次数');
             $table->timestamps();
             $table->softDeletes();
         });
