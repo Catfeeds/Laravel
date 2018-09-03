@@ -24,6 +24,7 @@ class WorkTransformer extends TransformerAbstract
             'created_at'  => $work->created_at->toDateTimeString(),
             'updated_at'  => $work->updated_at->toDateTimeString(),
             'user'        => (new UserTransformer())->transform($work->user),
+            'visible_range' => $work->visible_range,
 
             // 附加属性
             'liked'       => (boolean)$work->liked,

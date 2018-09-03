@@ -150,9 +150,9 @@ $api->version('v1', [
     // 获取某个用户的作品集
     $api->get('users/{user}/works', 'WorksController@userIndex')
         ->name('api.users.works.userIndex');
-    // 获取所有用户的作品集
-    $api->get('works', 'WorksController@index')
-        ->name('api.users.works.userIndex');
+    // 获取所有作品集
+    $api->get('works', 'WorksController@all')
+        ->name('api.users.works.all');
 
     /**
      * 需要 token 验证的接口
@@ -336,6 +336,9 @@ $api->version('v1', [
         // 修改作品内容
         $api->patch('works/{work}', 'WorksController@update')
             ->name('api.works.update');
+        // 修改作品内容
+        $api->get('works/{work}', 'WorksController@index')
+            ->name('api.works.index');
         // 删除作品
         $api->delete('works/{work}', 'WorksController@destroy')
             ->name('api.works.destroy');

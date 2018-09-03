@@ -10,33 +10,42 @@ use App\Transformers\WorkTransformer;
 
 class WorksController extends Controller
 {
-    public function store(WorkRequest $request, Work $work) {
+    public function store(WorkRequest $request, Work $work)
+    {
         $this->authorize('store', Work::class);
         $work->user_id = $this->user()->id;
         $work->title = $request->input('title');
         $work->description = $request->input('description');
         $work->visible_range = $request->input('visible_range');
-        $work->photo_urls = Upload::findMany($request->photo_ids)->pluck('path');
+        $work->photo_urls = $request->input('photo_urls');
         $work->save();
         return $this->response->item($work, new WorkTransformer());
     }
 
-    public function update(Work $work, WorkRequest $request) {
+    public function update(Work $work, WorkRequest $request)
+    {
         $this->authorize('store', $work);
-        $attributes = $request->only(['title', 'description', 'photo_urls']);
+        $attributes = $request->only(['title', 'description', 'photo_urls', 'visible_range']);
         $work->update($attributes);
         return $this->response->item($work, new WorkTransformer());
 
     }
 
-    public function destroy(Work $work) {
+    public function index(Work $work)
+    {
+        return $this->response->item($work, new WorkTransformer());
+    }
+
+    public function destroy(Work $work)
+    {
         $this->authorize('store', $work);
         $work->delete();
         return $this->response->noContent();
     }
 
     // 某个用户的作品集
-    public function userIndex(User $user) {
+    public function userIndex(User $user)
+    {
         $currentUser = $this->user();
         if ($currentUser && $user->id === $currentUser->id) {
             $works = $user->works()->recent()->paginate(20);
@@ -50,7 +59,8 @@ class WorksController extends Controller
     }
 
     // 所有作品集
-    public function index() {
+    public function all()
+    {
         $works = Work::public()->recent()->paginate(20);
         $currentUser = $this->user();
         $works->each(function ($work) use ($currentUser) {

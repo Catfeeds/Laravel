@@ -8,6 +8,7 @@ class Work extends Model
     protected $casts = [
         'photo_urls' => 'array'
     ];
+    protected $guarded = [];
 
     public function user()
     {
