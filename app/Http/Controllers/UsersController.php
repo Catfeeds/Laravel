@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Handlers\ImageUploadHandler;
 use App\Http\Requests\CheckPhoneRequest;
+use App\Http\Requests\SearchUsersRequest;
 use App\Services\UserMailsService;
 use App\Services\UsersService;
 use App\Services\VerificationCodesService;
@@ -64,7 +65,7 @@ class UsersController extends Controller
     public function update(UserRequest $request, UserMailsService $mailsService, UsersService $usersService)
     {
         $user = $this->user();
-        $attributes = $request->only(['name', 'title', 'introduction', 'id_number', 'bank_name', 'bank_card_number', 'account_name', 'qualification_urls']);
+        $attributes = $request->only(['name', 'title', 'introduction', 'id_number', 'bank_name', 'bank_card_number', 'account_name', 'qualification_urls', 'professional_fields']);
 
         if ($request->avatar_id) {
             $attributes['avatar_url'] = Upload::find($request->avatar_id)->path;
@@ -195,19 +196,27 @@ class UsersController extends Controller
         return $this->response->collection($users, new UserTransformer());
     }
 
-    public function search(Request $request)
+    // 搜索：只能搜索设计师
+    public function search(SearchUsersRequest $request)
     {
         if ($request->invite_to_review) {
             return $this->searchToInviteReview($request);
         }
 
         $currentUser = $this->user();
-        $query = User::where('name', 'like', "%$request->keyword%")
-            ->where('type', 'designer'); // 只能搜索设计师
 
-//        if ($request->type) {
-//        $query = $query->where('type', 'designer');
-//        }
+        $query = User::where('name', 'like', "%$request->keyword%")
+            ->where('type', 'designer');
+
+        if(is_array($request->professional_fields)) {
+            $fields = $request->professional_fields;
+            $query->where(function ($query) use ($fields) {
+                foreach ($fields as $field) {
+                    $query->orWhereJsonContains('professional_fields', $field);
+                }
+            });
+        }
+
         $users = $query->paginate(20);
         $users->each(function ($user) use ($currentUser) {
             $user->setFollowing($currentUser);
@@ -217,7 +226,7 @@ class UsersController extends Controller
     }
 
     // 如果搜索用户是为了邀请用户评价，则不显示当前登录用户，并设置'review_status'属性
-    public function searchToInviteReview(Request $request)
+    public function searchToInviteReview(SearchUsersRequest $request)
     {
         $currentUser = $this->user();
         $query = User::where('name', 'like', "%$request->keyword%")

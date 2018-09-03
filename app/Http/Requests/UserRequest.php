@@ -25,12 +25,14 @@ class UserRequest extends FormRequest
                     'introduction' => 'max:200',
                     'avatar_id' => 'exists:uploads,id,type,avatar,user_id,'.$userId,
                     'id_card_id' => 'exists:uploads,id,type,id_card,user_id,'.$userId,
-                    'id_number' => 'string|max:25',
-                    'bank_name' => 'string|max:100',
-                    'bank_card_number' => 'string|max:100',
-                    'account_name' => 'string|max:100',
+                    'id_number' => 'nullable|string',
+                    'bank_name' => 'nullable|string|max:100',
+                    'bank_card_number' => 'nullable|string|max:100',
+                    'account_name' => 'nullable|string|max:100',
                     'qualification_urls' => 'array',
-                    'qualification_urls.*' => 'distinct|url'
+                    'qualification_urls.*' => 'distinct|url',
+                    'professional_fields' => 'array',
+                    'professional_fields.*' => 'string'
                 ];
         }
     }

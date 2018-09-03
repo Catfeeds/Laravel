@@ -24,7 +24,8 @@ class User extends Authenticatable implements JWTSubject
         'password'
     ];
     protected $casts = [
-        'qualification_urls' => 'array'
+        'qualification_urls' => 'array',
+        'professional_fields' => 'array'
     ];
 
     public function followings()
