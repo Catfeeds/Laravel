@@ -210,6 +210,18 @@ class ProjectsController extends Controller
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 
+    // 给当前设计师推荐他没报名的进行中项目
+    public function recommend() {
+        $currentUser= $this->user();
+        $projects = Project::where('status', Project::STATUS_TENDERING)
+            ->whereDoesntHave('applications', function ($query) use ($currentUser) {
+                $query->where('user_id', $currentUser->id);
+            })
+            ->recent()
+            ->paginate(20);
+        return $this->response->paginator($projects, new ProjectTransformer());
+    }
+
     /**
      * 根据query中的参数初始化查询器
      * @params $request

@@ -37,8 +37,8 @@ class ProjectTransformer extends TransformerAbstract
             'created_at'             => $project->created_at->toDateTimeString(),
             'updated_at'             => $project->updated_at->toDateTimeString(),
             'canceled_at'            => $project->canceled_at ? $project->canceled_at->toDateTimeString() : '',
-            'favorite_count'         => $project->favorite_count,
             'user'                   => (new UserTransformer())->transform($project->user),
+            'favorite_count'         => $project->favorite_count,
             'application_count'      => $project->applications()->count() // 报名人数
         ];
     }

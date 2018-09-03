@@ -304,6 +304,9 @@ $api->version('v1', [
         // 当前登录用户收藏的项目
         $api->get('user/favoriting/projects', 'ProjectsController@favorite')
             ->name('api.user.projects.favorite');
+        // 向当前登录的设计师推荐项目
+        $api->get('user/recommended/projects', 'ProjectsController@recommend')
+            ->name('api.user.projects.recommend');
 
         /**
          * 通知相关
