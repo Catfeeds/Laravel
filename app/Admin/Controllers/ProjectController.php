@@ -155,9 +155,11 @@ class ProjectController extends Controller
         $show->features('功能')->as(function ($features) {
             return implode('/', $features);
         });
+        $show->keywords('关键字')->as(function ($keywords) {
+            return implode('/', $keywords);
+        });
         $show->payment('希望付给设计师的费用');
         $show->find_time('希望用多长时间找设计师');
-        $show->area('项目面积');
         $show->description('项目描述');
 
         if($project->project_file_url) {
@@ -168,15 +170,7 @@ class ProjectController extends Controller
 
         $show->delivery_time('交付时间');
         $show->remark('申请备注');
-        $show->supplement_description('补充需求');
-
-        if($project->supplement_file_url) {
-            $show->supplement_file_url('补充附件')->file();
-        } else {
-            $show->supplement_file_url('补充附件');
-        }
         $show->created_at('发布于');
-        $show->supplement_at('补充于');
         $show->canceled_at('取消于');
         $show->updated_at('上次更新');
 
@@ -241,33 +235,19 @@ class ProjectController extends Controller
             ->help('审核未通过时，向用户说明未通过的原因')
             ->rules('max:500');
 
-        $form->textarea('area', '项目面积')->rules('required');
-        $form->textarea('description', '项目描述与需求')->rules('required');
+        $form->textarea('description', '项目描述')->rules('required');
         $form->file('project_file_url', '项目附件')->uniqueName()->removable();;
         $form->text('delivery_time', '交付时间')->rules('required|max:50');
         $form->text('payment', '希望付给设计师的费用')->rules('required|max:200');
-        $form->textarea('supplement_description', '补充需求');
-        $form->file('supplement_file_url', '补充附件')->uniqueName()->removable();;
         $form->text('find_time', '希望用多长时间找设计师')->rules('required|max:50');;
         $form->textarea('remark', '申请备注');
         $form->display('created_at', '发布于');
-        $form->display('supplement_at', '补充于');
         $form->display('updated_at', '上次更新');
 
-        $form->saving(function (Form $form) {
-            // 如果用户没有补充过项目，而管理员新增了"补充内容"，则设置supplement_at字段
-            $project = $form->model();
-            if (!$project->supplement_at && (request('supplement_description') || request('supplement_file_url'))) {
-                $project->supplement_at = new Carbon;
-            }
-        });
         $form->saved(function ($form) {
             $project = $form->model();
             if (request('project_file_url') && $project->project_file_url) {
                 $project->project_file_url = UploadService::getFullUrlByPath($project->project_file_url);
-            }
-            if (request('supplement_file_url') && $project->supplement_file_url) {
-                $project->supplement_file_url = UploadService::getFullUrlByPath($project->supplement_file_url);
             }
             $project->save();
         });

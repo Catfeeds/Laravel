@@ -268,12 +268,9 @@ $api->version('v1', [
         // 删除项目
         $api->delete('projects/{project}', 'ProjectsController@destroy')
             ->name('api.projects.destroy');
-        // 补充项目
+        // 修改项目
         $api->patch('projects/{project}', 'ProjectsController@update')
             ->name('api.projects.update');
-        // 申请重新审核项目
-        $api->put('user/reviewing/projects/{project}', 'ProjectsController@reReview')
-            ->name('api.projects.reReview');
         // 取消项目
         $api->put('user/canceled/projects/{project}', 'ProjectsController@cancel')
             ->name('api.user.projects.cancel');

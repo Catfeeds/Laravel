@@ -40,7 +40,7 @@ class UsersService
         $upload_path = public_path() . '/' . $folder_name;
         $filename = str_random(10) . '.png';
 
-        if(!is_dir($upload_path)) { mkdir($upload_path); }
+        if(!is_dir($upload_path)) { mkdir($upload_path, 0777, true); }
 
         $fontSize = 20;
         $width = 40;

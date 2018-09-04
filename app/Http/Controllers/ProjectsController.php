@@ -21,12 +21,11 @@ class ProjectsController extends Controller
     public function store(ProjectRequest $request)
     {
         $this->authorize('store', Project::class);
-        $attrubutes = $request->only(['title', 'types', 'features', 'area', 'description', 'delivery_time', 'payment', 'find_time', 'remark']);
+
+        $attrubutes = $request->only(['title', 'types', 'features', 'keywords', 'depth', 'description', 'project_file_url', 'delivery_time', 'payment', 'find_time', 'mode', 'remark']);
         $attrubutes['user_id'] = $this->user()->id;
         $attrubutes['status'] = Project::STATUS_REVIEWING;
-        if ($request->project_file_id) {
-            $attrubutes['project_file_url'] = Upload::find($request->project_file_id)->path;
-        }
+
         return $this->response->item(Project::create($attrubutes), new ProjectForPublisherTransformer())
             ->setStatusCode(201);
     }
@@ -53,23 +52,22 @@ class ProjectsController extends Controller
                 return $this->response->item($project, new ProjectTransformer());
             }
         }
-
-
     }
 
-    // 补充项目
-    public function update(ProjectSupplementRequest $request, Project $project)
+    // 修改项目
+    public function update(ProjectRequest $request, Project $project)
     {
         $this->authorize('update', $project);
-        if ($project->supplement_at) {
-            return $this->response->errorBadRequest(__('每个项目只能补充一次'));
+
+        $attrubutes = $request->only(['title', 'types', 'features', 'keywords', 'depth', 'description', 'project_file_url',  'delivery_time', 'payment', 'find_time', 'mode', 'remark']);
+
+        // 是否重新审核
+        if($request->re_review && $project->status === Project::STATUS_REVIEW_FAILED) {
+            $attrubutes['status'] = Project::STATUS_REVIEWING;
         }
-        $project->supplement_description = $request->supplement_description;
-        if ($request->supplement_file_id) {
-            $project->supplement_file_url = Upload::find($request->supplement_file_id)->path;
-        }
-        $project->supplement_at = Carbon::now()->toDateTimeString();
-        $project->save();
+
+        $project->update($attrubutes);
+
         return $this->response->item($project, new ProjectForPublisherTransformer());
     }
 
@@ -79,18 +77,6 @@ class ProjectsController extends Controller
         $this->authorize('destroy', $project);
         $project->delete();
         return $this->response->noContent();
-    }
-
-    //申请重新审核
-    public function reReview(Project $project)
-    {
-        $this->authorize('update', $project);
-        if ($project->status != Project::STATUS_REVIEW_FAILED) {
-            return $this->response->errorBadRequest(__('只有未通过审核的订单才能申请重新审核'));
-        } else {
-            $project->status = Project::STATUS_REVIEWING;
-            return $this->response->item($project, new ProjectForPublisherTransformer());
-        }
     }
 
     // 取消项目

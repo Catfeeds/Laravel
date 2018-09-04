@@ -11,6 +11,7 @@ class Project extends Model
     protected $casts = [
         'types' => 'array',
         'features' => 'array',
+        'keywords' => 'array',
         'canceled_at' => 'datetime'
     ];
     protected $with=['user'];
@@ -27,12 +28,12 @@ class Project extends Model
         return $this->belongsTo(User::class);
     }
 
-    // 报名
+    // 报名列表
     public function applications() {
         return $this->hasMany(ProjectApplication::class);
     }
 
-    // 收藏者
+    // 收藏者列表
     public function favoriteUser() {
         return $this->hasMany(ProjectFavorite::class);
     }
