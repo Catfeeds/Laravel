@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
     {
         \App\Models\User::insert([
             'name'            => '甲方Zhu',
-            'phone'           => '15650753237',
+            'phone'           => '13000000000',
             'type'            => 'party',
             'email'           => 'zhukaihaorj@163.com',
             'email_activated' => true,
@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
         ]);
         \App\Models\User::insert([
             'name'            => '设计师Zhu',
-            'phone'           => '15650753236',
+            'phone'           => '13000000001',
             'type'            => 'designer',
             'email'           => 'm15650753237@163.com',
             'email_activated' => true,

@@ -46,7 +46,7 @@ class ProjectsController extends Controller
                 ->first();
             return $this->response->item($project, new ProjectForDesignerTransformer());
         } else {
-            if($currentUser->isAuthorOf($project)) {
+            if ($currentUser->isAuthorOf($project)) {
                 return $this->response->item($project, new ProjectForPublisherTransformer());
             } else {
                 return $this->response->item($project, new ProjectTransformer());
@@ -59,10 +59,10 @@ class ProjectsController extends Controller
     {
         $this->authorize('update', $project);
 
-        $attrubutes = $request->only(['title', 'types', 'features', 'keywords', 'depth', 'description', 'project_file_url',  'delivery_time', 'payment', 'find_time', 'mode', 'remark']);
+        $attrubutes = $request->only(['title', 'types', 'features', 'keywords', 'depth', 'description', 'project_file_url', 'delivery_time', 'payment', 'find_time', 'mode', 'remark']);
 
         // 是否重新审核
-        if($request->re_review && $project->status === Project::STATUS_REVIEW_FAILED) {
+        if ($request->re_review && $project->status === Project::STATUS_REVIEW_FAILED) {
             $attrubutes['status'] = Project::STATUS_REVIEWING;
         }
 
@@ -197,8 +197,9 @@ class ProjectsController extends Controller
     }
 
     // 给当前设计师推荐他没报名的进行中项目
-    public function recommend() {
-        $currentUser= $this->user();
+    public function recommend()
+    {
+        $currentUser = $this->user();
         $projects = Project::where('status', Project::STATUS_TENDERING)
             ->whereDoesntHave('applications', function ($query) use ($currentUser) {
                 $query->where('user_id', $currentUser->id);
@@ -238,13 +239,27 @@ class ProjectsController extends Controller
                 $status[] = $request->status;
             }
         } else {
-            $status = $allStatus; // 如果没有设置status，则默认搜索所有项目
+            $status = $allStatus; // 如果没有设置status，则默认搜索所有公开项目
         }
-
         $query = Project::whereIn('status', $status)->recent();
 
-        if (is_string($request->keyword)) {
-            $query = $query->where('title', 'like', "%$request->keyword%");
+        if (is_string($request->title)) {
+            $query = $query->where('title', 'like', "%$request->title%");
+        }
+
+        if ($request->keywords) {
+            // keywords可以是字符串也可以是数组
+            if (is_array($request->keywords)) {
+                $query->where(function ($query) use ($request) {
+                    $keywords = $request->keywords;
+                    $firstKeyword = array_shift($keywords);
+                    $query->whereJsonContains('keywords', $firstKeyword);
+                    foreach ($request->keywords as $keyword)
+                        $query->orWhereJsonContains('keywords', $keyword);
+                });
+            } else {
+                $query->whereJsonContains('keywords', $request->keywords);
+            }
         }
 
         return $query;

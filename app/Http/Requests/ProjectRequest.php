@@ -14,7 +14,7 @@ class ProjectRequest extends FormRequest
             'features'         => 'required|array',
             'features.*'       => 'string|max:50',
             'keywords'         => 'nullable|array|max:10',
-            'keywords.*'       => 'string|max:50',
+            'keywords.*'       => 'distinct|string|max:50',
             'depth'            => 'required|string',
             'delivery_time'    => 'required|string|max:50',
             'payment'          => 'required|string|max:200',
