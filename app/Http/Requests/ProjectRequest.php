@@ -7,23 +7,45 @@ class ProjectRequest extends FormRequest
     public function rules()
     {
         $userId = \Auth::guard('api')->id();
-        return [
-            'title'            => 'required|string|max:200',
-            'types'            => 'required|array',
-            'types.*'          => 'string|max:50',
-            'features'         => 'required|array',
-            'features.*'       => 'string|max:50',
-            'keywords'         => 'nullable|array|max:10',
-            'keywords.*'       => 'distinct|string|max:50',
-            'depth'            => 'required|string',
-            'delivery_time'    => 'required|string|max:50',
-            'payment'          => 'required|string|max:200',
-            'description'      => 'required|string',
-            'project_file_url' => 'nullable|string|exists:uploads,path,type,project_file,user_id,' . $userId,
-            'find_time'        => 'required|string|max:60',
-            'mode'             => 'required|string|in:free,invite,specify',
-            'remark'           => 'nullable|string'
-        ];
+        switch ($this->method()) {
+            case 'POST':
+                return [
+                    'title'            => 'required|string|max:200',
+                    'types'            => 'required|array',
+                    'types.*'          => 'string|max:50',
+                    'features'         => 'required|array',
+                    'features.*'       => 'string|max:50',
+                    'keywords'         => 'nullable|array|max:10',
+                    'keywords.*'       => 'distinct|string|max:50',
+                    'depth'            => 'required|string',
+                    'delivery_time'    => 'required|string|max:50',
+                    'payment'          => 'required|string|max:200',
+                    'description'      => 'required|string',
+                    'project_file_url' => 'nullable|string|exists:uploads,path,type,project_file,user_id,' . $userId,
+                    'find_time'        => 'required|string|max:60',
+                    'mode'             => 'required|string|in:free,invite,specify',
+                    'remark'           => 'nullable|string'
+                    // TODO 邀请设计师
+                ];
+            case 'PATCH':
+                return [
+                    'title'            => 'required|string|max:200',
+                    'types'            => 'required|array',
+                    'types.*'          => 'string|max:50',
+                    'features'         => 'required|array',
+                    'features.*'       => 'string|max:50',
+                    'keywords'         => 'nullable|array|max:10',
+                    'keywords.*'       => 'distinct|string|max:50',
+                    'depth'            => 'required|string',
+                    'delivery_time'    => 'required|string|max:50',
+                    'payment'          => 'required|string|max:200',
+                    'description'      => 'required|string',
+                    'project_file_url' => 'nullable|string|exists:uploads,path,type,project_file,user_id,' . $userId,
+                    'find_time'        => 'required|string|max:60',
+                    'remark'           => 'nullable|string',
+                    're_review'        => 'boolean' // 是否重新审核
+                ];
+        }
     }
 
     public function messages()

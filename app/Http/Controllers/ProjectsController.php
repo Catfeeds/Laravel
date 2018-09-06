@@ -59,7 +59,7 @@ class ProjectsController extends Controller
     {
         $this->authorize('update', $project);
 
-        $attrubutes = $request->only(['title', 'types', 'features', 'keywords', 'depth', 'description', 'project_file_url', 'delivery_time', 'payment', 'find_time', 'mode', 'remark']);
+        $attrubutes = $request->only(['title', 'types', 'features', 'keywords', 'depth', 'description', 'project_file_url', 'delivery_time', 'payment', 'find_time', 'remark']);
 
         // 是否重新审核
         if ($request->re_review && $project->status === Project::STATUS_REVIEW_FAILED) {

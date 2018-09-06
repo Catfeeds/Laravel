@@ -20,6 +20,7 @@ class ProjectTransformer extends TransformerAbstract
             'user_id'           => $project->user_id,
             'status'            => $project->status,
             'review_message'    => $project->review_message,
+            'mode'            => $project->mode,
             'title'             => $project->title,
             'types'             => (array)$project->types,
             'features'          => (array)$project->features,
