@@ -136,6 +136,9 @@ $api->version('v1', [
     /**
      * 项目相关
      */
+    // 获取项目详情
+    $api->get('projects/{project}', 'ProjectsController@index')
+        ->name('api.projects.index');
     // 某个业主发布的项目
     $api->get('users/{user}/projects', 'ProjectsController@partyIndex')
         ->where('user', '[0-9]+')
@@ -259,9 +262,6 @@ $api->version('v1', [
         /**
          * 项目相关
          */
-        // 获取项目详情
-        $api->get('projects/{project}', 'ProjectsController@index')
-            ->name('api.projects.index');
         // 发布项目
         $api->post('projects', 'ProjectsController@store')
             ->name('api.projects.store');
@@ -286,6 +286,12 @@ $api->version('v1', [
         // 取消报名
         $api->delete('user/applying/projects/{project}', 'ProjectApplicationsController@destroy')
             ->name('api.user.projects.cancelApply');
+        // 接受邀请
+        $api->put('projects/{project}/accepted/invitations', 'ProjectInvitationsController@accept')
+            ->name('api.projects.invitations.accept');
+        // 拒绝邀请
+        $api->put('projects/{project}/declined/invitations', 'ProjectInvitationsController@decline')
+            ->name('api.projects.invitations.decline');
         // 获取项目报名列表
         $api->get('projects/{project}/applications', 'ProjectApplicationsController@applications')
             ->name('api.projects.applications.index');
@@ -304,6 +310,17 @@ $api->version('v1', [
         // 向当前登录的设计师推荐项目
         $api->get('user/recommended/projects', 'ProjectsController@recommend')
             ->name('api.user.projects.recommend');
+
+        /**
+         * 项目交付相关
+         */
+        // 提交交付文件
+        $api->post('projects/{project}/deliveries', 'ProjectDeliveriesController@store');
+        // 删除交付文件
+        $api->delete('deliveries/{projectDelivery}', 'ProjectDeliveriesController@destroy');
+        // 获取项目交付列表
+        $api->get('projects/{project}/deliveries', 'ProjectDeliveriesController@index')
+            ->name('api.projects.deliveries.index');
 
         /**
          * 通知相关

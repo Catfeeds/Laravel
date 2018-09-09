@@ -9,7 +9,7 @@ class CurrentUserTransformer extends TransformerAbstract
     {
         $basic = (new UserTransformer())->transform($user);
 
-        // 隐私信息
+        // 隐私信息：这些信息其实大部分只有设计师才有，但是共用了一个表
         $extra = [
             'phone' => (string)$user->phone,
             'email' => (string)$user->email,

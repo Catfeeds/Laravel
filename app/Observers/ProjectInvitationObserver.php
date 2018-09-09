@@ -11,8 +11,6 @@ class ProjectInvitationObserver
     // 有新邀请时通知设计师
     public function created(ProjectInvitation $invitation)
     {
-        $designer = $invitation->invitedUser;
-        $designer->notify(new ProjectInvitedViaDatabase($invitation));
-        $designer->notifyViaEmail(new ProjectInvitedViaEmail($invitation));
+        // 见ProjectServices
     }
 }

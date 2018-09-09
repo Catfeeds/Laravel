@@ -11,7 +11,12 @@ use App\Models\Project;
 use App\Models\ProjectApplication;
 use League\Fractal\TransformerAbstract;
 
-class ProjectTransformer extends TransformerAbstract
+/**
+ * 没有登录的用户能获取到的有限的项目信息
+ * Class SimpleProjectTransformer
+ * @package App\Transformers
+ */
+class SimpleProjectTransformer extends TransformerAbstract
 {
     public function transform(Project $project)
     {
@@ -24,12 +29,6 @@ class ProjectTransformer extends TransformerAbstract
             'types'             => (array)$project->types,
             'features'          => (array)$project->features,
             'keywords'          => (array)$project->keywords,
-            'depth'             => $project->depth,
-            'description'       => $project->description,
-            'project_file_url'  => $project->project_file_url,
-            'delivery_time'     => $project->delivery_time,
-            'payment'           => $project->payment,
-            'find_time'         => $project->find_time,
             'created_at'        => $project->created_at->toDateTimeString(),
             'updated_at'        => $project->updated_at->toDateTimeString(),
             'canceled_at'       => $project->canceled_at ? $project->canceled_at->toDateTimeString() : '',

@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Transformers\ProjectForDesignerTransformer;
 use App\Transformers\ProjectForPublisherTransformer;
 use App\Transformers\ProjectTransformer;
+use App\Transformers\SimpleProjectTransformer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -32,7 +33,7 @@ class ProjectsController extends Controller
         // 邀请每个用户
         foreach ($request->invited_designer_ids as $designerId) {
             ProjectInvitation::create([
-                'invited_user_id' => $designerId,
+                'user_id'    => $designerId,
                 'project_id' => $project->id
             ]);
         }
@@ -44,15 +45,34 @@ class ProjectsController extends Controller
     // 获取项目详情
     public function index(Project $project)
     {
+        $currentUser = $this->user();
+
+        // 未登录时只能查看部分信息
+        if (!$currentUser) {
+            if ($project->isPublic()) {
+                return $this->response->item($project, new SimpleProjectTransformer());
+            } else {
+                return $this->response->errorUnauthorized();
+            }
+        }
+
+
         $this->authorize('retrieve', $project);
 
-        $currentUser = $this->user();
         $project->setExtraAttributes($currentUser);
 
-        // 添加当前用户的报名信息
+        // 添加当前用户的报名信息、邀请信息
         if ($currentUser->type === 'designer') {
             $project['application'] = $project
                 ->applications()
+                ->where('user_id', $currentUser->id)
+                ->first();
+            $project['invitation'] = $project
+                ->invitations()
+                ->where('user_id', $currentUser->id)
+                ->first();
+            $project['delivery'] = $project
+                ->deliveries()
                 ->where('user_id', $currentUser->id)
                 ->first();
             return $this->response->item($project, new ProjectForDesignerTransformer());
@@ -115,37 +135,41 @@ class ProjectsController extends Controller
         return $this->response->noContent();
     }
 
-    // 某个业主发布的项目
+    // 某个业主发布的公开项目
     public function partyIndex(User $user, Request $request)
     {
         if ($user->type !== 'party') {
             return $this->response->errorUnauthorized('公开接口只能访问甲方发布的项目');
         }
 
-        $projects = $this->getBasicQuery($request)
+        $projects = $this->getQueryFromRequest($request, Project::PUBLIC_STATUS)
             ->where('user_id', $user->id)
+            ->where('mode', 'free')
             ->recent()
             ->paginate(20);
 
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 
-    // 当前登录用户的项目
+    // 当前登录用户的所有项目
     public function userIndex(Request $request)
     {
         $currentUser = $this->user();
 
         // 当前用户是甲方：返回发布的项目
         if ($currentUser->type == 'party') {
-            $projects = $this->getBasicQuery($request, true)
+            $projects = $this->getQueryFromRequest($request, Project::ALL_STATUS)
                 ->where('user_id', $currentUser->id)
                 ->recent()
                 ->paginate(20);
             return $this->response->paginator($projects, new ProjectForPublisherTransformer());
         } else {
-            // 当前用户是设计师：返回报名的项目
-            $projects = $this->getBasicQuery($request, true)
+            // 当前用户是设计师：返回报名和被邀请的项目的项目
+            $projects = $this->getQueryFromRequest($request,Project::ALL_STATUS)
                 ->whereHas('applications', function ($query) use ($currentUser) {
+                    $query->where('user_id', $currentUser->id);
+                })
+                ->orWhereHas('invitations', function ($query) use ($currentUser) {
                     $query->where('user_id', $currentUser->id);
                 })
                 ->recent()
@@ -155,7 +179,7 @@ class ProjectsController extends Controller
 
     }
 
-    // 当前登录的业主进行中的项目
+    // 当前登录的用户进行中的项目
     public function processing(Request $request)
     {
         $currentUser = $this->user();
@@ -172,13 +196,15 @@ class ProjectsController extends Controller
                 ->recent()
                 ->paginate(20);
         } else {
-            // 当前用户是设计师：返回报名的项目
+            // 当前用户是设计师：返回参与的项目
             $projects = Project::whereIn('status', [
                 Project::STATUS_REVIEWING,
                 Project::STATUS_REVIEW_FAILED,
                 Project::STATUS_TENDERING,
                 Project::STATUS_WORKING
             ])->whereHas('applications', function ($query) use ($currentUser) {
+                $query->where('user_id', $currentUser->id);
+            })->orWhereHas('invitations', function ($query) use ($currentUser) {
                 $query->where('user_id', $currentUser->id);
             })->recent()->paginate(20);
         }
@@ -191,7 +217,7 @@ class ProjectsController extends Controller
     {
         $currentUser = $this->user();
 
-        $projects = $this->getBasicQuery($request, true)
+        $projects = $this->getQueryFromRequest($request, Project::ALL_STATUS)
             ->whereHas('favoriteUser', function ($query) use ($currentUser) {
                 $query->where('user_id', $currentUser->id);
             })
@@ -208,47 +234,33 @@ class ProjectsController extends Controller
     // 搜索项目
     public function search(Request $request)
     {
-        $projects = $this->getBasicQuery($request)
+        $projects = $this->getQueryFromRequest($request, Project::PUBLIC_STATUS)
+            ->where('mode', 'free')
             ->recent()
             ->paginate(20);
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 
-    // 给当前设计师推荐他没报名的进行中项目
+    // 给当前设计师推荐他没报名的自由式项目
     public function recommend()
     {
         $currentUser = $this->user();
         $projects = Project::where('status', Project::STATUS_TENDERING)
+            ->where('mode', 'free')
             ->whereDoesntHave('applications', function ($query) use ($currentUser) {
                 $query->where('user_id', $currentUser->id);
             })
+//            ->whereDoesntHave('invitations', function ($query) use ($currentUser) {
+//                $query->where('user_id', $currentUser->id);
+//            })
             ->recent()
             ->paginate(20);
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 
-    /**
-     * 根据query中的参数初始化查询器
-     * @params $request
-     * @params $withPrivate 是否包含私有项目（审核中、审核失败、已取消）
-     */
-    private function getBasicQuery(Request $request, $withPrivate = false)
+    // 根据query中的参数初始化查询器：status（项目状态）、title（项目标题）、keywords（项目关键字）
+    private function getQueryFromRequest(Request $request, $allowedStatus)
     {
-        $status = [];
-        $allStatus = [
-            Project::STATUS_TENDERING,
-            Project::STATUS_WORKING,
-            Project::STATUS_COMPLETED
-        ];
-
-        if ($withPrivate) {
-            $allStatus = array_merge($allStatus, [
-                Project::STATUS_REVIEWING,
-                Project::STATUS_REVIEW_FAILED,
-                Project::STATUS_CANCELED
-            ]);
-        }
-
         if ($request->status) {
             // status可以是字符串也可以是数组
             if (is_array($request->status)) {
@@ -256,8 +268,14 @@ class ProjectsController extends Controller
             } else {
                 $status[] = $request->status;
             }
+
+            // 表单验证
+            foreach ($status as $s) {
+                if(!in_array($s, $allowedStatus)) $this->response->errorBadRequest('status 参数错误');
+            }
+
         } else {
-            $status = $allStatus; // 如果没有设置status，则默认搜索所有公开项目
+            $status = $allowedStatus; // 如果没有设置status，则默认搜索所有项目
         }
         $query = Project::whereIn('status', $status)->recent();
 

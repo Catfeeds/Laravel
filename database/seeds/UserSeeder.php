@@ -24,6 +24,17 @@ class UserSeeder extends Seeder
             'updated_at'      => now()
         ]);
         \App\Models\User::insert([
+            'name'            => 'Party.Andrew',
+            'phone'           => '13000000002',
+            'type'            => 'party',
+            'email'           => '123123@163.com',
+            'email_activated' => true,
+            'avatar_url' => (new UsersService())->defaultAvatar('Z'),
+            'password'        => bcrypt('123123'),
+            'created_at'      => now(),
+            'updated_at'      => now()
+        ]);
+        \App\Models\User::insert([
             'name'            => '设计师Zhu',
             'phone'           => '13000000001',
             'type'            => 'designer',

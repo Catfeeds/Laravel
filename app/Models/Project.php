@@ -23,14 +23,24 @@ class Project extends Model
     const STATUS_WORKING = 1100; // 作标中
     const STATUS_COMPLETED = 1200; // 已完成
 
+    const PUBLIC_STATUS = [
+        Project::STATUS_TENDERING,
+        Project::STATUS_WORKING,
+        Project::STATUS_COMPLETED
+    ];
+
+    const ALL_STATUS = [
+        Project::STATUS_TENDERING,
+        Project::STATUS_WORKING,
+        Project::STATUS_COMPLETED,
+        Project::STATUS_REVIEWING,
+        Project::STATUS_REVIEW_FAILED,
+        Project::STATUS_CANCELED
+    ];
+
     // 作者
     public function user(){
         return $this->belongsTo(User::class);
-    }
-
-    // 报名列表
-    public function applications() {
-        return $this->hasMany(ProjectApplication::class);
     }
 
     // 收藏者列表
@@ -38,9 +48,29 @@ class Project extends Model
         return $this->hasMany(ProjectFavorite::class);
     }
 
+    // 报名列表
+    public function applications() {
+        return $this->hasMany(ProjectApplication::class);
+    }
+
     // 邀请列表
     public function invitations() {
         return $this->hasMany(ProjectInvitation::class);
+    }
+
+    // 交付列表
+    public function deliveries() {
+        return $this->hasMany(ProjectDelivery::class);
+    }
+
+    // 所有人都能访问的项目
+    function scopePublic($query) {
+        $query->whereIn('status', Project::PUBLIC_STATUS)->where('mode', 'free');
+    }
+
+    // 是否是所有人都能访问的项目
+    function isPublic() {
+        return in_array($this->status, Project::PUBLIC_STATUS) && $this->mode === 'free';
     }
 
     // 用户是否报名了该项目

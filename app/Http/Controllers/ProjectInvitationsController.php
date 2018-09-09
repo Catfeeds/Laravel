@@ -18,10 +18,24 @@ class ProjectInvitationsController extends Controller
             ->paginate(20), new ProjectInvitationTransformer());
     }
 
+    // 接受邀请
+    public function accept (Project $project) {
+        $invitation = $project->invitations()->where('user_id', $this->user()->id)->first();
+        if(!$invitation) {
+            $this->response->errorForbidden('您未被邀请');
+        }
+
+        $invitation->status = ProjectInvitation::STATUS_ACCEPTED;
+        $invitation->save();
+
+        return $this->response->item($invitation, new ProjectInvitationTransformer());
+    }
+
     // 拒绝邀请
-    public function decline (ProjectInvitation $invitation, ProjectInvitationRequest $request) {
-        if(!$this->user()->id !== $invitation->invited_user_id) {
-            $this->response->errorForbidden('非被邀请的设计师本人');
+    public function decline (Project $project, ProjectInvitationRequest $request) {
+        $invitation = $project->invitations()->where('user_id', $this->user()->id)->first();
+        if(!$invitation) {
+            $this->response->errorForbidden('您未被邀请');
         }
 
         $invitation->status = ProjectInvitation::STATUS_DECLINED;

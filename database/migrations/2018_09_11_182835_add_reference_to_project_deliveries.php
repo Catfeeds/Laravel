@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddReferenceToProjectInvitations extends Migration
+class AddReferenceToProjectDeliveries extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class AddReferenceToProjectInvitations extends Migration
      */
     public function up()
     {
-        Schema::table('project_invitations', function (Blueprint $table) {
+        Schema::table('project_deliveries', function (Blueprint $table) {
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
         });
@@ -26,7 +26,7 @@ class AddReferenceToProjectInvitations extends Migration
      */
     public function down()
     {
-        Schema::table('project_invitations', function (Blueprint $table) {
+        Schema::table('project_deliveries', function (Blueprint $table) {
             $table->dropForeign(['user_id']);
             $table->dropForeign(['project_id']);
         });

@@ -18,13 +18,13 @@ class ProjectInvitationTransformer extends TransformerAbstract
     {
         return [
             'id'              => $invitation->id,
-            'invited_user_id' => $invitation->invited_user,
+            'user_id' => $invitation->user,
             'project_id'      => $invitation->project_id,
             'status'          => $invitation->status,
             'refusal_cause'   => $invitation->refusal_cause,
             'created_at'      => $invitation->created_at->toDateTimeString(),
             'updated_at'      => $invitation->updated_at->toDateTimeString(),
-            'invited_user'    => (new UserTransformer())->transform($invitation->invitedUser),
+            'user'    => (new UserTransformer())->transform($invitation->user),
         ];
     }
 }

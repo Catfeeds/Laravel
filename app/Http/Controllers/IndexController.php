@@ -38,7 +38,8 @@ class IndexController extends Controller
         $status = Project::STATUS_COMPLETED;
         $projects = Project::whereIn('status', [
             Project::STATUS_TENDERING, Project::STATUS_WORKING, Project::STATUS_COMPLETED
-        ])->orderByRaw("case when status = $status then 0 else 1 end desc, id desc")
+        ])->where('mode', 'free')
+            ->orderByRaw("case when status = $status then 0 else 1 end desc, id desc")
             ->paginate(20);
         return $this->response->paginator($projects, new ProjectTransformer());
     }

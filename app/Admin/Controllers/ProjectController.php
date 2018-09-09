@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Admin\Services\UploadService;
 use App\Models\Project;
 use App\Http\Controllers\Controller;
+use App\Services\ProjectsService;
 use Carbon\Carbon;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
@@ -155,14 +156,18 @@ class ProjectController extends Controller
         $show->features('功能')->as(function ($features) {
             return implode('/', $features);
         });
-        $show->keywords('关键字')->as(function ($keywords) {
-            return implode('/', $keywords);
-        });
+
+        if($project && $project->keywords) {
+            $show->keywords('关键字')->as(function ($keywords) {
+                return implode('/', $keywords);
+            });
+        }
+
         $show->payment('希望付给设计师的费用');
         $show->find_time('希望用多长时间找设计师');
         $show->description('项目描述');
 
-        if($project->project_file_url) {
+        if ($project->project_file_url) {
             $show->project_file_url('项目附件')->file();
         } else {
             $show->project_file_url('项目附件');
@@ -244,6 +249,15 @@ class ProjectController extends Controller
         $form->display('created_at', '发布于');
         $form->display('updated_at', '上次更新');
 
+        // 如果状态由未审核变成审核通过，则通知所有被邀请的设计师
+        $form->saving(function ($form) {
+            $project = $form->model();
+            if ($project
+                && $project->status == Project::STATUS_REVIEWING
+                && $form->status == Project::STATUS_TENDERING) {
+                (new ProjectsService())->notifyInvitedDesigners($project);
+            }
+        });
         $form->saved(function ($form) {
             $project = $form->model();
             if (request('project_file_url') && $project->project_file_url) {

@@ -2,20 +2,19 @@
 
 namespace App\Models;
 
-class ProjectInvitation extends Model
+use Illuminate\Database\Eloquent\Model;
+
+class ProjectDelivery extends Model
 {
-    protected $with=['user'];
     protected $guarded = [];
+    protected $with = ['user'];
 
-    const STATUS_NOT_VIEWED = 0;
-    const STATUS_ACCEPTED = 1;
-    const STATUS_DECLINED = 2;
-
-
+    // 所属设计师
     public function user(){
         return $this->belongsTo(User::class);
     }
 
+    // 所属项目
     public function project(){
         return $this->belongsTo(Project::class);
     }
