@@ -30,7 +30,6 @@ class InvitedViaEmail extends Notification implements ShouldQueue
 
     public function toMail($notifiable)
     {
-        // TODO 判断邀请类型
         $user = $this->invitation->user;
         return (new MailMessage)
             ->subject($user->name . ' 邀请您评价')

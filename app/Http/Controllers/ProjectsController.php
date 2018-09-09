@@ -6,6 +6,7 @@ use App\Http\Requests\ProjectRequest;
 use App\Http\Requests\ProjectSupplementRequest;
 use App\Models\Project;
 use App\Models\ProjectApplication;
+use App\Models\ProjectInvitation;
 use App\Models\Reply;
 use App\Models\Upload;
 use App\Models\User;
@@ -26,7 +27,17 @@ class ProjectsController extends Controller
         $attrubutes['user_id'] = $this->user()->id;
         $attrubutes['status'] = Project::STATUS_REVIEWING;
 
-        return $this->response->item(Project::create($attrubutes), new ProjectForPublisherTransformer())
+        $project = Project::create($attrubutes);
+
+        // 邀请每个用户
+        foreach ($request->invited_designer_ids as $designerId) {
+            ProjectInvitation::create([
+                'invited_user_id' => $designerId,
+                'project_id' => $project->id
+            ]);
+        }
+
+        return $this->response->item($project, new ProjectForPublisherTransformer())
             ->setStatusCode(201);
     }
 
@@ -161,8 +172,15 @@ class ProjectsController extends Controller
                 ->recent()
                 ->paginate(20);
         } else {
-            // TODO 当前用户是设计师：返回报名的项目
-            $this->response->error('未实现');
+            // 当前用户是设计师：返回报名的项目
+            $projects = Project::whereIn('status', [
+                Project::STATUS_REVIEWING,
+                Project::STATUS_REVIEW_FAILED,
+                Project::STATUS_TENDERING,
+                Project::STATUS_WORKING
+            ])->whereHas('applications', function ($query) use ($currentUser) {
+                $query->where('user_id', $currentUser->id);
+            })->recent()->paginate(20);
         }
 
         return $this->response->paginator($projects, new ProjectForPublisherTransformer());

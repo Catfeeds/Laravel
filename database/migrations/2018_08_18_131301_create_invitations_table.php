@@ -17,7 +17,7 @@ class CreateInvitationsTable extends Migration
             $table->increments('id');
             $table->integer('user_id')->unsigned()->default(0);
             $table->integer('invited_user_id')->unsigned()->default(0);
-            $table->enum('type', ['review', 'apply'])->comment('邀请类型：评价、报名');
+            $table->enum('type', ['review', 'apply'])->comment('邀请类型：评价、报名'); // 这里报名投标单独做成一个表了
             $table->timestamps();
         });
     }

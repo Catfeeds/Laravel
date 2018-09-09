@@ -18,7 +18,7 @@ $api->version('v1', [
     'namespace'  => 'App\Http\Controllers',
     'middleware' => ['serializer:array', 'bindings', 'change-locale']
 ], function ($api) {
-    // TODO 测试
+    // TODO 删除测试
     $api->get('test', 'TestController@test');
 
 

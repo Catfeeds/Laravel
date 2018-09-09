@@ -24,8 +24,9 @@ class ProjectRequest extends FormRequest
                     'project_file_url' => 'nullable|string|exists:uploads,path,type,project_file,user_id,' . $userId,
                     'find_time'        => 'required|string|max:60',
                     'mode'             => 'required|string|in:free,invite,specify',
-                    'remark'           => 'nullable|string'
-                    // TODO 邀请设计师
+                    'remark'           => 'nullable|string',
+                    'invited_designer_ids' => 'array|required_if:mode,invite,specify',
+                    'invited_designer_ids.*' => 'exists:users,id,type,designer'
                 ];
             case 'PATCH':
                 return [

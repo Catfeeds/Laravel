@@ -38,6 +38,11 @@ class Project extends Model
         return $this->hasMany(ProjectFavorite::class);
     }
 
+    // 邀请列表
+    public function invitations() {
+        return $this->hasMany(ProjectInvitation::class);
+    }
+
     // 用户是否报名了该项目
     public function setApplying($user)
     {
