@@ -38,6 +38,13 @@ class Project extends Model
         Project::STATUS_CANCELED
     ];
 
+    const DESIGNER_ORDER_STATUS = [
+        Project::STATUS_TENDERING,
+        Project::STATUS_WORKING,
+        Project::STATUS_COMPLETED,
+        Project::STATUS_CANCELED
+    ];
+
     // 作者
     public function user(){
         return $this->belongsTo(User::class);

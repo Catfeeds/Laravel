@@ -9,7 +9,6 @@ class ProjectApplicationSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
      * @return void
      */
     public function run()
@@ -19,10 +18,14 @@ class ProjectApplicationSeeder extends Seeder
 
         $faker = Faker\Factory::create();
 
-        for($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             do {
                 $user_id = $faker->randomElement(User::where('type', 'designer')->pluck('id'));
-                $project_id = $faker->randomElement(Project::where('mode', 'free')->pluck('id'));
+                $project_id = $faker->randomElement(Project::where('mode', 'free')
+                    ->whereNotIn('status', [
+                        Project::STATUS_REVIEWING,
+                        Project::STATUS_REVIEW_FAILED
+                    ])->pluck('id'));
             } while (\App\Models\ProjectApplication::where([
                 'user_id'    => $user_id,
                 'project_id' => $project_id

@@ -31,11 +31,13 @@ class ProjectsController extends Controller
         $project = Project::create($attrubutes);
 
         // 邀请每个用户
-        foreach ($request->invited_designer_ids as $designerId) {
-            ProjectInvitation::create([
-                'user_id'    => $designerId,
-                'project_id' => $project->id
-            ]);
+        if($attrubutes['mode'] === 'invite' || $attrubutes['mode'] === 'specify') {
+            foreach ($request->invited_designer_ids as $designerId) {
+                ProjectInvitation::create([
+                    'user_id'    => $designerId,
+                    'project_id' => $project->id
+                ]);
+            }
         }
 
         return $this->response->item($project, new ProjectForPublisherTransformer())
@@ -47,7 +49,7 @@ class ProjectsController extends Controller
     {
         $currentUser = $this->user();
 
-        // 未登录时只能查看部分信息
+        // 未登录时只能查看公开项目，且只有部分信息
         if (!$currentUser) {
             if ($project->isPublic()) {
                 return $this->response->item($project, new SimpleProjectTransformer());
@@ -56,10 +58,11 @@ class ProjectsController extends Controller
             }
         }
 
-
-        $this->authorize('retrieve', $project);
+        // 已登录的话看是否有权限查看项目
+        $this->authorizeForUser($currentUser, 'retrieve', $project); // 不能用authorize
 
         $project->setExtraAttributes($currentUser);
+
 
         // 添加当前用户的报名信息、邀请信息
         if ($currentUser->type === 'designer') {
@@ -165,12 +168,13 @@ class ProjectsController extends Controller
             return $this->response->paginator($projects, new ProjectForPublisherTransformer());
         } else {
             // 当前用户是设计师：返回报名和被邀请的项目的项目
-            $projects = $this->getQueryFromRequest($request,Project::ALL_STATUS)
-                ->whereHas('applications', function ($query) use ($currentUser) {
-                    $query->where('user_id', $currentUser->id);
-                })
-                ->orWhereHas('invitations', function ($query) use ($currentUser) {
-                    $query->where('user_id', $currentUser->id);
+            $projects = $this->getQueryFromRequest($request, Project::DESIGNER_ORDER_STATUS)
+                ->where(function ($query) use ($currentUser) {
+                    $query->whereHas('applications', function ($query) use ($currentUser) {
+                        $query->where('user_id', $currentUser->id);
+                    })->orWhereHas('invitations', function ($query) use ($currentUser) {
+                        $query->where('user_id', $currentUser->id);
+                    });
                 })
                 ->recent()
                 ->paginate(20);
@@ -198,14 +202,14 @@ class ProjectsController extends Controller
         } else {
             // 当前用户是设计师：返回参与的项目
             $projects = Project::whereIn('status', [
-                Project::STATUS_REVIEWING,
-                Project::STATUS_REVIEW_FAILED,
                 Project::STATUS_TENDERING,
                 Project::STATUS_WORKING
-            ])->whereHas('applications', function ($query) use ($currentUser) {
-                $query->where('user_id', $currentUser->id);
-            })->orWhereHas('invitations', function ($query) use ($currentUser) {
-                $query->where('user_id', $currentUser->id);
+            ])->where(function ($query) use ($currentUser) {
+                $query->whereHas('applications', function ($query) use ($currentUser) {
+                    $query->where('user_id', $currentUser->id);
+                })->orWhereHas('invitations', function ($query) use ($currentUser) {
+                    $query->where('user_id', $currentUser->id);
+                });
             })->recent()->paginate(20);
         }
 
@@ -217,7 +221,7 @@ class ProjectsController extends Controller
     {
         $currentUser = $this->user();
 
-        $projects = $this->getQueryFromRequest($request, Project::ALL_STATUS)
+        $projects = $this->getQueryFromRequest($request, Project::DESIGNER_ORDER_STATUS)
             ->whereHas('favoriteUser', function ($query) use ($currentUser) {
                 $query->where('user_id', $currentUser->id);
             })
@@ -271,7 +275,7 @@ class ProjectsController extends Controller
 
             // 表单验证
             foreach ($status as $s) {
-                if(!in_array($s, $allowedStatus)) $this->response->errorBadRequest('status 参数错误');
+                if (!in_array($s, $allowedStatus)) $this->response->errorBadRequest('status 参数错误');
             }
 
         } else {

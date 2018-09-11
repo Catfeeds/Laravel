@@ -17,9 +17,20 @@ class UserSeeder extends Seeder
             'phone'           => '13000000000',
             'type'            => 'party',
             'email'           => 'zhukaihaorj@163.com',
-            'email_activated' => true,
+            'email_activated' => false,
             'avatar_url' => (new UsersService())->defaultAvatar('Z'),
             'password'        => bcrypt('123123'),
+            'created_at'      => now(),
+            'updated_at'      => now()
+        ]);
+        \App\Models\User::insert([
+            'name'            => '设计师Zhu',
+            'phone'           => '13000000001',
+            'type'            => 'designer',
+            'email'           => '123213123@163.com',
+            'email_activated' => true,
+            'password'        => bcrypt('123123'),
+            'avatar_url' => (new UsersService)->defaultAvatar('朱'),
             'created_at'      => now(),
             'updated_at'      => now()
         ]);
@@ -31,17 +42,6 @@ class UserSeeder extends Seeder
             'email_activated' => true,
             'avatar_url' => (new UsersService())->defaultAvatar('Z'),
             'password'        => bcrypt('123123'),
-            'created_at'      => now(),
-            'updated_at'      => now()
-        ]);
-        \App\Models\User::insert([
-            'name'            => '设计师Zhu',
-            'phone'           => '13000000001',
-            'type'            => 'designer',
-            'email'           => 'm15650753237@163.com',
-            'email_activated' => true,
-            'password'        => bcrypt('123123'),
-            'avatar_url' => (new UsersService)->defaultAvatar('朱'),
             'created_at'      => now(),
             'updated_at'      => now()
         ]);

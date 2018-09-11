@@ -17,21 +17,15 @@ class ProjectPolicy
         // 项目未审核通过时，只有作者可以查看
         if ($project->status == Project::STATUS_REVIEWING ||
             $project->status == Project::STATUS_REVIEW_FAILED) {
-            if (!$user->isAuthorOf($project)) {
-                throw new AccessDeniedException(__('您无权查看'));
-            }
-            return true;
+            return $user->isAuthorOf($project);
         }
 
         // 项目是其他状态时，如果是公开项目：所有人可访问
         if ($project->mode == 'free') {
             return true;
         } else {
-            // 如果是非公开项目只有被邀请的人（设计师）可以看
-            if (!$project->invitations()->where('user_id', $user->id)->exists()) {
-                throw new AccessDeniedException(__('您无权查看'));
-            }
-            return true;
+            // 如果是非公开项目，则只有作者或者被邀请的设计师可以看
+            return $user->isAuthorOf($project) || $project->invitations()->where('user_id', $user->id)->exists();
         }
     }
 

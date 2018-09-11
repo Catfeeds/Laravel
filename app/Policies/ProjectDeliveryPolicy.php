@@ -12,7 +12,7 @@ class ProjectDeliveryPolicy
 {
     use HandlesAuthorization;
 
-    public function store(User $user, ProjectDelivery $delivery, Project $project) {
+    public function store(User $user, Project $project) {
         if($user->type !== 'designer') {
             return false;
         }

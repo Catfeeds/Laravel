@@ -12,7 +12,7 @@ class ProjectDeliveriesController extends Controller
 {
     public function store(ProjectDeliveryRequest $request, Project $project)
     {
-        $this->authorize('store', [ProjectDelivery::class, $project]);
+        $this->authorize('store', [ ProjectDelivery::class, $project]);
 
         $user = $this->user();
 
@@ -23,7 +23,7 @@ class ProjectDeliveriesController extends Controller
         if (ProjectDelivery::where([
             'user_id'    => $user->id,
             'project_id' => $project->id
-        ])->exist()) {
+        ])->exists()) {
             $this->response->errorBadRequest(__('已上传过交付文件，不可重复上传'));
         }
 
