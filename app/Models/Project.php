@@ -70,6 +70,11 @@ class Project extends Model
         return $this->hasMany(ProjectDelivery::class);
     }
 
+    // 汇款信息
+    public function remit() {
+        return $this->hasOne(ProjectRemittance::class);
+    }
+
     // 所有人都能访问的项目
     function scopePublic($query) {
         $query->whereIn('status', Project::PUBLIC_STATUS)->where('mode', 'free');

@@ -233,7 +233,7 @@ class UserController extends Controller
         ])->label($user->email_activated ? 'success' : 'danger');
         $show->created_at('注册时间');
 
-        $show->panel()->tools(function ($tools) use ($user) {
+        $show->panel()->tools(function ($tools) {
             $tools->disableEdit();
             $tools->disableDelete();
         });

@@ -126,7 +126,7 @@ class ProjectController extends Controller
      * @param mixed $id
      * @return Show
      */
-    protected function detail($id)
+    public function detail($id)
     {
         $project = Project::findOrFail($id);
 

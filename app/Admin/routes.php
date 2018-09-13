@@ -21,6 +21,12 @@ Route::group([
     $router->resource('replies', ReplyController::class, [
         'only' => ['index',  'destroy']
     ]);
-
+    $router->resource('replies', ReplyController::class, [
+        'only' => ['index',  'destroy']
+    ]);
+    $router->resource('remittances', RemittanceController::class, [
+        'only' => ['index', 'show', 'edit']
+    ]);
+    $router->post('/projects/{project}/remittances', 'RemittanceController@update');
 });
 
