@@ -105,6 +105,23 @@ class ProjectsController extends Controller
         return $this->response->item($project, new ProjectForPublisherTransformer());
     }
 
+    // 填写项目汇款信息
+    public function updateRemittance(Request $request, Project $project)
+    {
+        $this->authorize('update', $project);
+
+        $this->validate($request, [
+            'remittance' => 'required|string|max:1000'
+        ]);
+
+        $project->update([
+            'remittance' => $request->remittance,
+            'remittance_submitted_at' => new Carbon
+        ]);
+
+        return $this->response->item($project, new ProjectForPublisherTransformer());
+    }
+
     // 删除项目
     public function destroy(Project $project)
     {

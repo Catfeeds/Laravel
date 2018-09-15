@@ -70,9 +70,14 @@ class Project extends Model
         return $this->hasMany(ProjectDelivery::class);
     }
 
-    // 汇款信息
+    // 甲方的真实汇款信息
     public function remit() {
         return $this->hasOne(ProjectRemittance::class);
+    }
+
+    // 奖金发放列表
+    public function payments() {
+        return $this->hasMany(Payment::class);
     }
 
     // 所有人都能访问的项目

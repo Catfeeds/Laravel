@@ -271,6 +271,9 @@ $api->version('v1', [
         // 修改项目
         $api->patch('projects/{project}', 'ProjectsController@update')
             ->name('api.projects.update');
+        // 修改项目
+        $api->patch('projects/{project}/remittance', 'ProjectsController@updateRemittance')
+            ->name('api.projects.update.remittance');
         // 取消项目
         $api->put('user/canceled/projects/{project}', 'ProjectsController@cancel')
             ->name('api.user.projects.cancel');

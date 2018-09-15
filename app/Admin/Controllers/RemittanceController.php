@@ -38,7 +38,7 @@ class RemittanceController extends Controller
     public function index(Content $content)
     {
         return $content
-            ->header('项目列表')
+            ->header('汇款入账登记')
             ->description('选择一个项目，填写汇款信息，项目将自动进入"工作中"状态')
             ->body($this->grid());
     }
@@ -110,6 +110,12 @@ class RemittanceController extends Controller
             $filter->equal('id', '项目ID');
             $filter->like('user.name', '甲方姓名');
             $filter->like('user.phone', '甲方手机号');
+            $filter->scope('reviewing', '待审核')->where('status', Project::STATUS_REVIEWING);
+            $filter->scope('canceled', '已取消')->where('status', Project::STATUS_CANCELED);
+            $filter->scope('review_failed', '审核未通过')->where('status', Project::STATUS_REVIEW_FAILED);
+            $filter->scope('tendering', '招标中')->where('status', Project::STATUS_TENDERING);
+            $filter->scope('working', '作标中')->where('status', Project::STATUS_WORKING);
+            $filter->scope('completed', '已完成')->where('status', Project::STATUS_COMPLETED);
         });
 
         $grid->actions(function ($actions) {
@@ -172,7 +178,7 @@ class RemittanceController extends Controller
                 $tools->disableList();
                 $tools->disableDelete();
                 $tools->append(
-                    "<a class='btn btn-sm btn-primary' href='/admin/remittances/$projectId/edit'><i class='fa fa-pencil'></i>&nbsp;&nbsp;编辑</a>"
+                    "<a class='btn btn-sm btn-primary' href='/admin/project_remittances/$projectId/edit'><i class='fa fa-pencil'></i>&nbsp;&nbsp;编辑</a>"
                 );
             });
 
@@ -180,7 +186,9 @@ class RemittanceController extends Controller
         $show->bank('汇款行');
         $show->name('汇款人');
         $show->amount('金额');
-        $show->remitted_at('汇款日期');
+        $show->remitted_at('汇款日期')->as(function ($time) {
+            return (new Carbon($time))->toDateString();
+        });
         $show->created_at('信息录入于');
         return $show;
     }
@@ -188,18 +196,13 @@ class RemittanceController extends Controller
     protected function form($id)
     {
         $project = Project::findOrFail($id);
-        $remittance = $project->remit;
-        if ($remittance) {
-            $form = new \Encore\Admin\Widgets\Form($remittance);
-        } else {
-            $form = new \Encore\Admin\Widgets\Form($remittance);
-        }
+        $form = new \Encore\Admin\Widgets\Form($project->remit);
 
         $form->text('number', '流水号');
         $form->text('bank', '汇款行');
         $form->text('name', '汇款人');
         $form->number('amount', '金额');
-        $form->datetime('remitted_at', '汇款日期');
+        $form->date('remitted_at', '汇款日期');
         $form->display('created_at', '信息录入于');
 
         $form->action("/admin/projects/$id/remittances");
@@ -211,34 +214,30 @@ class RemittanceController extends Controller
 
     public function update(Request $request, Project $project)
     {
-        $attributes = $request->only(['number', 'bank', 'name', 'amount', 'remitted_at']);
 
-        $validator = \Validator::make($attributes, [
+        $this->validate($request, [
             'number'      => 'required|max:300',
             'bank'        => 'required|max:300',
             'name'        => 'required|max:300',
             'amount'      => 'required|max:300',
-            'remitted_at' => 'required',
-        ], [
-            'number.required'      => '请填写流水号',
-            'bank.required'        => '请填写汇款行',
-            'name.required'        => '请填写汇款人',
-            'amount.required'      => '请填写金额',
-            'remitted_at.required' => '请填写汇款日期',
+            'remitted_at' => 'required|date',
+        ], [], [
+            'number'      => '流水号',
+            'bank'        => '汇款行',
+            'name'        => '汇款人',
+            'amount'      => '金额',
+            'remitted_at' => '汇款日期',
         ]);
 
+        $attributes = $request->only(['number', 'bank', 'name', 'amount', 'remitted_at']);
 
-        if ($validator->failed()) {
-            return back()->withInput()->withErrors($validator);
-        }
-
-        if($project->remit) {
+        if ($project->remit) {
             $project->remit()->update($attributes);
         } else {
             $attributes['project_id'] = $project->id;
             ProjectRemittance::create($attributes);
         }
 
-        return redirect("/admin/remittances/$project->id");
+        return redirect("/admin/project_remittances/$project->id");
     }
 }
