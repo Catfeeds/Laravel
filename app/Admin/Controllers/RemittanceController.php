@@ -61,17 +61,20 @@ class RemittanceController extends Controller
 
         return $content
             ->header('项目汇款信息')
+            ->body($this->remittanceBox($project->remittance))
             ->body($this->remittanceDetail($remittance, $id))
             ->body($this->projectDetail($id));
     }
 
     public function edit($id, Content $content)
     {
+        $project = Project::findOrFail($id);
         return $content
             ->header('编辑项目汇款信息')
             ->description('初次为"报名中"项目设置汇款信息时，项目状态会自动转为"工作中"')
-            ->body($this->form($id))
-            ->body($this->projectDetail($id));
+            ->body($this->remittanceBox($project->remittance))
+            ->body($this->form($project));
+//            ->body($this->projectDetail($id));
     }
 
     protected function grid()
@@ -193,9 +196,8 @@ class RemittanceController extends Controller
         return $show;
     }
 
-    protected function form($id)
+    protected function form($project)
     {
-        $project = Project::findOrFail($id);
         $form = new \Encore\Admin\Widgets\Form($project->remit);
 
         $form->text('number', '流水号');
@@ -205,10 +207,18 @@ class RemittanceController extends Controller
         $form->date('remitted_at', '汇款日期');
         $form->display('created_at', '信息录入于');
 
-        $form->action("/admin/projects/$id/remittances");
+        $form->action("/admin/projects/$project->id/remittances");
 
         $box = new Box('汇款信息', $form);
         $box->style('info');
+        return $box;
+    }
+
+    protected function remittanceBox($remittance) {
+        $box = new Box('甲方填写的汇款信息', $remittance ? $remittance :'暂未填写');
+        $box->collapsable();
+        $box->style('primary');
+        $box->solid();
         return $box;
     }
 
