@@ -39,6 +39,35 @@ class ActivityController extends Controller
             ->body($this->detail($id));
     }
 
+
+    // 用于关联关系中的show
+    public function showInRelation($show)
+    {
+        $show->setResource('/admin/activities');
+
+        $show->id('ID');
+        $show->user()->name('作者');
+        $show->content('内容');
+        $show->photo_urls('图片')->as(function ($urls) {
+            if(!is_array($urls)) {
+                return null;
+            }
+            $res = '';
+            foreach ($urls as $url) {
+                $res .= "<img src='$url' style='max-width:200px;max-height:200px;margin:0 8px 8px 0;' class='img' />";
+            }
+            return $res;
+        });
+        $show->like_count('点赞数');
+        $show->reply_count('评论数');
+        $show->created_at('发布于');
+
+        $show->panel()->tools(function ($tools) {
+            $tools->disableEdit();
+            $tools->disableDelete();
+        });
+    }
+
     /**
      * Make a grid builder.
      * @return Grid
@@ -101,11 +130,15 @@ class ActivityController extends Controller
         $show->reply_count('评论数');
         $show->created_at('发布于');
 
+        $show->panel()->tools(function ($tools) {
+            $tools->disableEdit();
+        });
+
         $show->replies('评论列表', function ($grid) {
             $grid->setResource('/admin/replies');
             $grid->id('ID')->sortable();
             $grid->user('作者')->display(function ($user) {
-                $route = 'users/' . $user['id'];
+                $route = '/admin/users/' . $user['id'];
                 return "<a href='{$route}'>{$user['name']}</a>";
             });
             $grid->content('内容');

@@ -27,13 +27,13 @@ class ReplyController extends Controller
             ->body($this->grid());
     }
 
+    public function show($id, Content $content)
+    {
+        return $content
+            ->header('评论详情')
+            ->body($this->detail($id));
+    }
 
-
-    /**
-     * Make a grid builder.
-     *
-     * @return Grid
-     */
     protected function grid()
     {
         $grid = new Grid(new Reply);
@@ -49,7 +49,6 @@ class ReplyController extends Controller
 
         $grid->actions(function ($actions) {
             $actions->disableEdit();
-            $actions->disableView();
         });
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -66,11 +65,21 @@ class ReplyController extends Controller
         return $grid;
     }
 
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
+    protected function detail($id){
+        $show = new Show(Reply::findOrFail($id));
+        $show->id('评论ID');
+        $show->user()->name('用户');
+        $show->content('内容');
+        $show->created_at('发表于');
+        $show->activity('评论动态', function ($show) {
+            (new ActivityController())->showInRelation($show);
+        });
+        $show->panel()->tools(function ($tools) {
+            $tools->disableEdit();
+        });
+        return $show;
+    }
+
     protected function form()
     {
         $form = new Form(new Reply);

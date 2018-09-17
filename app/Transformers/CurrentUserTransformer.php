@@ -14,7 +14,11 @@ class CurrentUserTransformer extends TransformerAbstract
             'phone' => (string)$user->phone,
             'email' => (string)$user->email,
 
-            // 以下信息其实大部分只有设计师才有，但是共用了一个表
+            'email_activated' => (boolean)$user->email_activated,
+            'notification_count' => (int)$user->notification_count,
+            'unread_message_count' => (int)$user->unreadMessagesCount(),
+
+            // 以下信息只有设计师有，但是共用了一个表
             'id_number' => (string)$user->id_number,
             'id_card_url' => (string)$user->id_card_url,
             'bank_name' => (string)$user->bank_name,
@@ -22,10 +26,6 @@ class CurrentUserTransformer extends TransformerAbstract
             'account_name' => (string)$user->account_name,
             'qualification_urls' => (array)$user->qualification_urls,
             'total_payment' => (float)$user->payments()->sum('amount'),
-
-            'email_activated' => (boolean)$user->email_activated,
-            'notification_count' => (int)$user->notification_count,
-            'unread_message_count' => (int)$user->unreadMessagesCount(),
         ];
 
         return array_merge($basic, $extra);

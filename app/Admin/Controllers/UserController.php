@@ -16,6 +16,12 @@ class UserController extends Controller
 {
     use HasResourceActions;
 
+    // form方法需要根据$id来判断使用设计师还是甲方的表单，所以覆盖HasResourceActions中的方法
+    public function update($id)
+    {
+        return $this->form($id)->update($id);
+    }
+
     /**
      * Index interface.
      * @param Content $content
@@ -117,27 +123,45 @@ class UserController extends Controller
         } else {
             $show->avatar_url('头像');
         }
-        $show->type('用户类型')->using([
-            'designer' => '设计师',
-            'party'    => '甲方'
-        ]);
+        $show->type('用户类型')->as(function ($type) {
+            $types = ['designer' => '设计师', 'party' => '甲方'];
+            return "<span class='label label-primary'>$types[$type]</span>";
+        });
         $show->phone('手机号');
         $show->email('邮箱');
         $show->title('职位/公司');
         $show->introduction('简介');
-        $show->company_name('公司名');
-        $show->registration_number('注册号');
-        if ($user->business_license_url) {
-            $show->business_license_url('营业执照')->image(null, 500, 500);
-        } else {
-            $show->business_license_url('营业执照');
+
+        if ($user->type === 'designer') {
+            $show->professional_fields('专业领域')->as(function ($value) {
+                if (!$value) return $value;
+                else return implode(' / ', $value);
+            });
+
+            $show->qualification_urls('资质证书')->as(function ($urls) {
+                if (!is_array($urls)) {
+                    return null;
+                }
+
+                $res = '';
+                foreach ($urls as $url) {
+                    $res .= "<img src='$url' style='max-width:300px;max-height:300px;margin:0 8px 8px 0;' class='img' />";
+                }
+                return $res;
+            });
+
+            $show->bank_name('开户行');
+            $show->account_name('开户名');
+            $show->bank_card_number('银行卡号');
+            $show->id_number('身份证号');
+
+            if ($user->id_card_url) {
+                $show->id_card_url('身份证照片')->image(null, 300, 300);
+            } else {
+                $show->id_card_url('身份证照片');
+            }
         }
-        $show->id_number('身份证号');
-        if ($user->id_card_url) {
-            $show->id_card_url('身份证照片')->image(null, 300, 300);
-        } else {
-            $show->id_card_url('身份证照片');
-        }
+
         $show->email_activated('邮箱是否激活')->using([
             1 => '是',
             0 => '否'
@@ -147,14 +171,22 @@ class UserController extends Controller
         return $show;
     }
 
-    /**
-     * Make a form builder.
-     * @return Form
-     */
     protected function form($id = null)
     {
-        $form = new Form(new User());
+        if (User::where([
+            'id'   => $id,
+            'type' => 'designer'
+        ])->exists()) {
+            $form = $this->formForDesigner($id);
+        } else {
+            $form = $this->formForParty($id);
+        }
+        return $form;
+    }
 
+    protected function formForDesigner($id = null)
+    {
+        $form = new Form(new User());
         $form->text('name', '姓名')->rules('required');
         $form->image('avatar_url', '头像')
             ->uniqueName()
@@ -168,9 +200,68 @@ class UserController extends Controller
         $form->email('email', '邮箱')->rules('nullable');
         $form->text('title', '职位/公司');
         $form->textarea('introduction', '简介');
-        $form->text('company_name', '公司名');
-        $form->text('registration_number', '注册号');
+
+        // TODO saved中需要查找是否包含根域名，然后设置成完整域名
+//            $form->multipleImage('qualification_urls', '资质证书')
+//                ->uniqueName()
+//                ->removable()
+//                ->rules('max:2048', ['max' => '资质证书最大是2MB']);
+        $form->text('bank_name', '开户行');
+        $form->text('account_name', '开户名');
+        $form->text('bank_card_number', '银行卡号');
         $form->text('id_number', '身份证号');
+
+        $form->image('id_card_url', '身份证照片')
+            ->uniqueName()
+            ->removable()
+            ->rules('max:5120', ['max' => '身份证照片最大是5MB']);
+
+        $form->switch('email_activated', '邮箱是否激活')->states([
+            'on'  => ['value' => 1, 'text' => '是', 'color' => 'success'],
+            'off' => ['value' => 0, 'text' => '否', 'color' => 'default']
+        ])->rules('required');
+        $form->password('password', '密码')->help('填写此项后将覆盖该用户的密码，请谨慎操作。若您不想修改该用户的密码，请将此项留空。');
+
+        $form->ignore('password');
+
+        $form->saving(function ($form) {
+            if (request('password')) {
+                $form->password = bcrypt(request('password'));
+            }
+        });
+        $form->saved(function ($form) {
+            $user = $form->model();
+
+            $attributes = [];
+            if (request('avatar_url') && $user->avatar_url) {
+                $attributes['avatar_url'] = UploadService::getFullUrlByPath($user->avatar_url);
+            }
+            if (request('id_card_url') && $user->id_card_url) {
+                $attributes['id_card_url'] = UploadService::getFullUrlByPath($user->id_card_url);
+            }
+
+            $user->update($attributes);
+        });
+
+        return $form;
+    }
+
+    protected function formForParty($id = null)
+    {
+        $form = new Form(new User());
+        $form->text('name', '姓名')->rules('required');
+        $form->image('avatar_url', '头像')
+            ->uniqueName()
+            ->removable()
+            ->rules('max:2048', ['max' => '头像最大是2MB']);
+        $form->select('type', '用户类型')->options([
+            'designer' => '设计师',
+            'party'    => '甲方'
+        ])->rules('required');
+        $form->text('phone', '手机号')->prepend('<i class="fa fa-phone fa-fw"></i>')->rules('required');
+        $form->email('email', '邮箱')->rules('nullable');
+        $form->text('title', '职位/公司');
+        $form->textarea('introduction', '简介');
         $form->switch('email_activated', '邮箱是否激活')->states([
             'on'  => ['value' => 1, 'text' => '是', 'color' => 'success'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'default']
@@ -187,7 +278,8 @@ class UserController extends Controller
         $form->saved(function ($form) {
             $user = $form->model();
             if (request('avatar_url') && $user->avatar_url) {
-                $user->update(['avatar_url' => UploadService::getFullUrlByPath($user->avatar_url)]);
+                $attributes['avatar_url'] = UploadService::getFullUrlByPath($user->avatar_url);
+                $user->update($attributes);
             }
         });
 

@@ -22,7 +22,7 @@ Route::group([
         'only' => ['index',  'destroy']
     ]);
     $router->resource('replies', ReplyController::class, [
-        'only' => ['index',  'destroy']
+        'only' => ['index', 'show', 'destroy']
     ]);
     $router->resource('project_remittances', RemittanceController::class, [
         'only' => ['index', 'show', 'edit']

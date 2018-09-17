@@ -100,7 +100,7 @@ class ProjectController extends Controller
                 'invite'  => '邀请式',
                 'specify' => '指定式'
             ];
-            return $modes[$mode];
+            return "<span class='label label-primary'>$modes[$mode]</span>";
         });
 
         $grid->title('标题');
@@ -200,9 +200,9 @@ class ProjectController extends Controller
         $show->updated_at('上次更新');
 
         if ($project->mode === 'free') {
-            $this->invitationList($show);
-        } else {
             $this->applicationList($show);
+        } else {
+            $this->invitationList($show);
         }
 
         $this->deliveryList($show);
@@ -292,8 +292,8 @@ class ProjectController extends Controller
             });
             $grid->status('状态')->display(function ($status) {
                 $texts = [
-                    ProjectInvitation::STATUS_ACCEPTED   => '接受',
-                    ProjectInvitation::STATUS_DECLINED   => '拒绝',
+                    ProjectInvitation::STATUS_ACCEPTED   => '已接受',
+                    ProjectInvitation::STATUS_DECLINED   => '已拒绝',
                     ProjectInvitation::STATUS_NOT_VIEWED => '未查看'
                 ];
                 $styles = [
