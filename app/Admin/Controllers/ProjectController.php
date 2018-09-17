@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Admin\Services\UploadService;
 use App\Models\Project;
 use App\Http\Controllers\Controller;
+use App\Models\ProjectInvitation;
 use App\Services\ProjectsService;
 use Carbon\Carbon;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -95,8 +96,8 @@ class ProjectController extends Controller
 
         $grid->mode('模式')->display(function ($mode) {
             $modes = [
-                'free' => '自由式',
-                'invite' => '邀请式',
+                'free'    => '自由式',
+                'invite'  => '邀请式',
                 'specify' => '指定式'
             ];
             return $modes[$mode];
@@ -145,6 +146,15 @@ class ProjectController extends Controller
         $show->title('项目标题');
         $show->user()->name('发布者');
         $show->favorite_count('收藏人数');
+        $show->mode('项目模式')->as(function ($mode) {
+            $modes = [
+                'free'    => '自由式',
+                'invite'  => '邀请式',
+                'specify' => '指定式'
+            ];
+            return "<span class='label label-primary'>$modes[$mode]</span>";
+        });
+
         $texts = $this->statusTexts;
         $show->status('项目状态')->as(function ($status) use ($texts) {
             $styles = [
@@ -155,9 +165,9 @@ class ProjectController extends Controller
                 Project::STATUS_WORKING       => 'primary',
                 Project::STATUS_COMPLETED     => 'default'
             ];
-
             return "<span class='label label-{$styles[$status]}'>$texts[$status]</span>";
         });
+
         $show->review_message('审核结果说明');
         $show->types('类型')->as(function ($types) {
             return implode('/', $types);
@@ -166,15 +176,17 @@ class ProjectController extends Controller
             return implode('/', $features);
         });
 
-        if($project && $project->keywords) {
+        if ($project->keywords) {
             $show->keywords('关键字')->as(function ($keywords) {
                 return implode('/', $keywords);
             });
         }
 
-        $show->payment('希望付给设计师的费用');
-        $show->find_time('希望用多长时间找设计师');
         $show->description('项目描述');
+        $show->depth('项目设计深度要求');
+        $show->delivery_time('交付时间');
+        $show->find_time('希望用多长时间找设计师');
+        $show->payment('希望付给设计师的费用');
 
         if ($project->project_file_url) {
             $show->project_file_url('项目附件')->file();
@@ -182,39 +194,21 @@ class ProjectController extends Controller
             $show->project_file_url('项目附件');
         }
 
-        $show->delivery_time('交付时间');
         $show->remark('申请备注');
         $show->created_at('发布于');
         $show->canceled_at('取消于');
         $show->updated_at('上次更新');
 
+        if ($project->mode === 'free') {
+            $this->invitationList($show);
+        } else {
+            $this->applicationList($show);
+        }
+
+        $this->deliveryList($show);
 
         $show->user('甲方信息', function ($show) {
             (new UserController())->showInRelation($show);
-        });
-
-        $show->applications('报名列表', function ($grid) {
-            $grid->id('ID')->sortable();
-            $grid->user('设计师')->display(function ($user) {
-                $route = 'users/' . $user['id'];
-                return "<a href='{$route}'>{$user['name']}</a>";
-            });
-            $grid->remark('备注');
-            $grid->application_file_url('附件')->display(function ($url) {
-                return "<a href='{$url}' target='_blank'>下载</a>";
-            });
-            $grid->created_at('报名时间');
-
-            $grid->disableActions();
-
-            $grid->filter(function (Grid\Filter $filter) {
-                $filter->disableIdFilter();
-                $filter->like('user.name', '设计师姓名');
-                $filter->like('user.phone', '设计师手机号');
-                $filter->between('created_at', '报名时间')->date();
-            });
-
-            $grid->disableCreateButton();
         });
 
         return $show;
@@ -276,5 +270,94 @@ class ProjectController extends Controller
         });
 
         return $form;
+    }
+
+    protected function invitationList($show)
+    {
+        $show->invitations('邀请列表', function ($grid) {
+            $grid->id('ID')->sortable();
+            $grid->user('设计师')->display(function ($user) {
+                $route = 'users/' . $user['id'];
+                return "<a href='{$route}'>{$user['name']}</a>";
+            });
+            $grid->status('状态')->display(function ($status) {
+                $texts = [
+                    ProjectInvitation::STATUS_ACCEPTED   => '接受',
+                    ProjectInvitation::STATUS_DECLINED   => '拒绝',
+                    ProjectInvitation::STATUS_NOT_VIEWED => '未查看'
+                ];
+                $styles = [
+                    ProjectInvitation::STATUS_ACCEPTED   => 'success',
+                    ProjectInvitation::STATUS_DECLINED   => 'danger',
+                    ProjectInvitation::STATUS_NOT_VIEWED => 'default'
+                ];
+                return "<span class='label label-{$styles[$status]}'>$texts[$status]</span>";
+            });
+            $grid->created_at('邀请于');
+
+            $grid->disableActions();
+            $grid->disableCreateButton();
+
+            $grid->filter(function (Grid\Filter $filter) {
+                $filter->disableIdFilter();
+                $filter->like('user.name', '设计师姓名');
+                $filter->like('user.phone', '设计师手机号');
+                $filter->between('created_at', '邀请时间')->date();
+            });
+        });
+        return $show;
+    }
+
+    protected function applicationList($show)
+    {
+        $show->applications('报名列表', function ($grid) {
+            $grid->id('ID')->sortable();
+            $grid->user('设计师')->display(function ($user) {
+                $route = 'users/' . $user['id'];
+                return "<a href='{$route}'>{$user['name']}</a>";
+            });
+            $grid->remark('备注');
+            $grid->application_file_url('附件')->display(function ($url) {
+                return "<a href='{$url}' target='_blank'>下载</a>";
+            });
+            $grid->created_at('报名时间');
+
+            $grid->disableActions();
+            $grid->disableCreateButton();
+
+            $grid->filter(function (Grid\Filter $filter) {
+                $filter->disableIdFilter();
+                $filter->like('user.name', '设计师姓名');
+                $filter->like('user.phone', '设计师手机号');
+                $filter->between('created_at', '报名时间')->date();
+            });
+
+        });
+    }
+
+    protected function deliveryList($show) {
+        $show->applications('交付列表', function ($grid) {
+            $grid->id('ID')->sortable();
+            $grid->user('设计师')->display(function ($user) {
+                $route = 'users/' . $user['id'];
+                return "<a href='{$route}'>{$user['name']}</a>";
+            });
+            $grid->remark('备注');
+            $grid->file_url('设计文件')->display(function ($url) {
+                return "<a href='{$url}' target='_blank'>下载</a>";
+            });
+            $grid->created_at('提交时间');
+
+            $grid->disableActions();
+            $grid->disableCreateButton();
+
+            $grid->filter(function (Grid\Filter $filter) {
+                $filter->disableIdFilter();
+                $filter->like('user.name', '设计师姓名');
+                $filter->like('user.phone', '设计师手机号');
+                $filter->between('created_at', '提交时间')->date();
+            });
+
+        });
     }
 }
