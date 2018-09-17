@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectRequest;
 use App\Http\Requests\ProjectSupplementRequest;
+use App\Models\Payment;
 use App\Models\Project;
 use App\Models\ProjectApplication;
 use App\Models\ProjectInvitation;
@@ -201,7 +202,7 @@ class ProjectsController extends Controller
         return $this->response->paginator($projects, new ProjectTransformer());
     }
 
-    // 当前登录用户的所有项目
+    // 当前登录用户的项目列表
     public function userIndex(Request $request)
     {
         $currentUser = $this->user();
@@ -225,6 +226,16 @@ class ProjectsController extends Controller
                 })
                 ->recent()
                 ->paginate(20);
+
+            // 设计费信息
+            $projects->getCollection()->transform(function ($project) use ($currentUser) {
+                $project->designerPayment = Payment::where([
+                    'user_id'    => $currentUser->id,
+                    'project_id' => $project->id
+                ])->first();
+                return $project;
+            });
+
             return $this->response->paginator($projects, new ProjectForDesignerTransformer());
         }
 
@@ -246,6 +257,7 @@ class ProjectsController extends Controller
                 ])
                 ->recent()
                 ->paginate(20);
+            return $this->response->paginator($projects, new ProjectForPublisherTransformer());
         } else {
             // 当前用户是设计师：返回参与的项目
             $projects = Project::whereIn('status', [
@@ -258,9 +270,8 @@ class ProjectsController extends Controller
                     $query->where('user_id', $currentUser->id);
                 });
             })->recent()->paginate(20);
+            return $this->response->paginator($projects, new ProjectForDesignerTransformer());
         }
-
-        return $this->response->paginator($projects, new ProjectForPublisherTransformer());
     }
 
     // 当前登录用户收藏的项目

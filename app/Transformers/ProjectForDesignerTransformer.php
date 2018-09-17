@@ -47,7 +47,10 @@ class ProjectForDesignerTransformer extends TransformerAbstract
                 'file_url'   => $project->delivery->file_url,
                 'created_at' => $project->delivery->created_at->toDateTimeString(),
                 'updated_at' => $project->delivery->updated_at->toDateTimeString(),
-            ] : null
+            ] : null,
+
+            // 当前登录设计师收到的设计费信息
+            'designer_payment'     => $project->designerPayment ? (new PaymentTransformer())->transform($project->designerPayment) : null,
         ];
         return array_merge($basic, $extra);
     }
