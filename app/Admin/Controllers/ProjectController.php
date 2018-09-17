@@ -244,10 +244,20 @@ class ProjectController extends Controller
             ->rules('max:500');
 
         $form->textarea('description', '项目描述')->rules('required');
-        $form->file('project_file_url', '项目附件')->uniqueName()->removable();;
+        $form->file('project_file_url', '项目附件')->uniqueName()->removable();
+        $form->select('depth', '项目设计深度要求')
+            ->options([
+                '概念方案' => '概念方案',
+                '方案设计' => '方案设计',
+                '方案设计+初步设计' => '方案设计+初步设计',
+                'Conceptual plan' => 'Conceptual plan',
+                'Plan & design' => 'Plan & design',
+                'Scheme + Preliminary design' => 'Scheme + Preliminary design',
+            ])
+            ->rules('required');
         $form->text('delivery_time', '交付时间')->rules('required|max:50');
+        $form->text('find_time', '希望用多长时间找设计师')->rules('required|max:50');
         $form->text('payment', '希望付给设计师的费用')->rules('required|max:200');
-        $form->text('find_time', '希望用多长时间找设计师')->rules('required|max:50');;
         $form->textarea('remark', '申请备注');
         $form->display('created_at', '发布于');
         $form->display('updated_at', '上次更新');
