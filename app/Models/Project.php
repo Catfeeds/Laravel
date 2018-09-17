@@ -12,7 +12,10 @@ class Project extends Model
         'types' => 'array',
         'features' => 'array',
         'keywords' => 'array',
-        'canceled_at' => 'datetime'
+        'canceled_at' => 'datetime',
+        'completed_at' => 'datetime',
+        'remittance_submitted_at' => 'datetime',
+        'payment_remark_updated_at' => 'datetime'
     ];
     protected $with=['user'];
 

@@ -31,6 +31,7 @@ class CreateProjectsTable extends Migration
             $table->text('remark')->nullable()->comment('申请备注');
             $table->enum('mode', ['free', 'invite', 'specify'])->comment('招标模式：自由，邀请，指定');
             $table->string('canceled_at')->nullable()->comment('取消时间');
+            $table->string('completed_at')->nullable()->comment('完成时间');
             $table->integer('favorite_count')->unsigned()->default(0)->comment('收藏人数');
             $table->timestamps();
             $table->softDeletes();

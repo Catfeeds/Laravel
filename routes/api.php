@@ -271,9 +271,12 @@ $api->version('v1', [
         // 修改项目
         $api->patch('projects/{project}', 'ProjectsController@update')
             ->name('api.projects.update');
-        // 修改项目
+        // 填写项目汇款信息
         $api->patch('projects/{project}/remittance', 'ProjectsController@updateRemittance')
             ->name('api.projects.update.remittance');
+        // 填写项目设计费发放信息
+        $api->patch('projects/{project}/payment', 'ProjectsController@updatePayment')
+            ->name('api.projects.update.payment');
         // 取消项目
         $api->put('user/canceled/projects/{project}', 'ProjectsController@cancel')
             ->name('api.user.projects.cancel');

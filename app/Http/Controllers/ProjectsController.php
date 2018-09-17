@@ -16,6 +16,7 @@ use App\Transformers\ProjectTransformer;
 use App\Transformers\SimpleProjectTransformer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ProjectsController extends Controller
 {
@@ -31,7 +32,7 @@ class ProjectsController extends Controller
         $project = Project::create($attrubutes);
 
         // 邀请每个用户
-        if($attrubutes['mode'] === 'invite' || $attrubutes['mode'] === 'specify') {
+        if ($attrubutes['mode'] === 'invite' || $attrubutes['mode'] === 'specify') {
             foreach ($request->invited_designer_ids as $designerId) {
                 ProjectInvitation::create([
                     'user_id'    => $designerId,
@@ -115,9 +116,38 @@ class ProjectsController extends Controller
         ]);
 
         $project->update([
-            'remittance' => $request->remittance,
+            'remittance'              => $request->remittance,
             'remittance_submitted_at' => new Carbon
         ]);
+
+        return $this->response->item($project, new ProjectForPublisherTransformer());
+    }
+
+    // 填写项目设计费的分配方案信息
+    public function updatePayment(Request $request, Project $project)
+    {
+        $this->authorize('update', $project);
+
+        $this->validate($request, ['payment_remark' => 'required|string|max:1000']);
+
+        $attributes = [
+            'payment_remark'            => $request->payment_remark,
+            'payment_remark_updated_at' => new Carbon
+        ];
+
+        // 是否设置项目状态为"已完成"
+        if ($request->mark_as_completed) {
+            if ($project->status != Project::STATUS_WORKING) {
+                throw new BadRequestHttpException(__('不是工作中的项目'));
+            } else {
+                $attributes = array_merge($attributes, [
+                    'status'       => Project::STATUS_COMPLETED,
+                    'completed_at' => new Carbon
+                ]);
+            }
+        }
+
+        $project->update($attributes);
 
         return $this->response->item($project, new ProjectForPublisherTransformer());
     }

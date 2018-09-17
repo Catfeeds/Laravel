@@ -19,7 +19,7 @@ class ProjectTransformer extends TransformerAbstract
             'id'                => $project->id,
             'user_id'           => $project->user_id,
             'status'            => $project->status,
-            'mode'            => $project->mode,
+            'mode'              => $project->mode,
             'title'             => $project->title,
             'types'             => (array)$project->types,
             'features'          => (array)$project->features,
@@ -33,13 +33,14 @@ class ProjectTransformer extends TransformerAbstract
             'created_at'        => $project->created_at->toDateTimeString(),
             'updated_at'        => $project->updated_at->toDateTimeString(),
             'canceled_at'       => $project->canceled_at ? $project->canceled_at->toDateTimeString() : '',
+            'completed_at'      => $project->completed_at ? $project->completed_at->toDateTimeString() : '',
             'user'              => (new UserTransformer())->transform($project->user),
             'favorite_count'    => $project->favorite_count,
             'application_count' => $project->applications()->count(), // 报名人数
-            'invitation_count' => $project->invitations()->count(), // 邀请人数
+            'invitation_count'  => $project->invitations()->count(), // 邀请人数
 
-            'favoriting' => (boolean)$project->favoriting, // 是否收藏
-            'applying'   => (boolean)$project->applying, // 是否报名
+            'favoriting'   => (boolean)$project->favoriting, // 是否收藏
+            'applying'     => (boolean)$project->applying, // 是否报名
             'has_remitted' => $project->remit()->exists()
         ];
     }

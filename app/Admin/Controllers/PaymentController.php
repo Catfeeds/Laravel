@@ -60,8 +60,8 @@ class PaymentController extends Controller
     {
         $grid = new Grid(new Project);
 
-        // 工作中的项目在前面
-        $STATUS = Project::STATUS_WORKING;
+        // 已完成的项目在前面
+        $STATUS = Project::STATUS_COMPLETED;
         $grid->model()->orderByRaw("case when status = $STATUS then 1 else 0 end desc, id desc");
 
         $grid->id('ID')->sortable();
