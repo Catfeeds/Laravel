@@ -32,7 +32,7 @@ class ProjectPayedViaEmail extends Notification implements ShouldQueue
             ->subject("您已收到项目设计费 {$this->payment->amount} 元")
             ->greeting('您好！')
             ->line("您已收到项目 $project->title 的设计费 {$this->payment->amount} 元")
-            ->action('立即查看', url(env('APP_FRONT_URL') . "#/project/$project->id"))
+            ->action('立即查看', url(env('APP_FRONT_URL') . "#/payment/{$this->payment->id}"))
             ->line('（这是一封自动产生的邮件，请勿回复）')
             ->salutation( null);
     }

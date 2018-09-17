@@ -329,6 +329,12 @@ $api->version('v1', [
             ->name('api.projects.deliveries.index');
 
         /**
+         * 项目设计费信息
+         */
+        $api->get('payments/{payment}', 'PaymentController@index')
+            ->name('api.payments.index');
+
+        /**
          * 通知相关
          */
         // 通知列表
