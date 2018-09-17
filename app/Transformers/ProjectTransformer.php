@@ -40,6 +40,7 @@ class ProjectTransformer extends TransformerAbstract
 
             'favoriting' => (boolean)$project->favoriting, // 是否收藏
             'applying'   => (boolean)$project->applying, // 是否报名
+            'has_remitted' => $project->remit()->exists()
         ];
     }
 }

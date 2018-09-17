@@ -11,6 +11,8 @@ namespace App\Services;
 use App\Models\Project;
 use App\Notifications\ProjectInvitedViaDatabase;
 use App\Notifications\ProjectInvitedViaEmail;
+use App\Notifications\ProjectRemittedViaDatabase;
+use App\Notifications\ProjectRemittedViaEmail;
 
 class ProjectsService
 {
@@ -29,4 +31,13 @@ class ProjectsService
         $project->invitations()->update(['notified' => true]);
     }
 
+    // 甲方托管赏金后，向参与项目的所有设计师发送通知邮件
+    public function notifyParticipatingDesigners(Project $project)
+    {
+        $project->getParticipants()
+            ->each(function ($designer) use ($project) {
+                $designer->notify(new ProjectRemittedViaDatabase($project));
+                $designer->notifyViaEmail(new ProjectRemittedViaEmail($project));
+            });
+    }
 }

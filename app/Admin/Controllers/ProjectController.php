@@ -93,6 +93,15 @@ class ProjectController extends Controller
             return "<span class='label label-{$styles[$status]}'>$texts[$status]</span>";
         });
 
+        $grid->mode('模式')->display(function ($mode) {
+            $modes = [
+                'free' => '自由式',
+                'invite' => '邀请式',
+                'specify' => '指定式'
+            ];
+            return $modes[$mode];
+        });
+
         $grid->title('标题');
         $grid->types('类型')->implode('/');
         $grid->features('功能')->implode('/');

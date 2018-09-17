@@ -105,6 +105,14 @@ class RemittanceController extends Controller
             return "<span class='label label-{$styles[$status]}'>$texts[$status]</span>";
         });
 
+        $grid->mode('模式')->display(function ($mode) {
+            $modes = [
+                'free' => '自由式',
+                'invite' => '邀请式',
+                'specify' => '指定式'
+            ];
+            return $modes[$mode];
+        });
         $grid->title('标题');
         $grid->find_time('希望用多长时间找设计师');
         $grid->created_at('发布于')->sortable();
@@ -246,6 +254,13 @@ class RemittanceController extends Controller
         } else {
             $attributes['project_id'] = $project->id;
             ProjectRemittance::create($attributes);
+
+            // 更新项目为工作中状态，并且通知所有参与项目的设计师
+            if($project->status == Project::STATUS_TENDERING) {
+                $project->status = Project::STATUS_WORKING;
+                $project->save();
+                (new ProjectsService())->notifyParticipatingDesigners($project);
+            }
         }
 
         return redirect("/admin/project_remittances/$project->id");

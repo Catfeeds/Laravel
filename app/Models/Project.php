@@ -85,6 +85,24 @@ class Project extends Model
         $query->whereIn('status', Project::PUBLIC_STATUS)->where('mode', 'free');
     }
 
+    // 获取所有参与者：报名项目的人（自由式）或同意邀请的人（其他）
+    // $is_accepted：是否必须要接受邀请？
+    function getParticipants($is_accepted = true) {
+        $id = $this->id;
+        if($this->mode === 'free') {
+            return User::whereHas('applications', function ($query) use ($id) {
+                $query->where('project_id', $id);
+            })->get();
+        } else {
+            return User::whereHas('projectInvitations', function ($query) use ($id, $is_accepted) {
+                $query->where('project_id', $id);
+                if($is_accepted) {
+                    $query->where('status', ProjectInvitation::STATUS_ACCEPTED);
+                }
+            })->get();
+        }
+    }
+
     // 是否是所有人都能访问的项目
     function isPublic() {
         return in_array($this->status, Project::PUBLIC_STATUS) && $this->mode === 'free';

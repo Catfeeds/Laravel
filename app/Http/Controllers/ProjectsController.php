@@ -224,7 +224,7 @@ class ProjectsController extends Controller
             ])->where(function ($query) use ($currentUser) {
                 $query->whereHas('applications', function ($query) use ($currentUser) {
                     $query->where('user_id', $currentUser->id);
-                })->orWhereHas('invitations', function ($query) use ($currentUser) {
+                })->orWhereHas('projectInvitations', function ($query) use ($currentUser) {
                     $query->where('user_id', $currentUser->id);
                 });
             })->recent()->paginate(20);

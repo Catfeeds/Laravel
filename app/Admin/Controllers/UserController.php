@@ -214,19 +214,24 @@ class UserController extends Controller
         $show->email('邮箱');
         $show->title('职位/公司');
         $show->introduction('简介');
-        $show->company_name('公司名');
-        $show->registration_number('注册号');
-        if ($user->business_license_url) {
-            $show->business_license_url('营业执照')->image(null, 500, 500);
-        } else {
-            $show->business_license_url('营业执照');
+
+        // TODO 专业领域等
+        if ($user->type === 'designer') {
+            $show->company_name('公司名');
+            $show->registration_number('注册号');
+            if ($user->business_license_url) {
+                $show->business_license_url('营业执照')->image(null, 500, 500);
+            } else {
+                $show->business_license_url('营业执照');
+            }
+            $show->id_number('身份证号');
+            if ($user->id_card_url) {
+                $show->id_card_url('身份证照片')->image(null, 300, 300);
+            } else {
+                $show->id_card_url('身份证照片');
+            }
         }
-        $show->id_number('身份证号');
-        if ($user->id_card_url) {
-            $show->id_card_url('身份证照片')->image(null, 300, 300);
-        } else {
-            $show->id_card_url('身份证照片');
-        }
+
         $show->email_activated('邮箱是否激活')->using([
             1 => '是',
             0 => '否'

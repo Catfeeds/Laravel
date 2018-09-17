@@ -69,7 +69,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Invitation::class);
     }
 
-    // 收到的邀请
+    // 收到的邀请：用来评价的邀请
     public function receivedInvitations() {
         return $this->hasMany(Invitation::class, 'invited_user_id');
     }
@@ -82,6 +82,16 @@ class User extends Authenticatable implements JWTSubject
     // 发表的评价
     public function postedReviews() {
         return $this->hasMany(Review::class, 'reviewer_id');
+    }
+
+    // 报名
+    public function applications() {
+        return $this->hasMany(ProjectApplication::class);
+    }
+
+    // 项目
+    public function projectInvitations() {
+        return $this->hasMany(ProjectInvitation::class);
     }
 
     /**
