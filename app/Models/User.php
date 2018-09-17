@@ -94,6 +94,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(ProjectInvitation::class);
     }
 
+    // 设计费
+    public function payments() {
+        return $this->hasMany(Payment::class);
+    }
+
     /**
      * 发送数据库通知，每次通知时通知数+1
      * 发送邮件的时候不需要增加通知数，应该调用notifyByEmail

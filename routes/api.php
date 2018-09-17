@@ -331,6 +331,8 @@ $api->version('v1', [
         /**
          * 项目设计费信息
          */
+        $api->get('payments', 'PaymentController@list')
+            ->name('api.payments.index');
         $api->get('payments/{payment}', 'PaymentController@index')
             ->name('api.payments.index');
 
