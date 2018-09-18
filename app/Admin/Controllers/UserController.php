@@ -287,7 +287,7 @@ class UserController extends Controller
     }
 
     // 用于关联关系中的show
-    public function showInRelation(&$show)
+    public function showInRelation($show)
     {
         $show->setResource('/admin/users');
         $user = $show->getModel();
@@ -308,21 +308,21 @@ class UserController extends Controller
         $show->introduction('简介');
 
         // TODO 专业领域等
-        if ($user->type === 'designer') {
-            $show->company_name('公司名');
-            $show->registration_number('注册号');
-            if ($user->business_license_url) {
-                $show->business_license_url('营业执照')->image(null, 500, 500);
-            } else {
-                $show->business_license_url('营业执照');
-            }
-            $show->id_number('身份证号');
-            if ($user->id_card_url) {
-                $show->id_card_url('身份证照片')->image(null, 300, 300);
-            } else {
-                $show->id_card_url('身份证照片');
-            }
-        }
+//        if ($user->type === 'designer') {
+//            $show->company_name('公司名');
+//            $show->registration_number('注册号');
+//            if ($user->business_license_url) {
+//                $show->business_license_url('营业执照')->image(null, 500, 500);
+//            } else {
+//                $show->business_license_url('营业执照');
+//            }
+//            $show->id_number('身份证号');
+//            if ($user->id_card_url) {
+//                $show->id_card_url('身份证照片')->image(null, 300, 300);
+//            } else {
+//                $show->id_card_url('身份证照片');
+//            }
+//        }
 
         $show->email_activated('邮箱是否激活')->using([
             1 => '是',
@@ -330,9 +330,13 @@ class UserController extends Controller
         ])->label($user->email_activated ? 'success' : 'danger');
         $show->created_at('注册时间');
 
-        $show->panel()->tools(function ($tools) {
+        $show->panel()->tools(function ($tools) use ($user) {
             $tools->disableEdit();
             $tools->disableDelete();
+            $tools->disableList();
+            $tools->append(
+                "<a class='btn btn-sm btn-primary' href='/admin/users/$user->id''><i class='fa fa-eye'></i>&nbsp;&nbsp;查看详情</a>"
+            );
         });
     }
 }
