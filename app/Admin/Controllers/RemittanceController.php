@@ -111,7 +111,7 @@ class RemittanceController extends Controller
                 'invite' => '邀请式',
                 'specify' => '指定式'
             ];
-            return $modes[$mode];
+            return "<span class='label label-primary'>$modes[$mode]</span>";
         });
         $grid->title('标题');
         $grid->find_time('希望用多长时间找设计师');

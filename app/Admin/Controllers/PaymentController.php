@@ -44,6 +44,59 @@ class PaymentController extends Controller
             ->body($this->grid());
     }
 
+    public function update(Request $request)
+    {
+        $this->validateQueryParams($request);
+
+        $this->validate($request, [
+            'number'      => 'required|max:300',
+            'bank'        => 'required|max:300',
+            'name'        => 'required|max:300',
+            'amount'      => 'required|max:300',
+            'remitted_at' => 'required|date',
+        ], [], [
+            'number'      => '流水号',
+            'bank'        => '汇款行',
+            'name'        => '汇款人',
+            'amount'      => '金额',
+            'remitted_at' => '汇款日期',
+        ]);
+
+        $attributes = $request->only(['number', 'bank', 'name', 'amount', 'remitted_at']);
+
+        $payment = Payment::where([
+            'project_id' => $request->project_id,
+            'user_id' => $request->user_id
+        ])->first();
+
+        if ($payment) {
+            $payment->update($attributes);
+        } else {
+            $attributes['project_id'] = $request->project_id;
+            $attributes['user_id'] = $request->user_id;
+            Payment::create($attributes);
+        }
+
+        return redirect("/admin/project_payments/$request->project_id");
+    }
+
+    public function destroy(Request $request, Payment $payment)
+    {
+        if ($payment->delete()) {
+            $data = [
+                'status'  => true,
+                'message' => trans('admin.delete_succeeded'),
+            ];
+        } else {
+            $data = [
+                'status'  => false,
+                'message' => trans('admin.delete_failed'),
+            ];
+        }
+
+        return response()->json($data);
+    }
+
     public function show($id, Content $content)
     {
         $project = Project::findOrFail($id);
@@ -51,9 +104,22 @@ class PaymentController extends Controller
         return $content
             ->header('项目设计费发放列表')
             ->description('只能给提交设计文件的设计师发放设计费')
+            ->body($this->paymentBox($project))
             ->body($this->paymentList($project))
             ->body($this->designerList($project))
             ->body($this->projectDetail($id));
+    }
+
+    public function form(Request $request, Content $content)
+    {
+        $this->validateQueryParams($request);
+
+        return $content
+            ->header('编辑项目汇款信息')
+            ->description('初次为"报名中"项目设置汇款信息时，项目状态会自动转为"工作中"')
+            ->body($this->paymentBox(Project::find($request->project_id)))
+            ->body($this->paymentForm($request))
+            ->body($this->projectDetail($request->project_id));
     }
 
     protected function grid()
@@ -90,7 +156,7 @@ class PaymentController extends Controller
                 'invite' => '邀请式',
                 'specify' => '指定式'
             ];
-            return $modes[$mode];
+            return "<span class='label label-primary'>$modes[$mode]</span>";
         });
 
         $grid->title('标题');
@@ -121,17 +187,6 @@ class PaymentController extends Controller
         $grid->disableCreateButton();
 
         return $grid;
-    }
-
-    public function form(Request $request, Content $content)
-    {
-        $this->validateQueryParams($request);
-
-        return $content
-            ->header('编辑项目汇款信息')
-            ->description('初次为"报名中"项目设置汇款信息时，项目状态会自动转为"工作中"')
-            ->body($this->paymentForm($request))
-            ->body($this->projectDetail($request->project_id));
     }
 
     protected function paymentList(Project $project)
@@ -304,58 +359,14 @@ class PaymentController extends Controller
         return $box;
     }
 
-    public function update(Request $request)
-    {
-        $this->validateQueryParams($request);
-
-        $this->validate($request, [
-            'number'      => 'required|max:300',
-            'bank'        => 'required|max:300',
-            'name'        => 'required|max:300',
-            'amount'      => 'required|max:300',
-            'remitted_at' => 'required|date',
-        ], [], [
-            'number'      => '流水号',
-            'bank'        => '汇款行',
-            'name'        => '汇款人',
-            'amount'      => '金额',
-            'remitted_at' => '汇款日期',
-        ]);
-
-        $attributes = $request->only(['number', 'bank', 'name', 'amount', 'remitted_at']);
-
-        $payment = Payment::where([
-            'project_id' => $request->project_id,
-            'user_id' => $request->user_id
-        ])->first();
-
-        if ($payment) {
-            $payment->update($attributes);
-        } else {
-            $attributes['project_id'] = $request->project_id;
-            $attributes['user_id'] = $request->user_id;
-            Payment::create($attributes);
-        }
-
-        return redirect("/admin/project_payments/$request->project_id");
+    protected function paymentBox(Project $project) {
+        $box = new Box('甲方填写的设计费发放方案', $project->payment_remark ?? '暂未填写');
+        $box->collapsable();
+        $box->style('primary');
+        $box->solid();
+        return $box;
     }
 
-    public function destroy(Request $request, Payment $payment)
-    {
-        if ($payment->delete()) {
-            $data = [
-                'status'  => true,
-                'message' => trans('admin.delete_succeeded'),
-            ];
-        } else {
-            $data = [
-                'status'  => false,
-                'message' => trans('admin.delete_failed'),
-            ];
-        }
-
-        return response()->json($data);
-    }
 
     // 验证project_id与user_id是否合理合法
     protected function validateQueryParams(Request $request)
