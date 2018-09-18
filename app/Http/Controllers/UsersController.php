@@ -116,6 +116,16 @@ class UsersController extends Controller
     // 某个用户
     public function index(User $user)
     {
+        $currentUser = \Auth::guard('api')->user();
+
+        if (!$currentUser) {
+            if ($user->type != 'designer') {
+                $this->response->errorUnauthorized(); // 如果要查看甲方的信息，需要登录后再确认
+            }
+        } else {
+            $this->authorizeForUser($currentUser, 'retrieve', $user);
+        }
+
         $user->setFollowing($this->user());
         $user->increment('views'); // 浏览量+1
         return $this->response->item($user, new UserTransformer());
@@ -208,7 +218,7 @@ class UsersController extends Controller
         $query = User::where('name', 'like', "%$request->keyword%")
             ->where('type', 'designer');
 
-        if(is_array($request->professional_fields)) {
+        if (is_array($request->professional_fields)) {
             $fields = $request->professional_fields;
             $query->where(function ($query) use ($fields) {
                 foreach ($fields as $field) {

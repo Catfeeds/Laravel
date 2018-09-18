@@ -1,0 +1,68 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\Project;
+use App\Models\ProjectInvitation;
+use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
+
+class UserPolicy
+{
+    use HandlesAuthorization;
+
+    public function retrieve(User $currentUser, User $user)
+    {
+        // 设计师的信息是所有人都可以看的
+        if ($user->type === 'designer') {
+            return true;
+        }
+
+        // 可以查看自己的信息
+        if($user->id == $currentUser->id) {
+            return true;
+        }
+
+        // 设计师的信息是所有人都可以看的
+        if ($user->type === 'designer') {
+            return true;
+        } else {
+            // 甲方的信息只有与之达成协议的设计师可以看：
+
+            // 1. 设计师报名了甲方的某个项目，且该项目正在工作中
+            $condition1 = $user->projects()
+                ->where('status', Project::STATUS_WORKING)
+                ->whereHas('applications', function ($query) use ($currentUser) {
+                    $query->where('user_id', $currentUser->id);
+                })->exists();
+
+            // 2. 甲方在某个项目里邀请了该设计师，若该项目正在报名中，则设计师不能明确拒绝邀请
+            $condition2 = $user->projects()
+                ->where('status', Project::STATUS_TENDERING)
+                ->whereHas('invitations', function ($query) use ($currentUser) {
+                    $query->where('user_id', $currentUser->id)->where('status', '!=', ProjectInvitation::STATUS_DECLINED);
+                })->exists();
+
+            // 3. 甲方在某个项目里邀请了该设计师，若该项目正在工作中，则设计师必须接受邀请
+            $condition3 = $user->projects()
+                ->where('status', Project::STATUS_WORKING)
+                ->whereHas('invitations', function ($query) use ($currentUser) {
+                    $query->where([
+                        'user_id' => $currentUser->id,
+                        'status' => ProjectInvitation::STATUS_ACCEPTED
+                    ]);
+                })->exists();
+
+            if($condition1 || $condition2 || $condition3) {
+                return true;
+            }
+
+            if($currentUser->type === 'designer') {
+                throw new AccessDeniedException(__('您无权查看该甲方的信息，仅当您与他有进行中的项目时才可查看'));
+            } else {
+                throw new AccessDeniedException(__('您无权查看该甲方的信息'));
+            }
+        }
+    }
+}
