@@ -29,7 +29,11 @@ class IndexController extends Controller
             ->limit(20)
             ->get();
 
-        return $this->response->collection($works->random(5), new WorkTransformer());
+        if(!$works->isEmpty()) {
+            $works = $works->random(5);
+        }
+
+        return $this->response->collection($works, new WorkTransformer());
     }
 
     // 获取项目，进行中的项目在前面，已完成的项目在后面
