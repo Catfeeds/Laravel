@@ -12,25 +12,27 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
+        $designerAvatar = (new UsersService())->defaultAvatar('D');
+        $partyAvatar = (new UsersService())->defaultAvatar('P');
         \App\Models\User::insert([
-            'name'            => '甲方Zhu',
+            'name'            => 'Party A',
             'phone'           => '13000000000',
             'type'            => 'party',
-            'email'           => 'zhukaihaorj@163.com',
+            'email'           => '111@163.com',
             'email_activated' => false,
-            'avatar_url' => (new UsersService())->defaultAvatar('Z'),
+            'avatar_url' => $partyAvatar,
             'password'        => bcrypt('123123'),
             'created_at'      => now(),
             'updated_at'      => now()
         ]);
         \App\Models\User::insert([
-            'name'            => '设计师Zhu',
+            'name'            => 'Designer Zhu',
             'phone'           => '13000000001',
             'type'            => 'designer',
             'email'           => '123213123@163.com',
             'email_activated' => true,
             'password'        => bcrypt('123123'),
-            'avatar_url' => (new UsersService)->defaultAvatar('朱'),
+            'avatar_url' => $designerAvatar,
             'created_at'      => now(),
             'updated_at'      => now()
         ]);
@@ -40,7 +42,18 @@ class UserSeeder extends Seeder
             'type'            => 'party',
             'email'           => '123123@163.com',
             'email_activated' => true,
-            'avatar_url' => (new UsersService())->defaultAvatar('Z'),
+            'avatar_url' => $partyAvatar,
+            'password'        => bcrypt('123123'),
+            'created_at'      => now(),
+            'updated_at'      => now()
+        ]);
+        \App\Models\User::insert([
+            'name'            => 'Designer Two',
+            'phone'           => '13000000003',
+            'type'            => 'party',
+            'email'           => '123123@163.com',
+            'email_activated' => true,
+            'avatar_url' => $designerAvatar,
             'password'        => bcrypt('123123'),
             'created_at'      => now(),
             'updated_at'      => now()
