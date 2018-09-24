@@ -9,7 +9,7 @@ class ProjectDeliveryRequest extends FormRequest
         $userId = \Auth::guard('api')->id();
         return [
             'remark'    => 'nullable|string|max:5000',
-            'file_url'  => 'string|exists:uploads,path,type,delivery_file,user_id,' . $userId,
+            'file_url'  => 'required|string|exists:uploads,path,type,delivery_file,user_id,' . $userId,
         ];
     }
 }

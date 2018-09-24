@@ -50,7 +50,7 @@ class UserSeeder extends Seeder
         \App\Models\User::insert([
             'name'            => 'Designer Two',
             'phone'           => '13000000003',
-            'type'            => 'party',
+            'type'            => 'designer',
             'email'           => '123123@163.com',
             'email_activated' => true,
             'avatar_url' => $designerAvatar,

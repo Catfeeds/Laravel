@@ -322,8 +322,10 @@ $api->version('v1', [
          */
         // 提交交付文件
         $api->post('projects/{project}/deliveries', 'ProjectDeliveriesController@store');
+        // 修改交付文件
+        $api->patch('deliveries/{id}', 'ProjectDeliveriesController@update');
         // 删除交付文件
-        $api->delete('deliveries/{projectDelivery}', 'ProjectDeliveriesController@destroy');
+        $api->delete('deliveries/{id}', 'ProjectDeliveriesController@destroy');
         // 获取项目交付列表
         $api->get('projects/{project}/deliveries', 'ProjectDeliveriesController@index')
             ->name('api.projects.deliveries.index');

@@ -37,7 +37,27 @@ class ProjectDeliveriesController extends Controller
         return $this->response->item($delivery, new ProjectDeliveryTransformer());
     }
 
-    public function destroy(ProjectDelivery $delivery) {
+    public function update(ProjectDeliveryRequest $request, $id)
+    {
+        $delivery = ProjectDelivery::findOrFail($id);
+
+        $this->authorize('update', $delivery);
+
+        if ($delivery->project->status !== Project::STATUS_WORKING) {
+            $this->response->errorBadRequest(__('项目当前不允许修改交付文件'));
+        }
+
+        $delivery ->update([
+            'remark'     => $request->remark,
+            'file_url'   => $request->file_url
+        ]);
+
+        return $this->response->item($delivery, new ProjectDeliveryTransformer());
+    }
+
+    public function destroy($id)
+    {
+        $delivery = ProjectDelivery::findOrFail($id);
         $this->authorize('destroy', $delivery);
         $delivery->delete();
         return $this->response->noContent();

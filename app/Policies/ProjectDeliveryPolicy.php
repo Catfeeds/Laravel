@@ -26,7 +26,11 @@ class ProjectDeliveryPolicy
         }
     }
 
-    // 删除报名文件：TODO 项目所属甲方也能删除
+    public function update(User $user, ProjectDelivery $delivery) {
+        return $user->isAuthorOf($delivery);
+    }
+
+    // 删除交付文件：TODO 项目所属甲方也能删除
     public function destroy(User $user, ProjectDelivery $delivery) {
         return $user->isAuthorOf($delivery) /* || $user->isAuthorOf($delivery->project) */;
     }

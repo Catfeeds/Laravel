@@ -22,5 +22,7 @@
   "已发表过评价": "Already reviewed",
   "您无权查看": "You have no right to visit",
   "您无权查看该甲方的信息": "You are not authorized to view the information of the Party.",
-  "您无权查看该甲方的信息，仅当您与他有进行中的项目时才可查看": "You are not authorized to view the information of the Party, but only if you have an ongoing project with him."
+  "您无权查看该甲方的信息，仅当您与他有进行中的项目时才可查看": "You are not authorized to view the information of the Party, but only if you have an ongoing project with him.",
+
+  "项目当前不允许修改交付文件": "Cannot edit the delivered file of the project"
 }

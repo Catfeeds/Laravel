@@ -349,7 +349,7 @@ class ProjectController extends Controller
 
     protected function deliveryList($show)
     {
-        $show->applications('交付列表', function ($grid) {
+        $show->deliveries('交付列表', function ($grid) {
             $grid->id('ID')->sortable();
             $grid->user('设计师')->display(function ($user) {
                 $route = 'users/' . $user['id'];
