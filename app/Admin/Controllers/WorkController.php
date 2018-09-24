@@ -58,7 +58,13 @@ class WorkController extends Controller
             $filter->like('user.phone', '设计师手机号');
             $filter->like('title', '作品标题');
             $filter->like('description', '作品描述');
+            $filter->equal('visible_range', '权限')->multipleSelect([
+                'public'  => '公开',
+                'private' => '私密'
+            ]);
             $filter->between('created_at', '发布时间')->date();
+            $filter->scope('public', '公开')->where('visible_range', 'public');
+            $filter->scope('private', '私密')->where('visible_range', 'private');
         });
         $grid->actions(function ($actions) {
             $actions->disableEdit();

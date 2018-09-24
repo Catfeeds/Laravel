@@ -95,6 +95,10 @@ class ProjectsController extends Controller
     {
         $this->authorize('update', $project);
 
+        if($project->status != Project::STATUS_REVIEWING || $project->status != Project::STATUS_REVIEW_FAILED) {
+            throw new BadRequestHttpException(__('该项目无法修改'));
+        }
+
         $attrubutes = $request->only(['title', 'types', 'features', 'keywords', 'depth', 'description', 'project_file_url', 'delivery_time', 'payment', 'find_time', 'remark']);
 
         // 是否重新审核

@@ -19,14 +19,13 @@ class UserMailsService
     {
         $emailToken = EmailToken::where([
             'user_id' => $user->id,
-            'email' => $user->email
+            'email'   => $user->email
         ])->first();
 
-        if(!$emailToken) {
-            $emailToken = new EmailToken([
-                'user_id' => $user->id,
-                'email' => $user->email
-            ]);
+        if (!$emailToken) {
+            $emailToken = new EmailToken();
+            $emailToken->user_id = $user->id;
+            $emailToken->email = $user->email;
         }
 
         $token = bcrypt($user->email . time());

@@ -68,7 +68,7 @@ class UserPasswordController extends Controller
             ])->first();
         }
         if (!$user) {
-            $this->response->errorNotFound($request->phone ?__('该手机号未注册，请确认用户类型选择正确') : __('该邮箱未被绑定，请确认用户类型选择正确且邮箱已激活'));
+            $this->response->errorNotFound($request->phone ?__('该手机号未注册，请确认用户类型选择正确') : __('该邮箱未绑定对应类型的用户，请确认用户类型选择正确且邮箱已激活'));
         }
 
         $service->validateCode($request->phone ?? $request->email, $request->code);

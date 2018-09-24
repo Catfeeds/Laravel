@@ -53,10 +53,10 @@ class ReplyController extends Controller
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
+            $filter->equal('activity.id', '动态ID');
             $filter->like('user.name', '用户姓名');
             $filter->like('user.phone', '用户手机号');
             $filter->like('content', '评论内容');
-            $filter->equal('activity.id', '动态ID');
             $filter->between('created_at', '发表时间')->date();
         });
 

@@ -21,12 +21,16 @@ class HomeController extends Controller
         return $content
             ->header('控制台')
             ->row(function (Row $row) {
-                $row->column(6, function (Column $column) {
+                $row->column(4, function (Column $column) {
+                    $infoBox = new InfoBox('查看所有待审核项目', 'file-pdf-o', 'aqua', '/admin/projects?&_scope_=reviewing', '审核项目');
+                    $column->append($infoBox);
+                });
+                $row->column(4, function (Column $column) {
                     $infoBox = new InfoBox('收到甲方汇款后，请在此登记入账信息', 'bitcoin', 'aqua', '/admin/project_remittances', "项目汇款入账登记");
                     $column->append($infoBox);
                 });
-                $row->column(6, function (Column $column) {
-                    $infoBox = new InfoBox('项目结束后，请按照甲方申请向设计师发放设计费', 'dollar', 'aqua', '/admin/project_payments', "设计费发放登记");
+                $row->column(4, function (Column $column) {
+                    $infoBox = new InfoBox('项目结束后，向设计师发放设计费', 'dollar', 'aqua', '/admin/project_payments', "设计费发放登记");
                     $column->append($infoBox);
                 });
             })

@@ -115,8 +115,8 @@ class PaymentController extends Controller
         $this->validateQueryParams($request);
 
         return $content
-            ->header('编辑项目汇款信息')
-            ->description('初次为"报名中"项目设置汇款信息时，项目状态会自动转为"工作中"')
+            ->header('填写项目设计费信息')
+            ->description('只能给提交设计文件的设计师发放设计费，录入成功后设计师会收到通知"')
             ->body($this->paymentBox(Project::find($request->project_id)))
             ->body($this->paymentForm($request))
             ->body($this->projectDetail($request->project_id));

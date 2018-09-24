@@ -20,9 +20,9 @@ class User extends Authenticatable implements JWTSubject
     }
 
     protected $guarded = [];
-    protected $hidden = [
-        'password'
-    ];
+//    protected $hidden = [
+//        'password' // 取消hidden，管理系统要用到
+//    ];
     protected $casts = [
         'qualification_urls' => 'array',
         'professional_fields' => 'array'

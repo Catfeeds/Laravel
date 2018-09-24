@@ -222,11 +222,11 @@ class UserController extends Controller
         ])->rules('required');
         $form->password('password', '密码')->help('填写此项后将覆盖该用户的密码，请谨慎操作。若您不想修改该用户的密码，请将此项留空。');
 
-        $form->ignore('password');
+//        $form->ignore('password');
 
         $form->saving(function ($form) {
-            if (request('password')) {
-                $form->password = bcrypt(request('password'));
+            if ($form->password && $form->model()->password != $form->password) {
+                $form->password = bcrypt($form->password);
             }
         });
         $form->saved(function ($form) {
@@ -268,11 +268,9 @@ class UserController extends Controller
         ])->rules('required');
         $form->password('password', '密码')->help('填写此项后将覆盖该用户的密码，请谨慎操作。若您不想修改该用户的密码，请将此项留空。');
 
-        $form->ignore('password');
-
         $form->saving(function ($form) {
-            if (request('password')) {
-                $form->password = bcrypt(request('password'));
+            if ($form->password && $form->model()->password != $form->password) {
+                $form->password = bcrypt($form->password);
             }
         });
         $form->saved(function ($form) {

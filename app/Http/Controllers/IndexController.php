@@ -25,6 +25,7 @@ class IndexController extends Controller
     {
         // 先选出20个，然后随机挑5个
         $works = Work::where('created_at', '>=', Carbon::now()->subMonths(1))
+            ->public()
             ->orderBy('like_count', 'desc')
             ->limit(20)
             ->get();

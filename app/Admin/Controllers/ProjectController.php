@@ -112,6 +112,7 @@ class ProjectController extends Controller
         $grid->updated_at('更新于')->sortable();
 
         $grid->filter(function (Grid\Filter $filter) {
+            $filter->disableIdFilter();
             $filter->equal('id', '项目ID');
             $filter->like('user.name', '甲方姓名');
             $filter->like('user.phone', '甲方手机号');
@@ -247,11 +248,11 @@ class ProjectController extends Controller
         $form->file('project_file_url', '项目附件')->uniqueName()->removable();
         $form->select('depth', '项目设计深度要求')
             ->options([
-                '概念方案' => '概念方案',
-                '方案设计' => '方案设计',
-                '方案设计+初步设计' => '方案设计+初步设计',
-                'Conceptual plan' => 'Conceptual plan',
-                'Plan & design' => 'Plan & design',
+                '概念方案'                        => '概念方案',
+                '方案设计'                        => '方案设计',
+                '方案设计+初步设计'                   => '方案设计+初步设计',
+                'Conceptual plan'             => 'Conceptual plan',
+                'Plan & design'               => 'Plan & design',
                 'Scheme + Preliminary design' => 'Scheme + Preliminary design',
             ])
             ->rules('required');
@@ -262,11 +263,12 @@ class ProjectController extends Controller
         $form->display('created_at', '发布于');
         $form->display('updated_at', '上次更新');
 
-        // 如果状态由未审核变成审核通过，则通知所有被邀请的设计师
+        // 如果状态由未审核或审核未通过变成审核通过，则通知所有被邀请的设计师
         $form->saving(function ($form) {
             $project = $form->model();
             if ($project
-                && $project->status == Project::STATUS_REVIEWING
+                && ($project->status == Project::STATUS_REVIEWING ||
+                    $project->status == Project::STATUS_REVIEW_FAILED)
                 && $form->status == Project::STATUS_TENDERING) {
                 (new ProjectsService())->notifyInvitedDesigners($project);
             }
@@ -287,7 +289,7 @@ class ProjectController extends Controller
         $show->invitations('邀请列表', function ($grid) {
             $grid->id('ID')->sortable();
             $grid->user('设计师')->display(function ($user) {
-                $route = 'users/' . $user['id'];
+                $route = '/admin/users/' . $user['id'];
                 return "<a href='{$route}'>{$user['name']}</a>";
             });
             $grid->status('状态')->display(function ($status) {
@@ -323,7 +325,7 @@ class ProjectController extends Controller
         $show->applications('报名列表', function ($grid) {
             $grid->id('ID')->sortable();
             $grid->user('设计师')->display(function ($user) {
-                $route = 'users/' . $user['id'];
+                $route = '/admin/users/' . $user['id'];
                 return "<a href='{$route}'>{$user['name']}</a>";
             });
             $grid->remark('备注');
@@ -345,7 +347,8 @@ class ProjectController extends Controller
         });
     }
 
-    protected function deliveryList($show) {
+    protected function deliveryList($show)
+    {
         $show->applications('交付列表', function ($grid) {
             $grid->id('ID')->sortable();
             $grid->user('设计师')->display(function ($user) {

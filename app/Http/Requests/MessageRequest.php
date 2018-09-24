@@ -8,7 +8,7 @@ class MessageRequest extends FormRequest
     {
         return [
             'to' => 'required|exists:users,id',
-            'body' => 'required'
+            'body' => 'required|max:300'
         ];
     }
 

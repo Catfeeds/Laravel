@@ -90,7 +90,7 @@ class ActivityController extends Controller
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
-            $filter->like('user.name', '用户名');
+            $filter->like('user.name', '用户姓名');
             $filter->like('user.phone', '用户手机号');
             $filter->like('content', '动态内容');
             $filter->between('created_at', '发布时间')->date();

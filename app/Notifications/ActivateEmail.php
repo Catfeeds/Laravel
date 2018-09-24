@@ -43,16 +43,4 @@ class ActivateEmail extends Notification implements ShouldQueue
             ->line('（这是一封自动产生的邮件，请勿回复）')
             ->salutation( null);
     }
-
-    /**
-     * Get the array representation of the notification.
-     * @param  mixed $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
-    {
-        return [
-            //
-        ];
-    }
 }

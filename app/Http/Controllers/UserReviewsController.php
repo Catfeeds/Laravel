@@ -8,6 +8,7 @@ use App\Models\Invitation;
 use App\Models\Review;
 use App\Models\User;
 use App\Transformers\ReviewTransformer;
+use App\Transformers\UserForReviewTransformer;
 use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
 
@@ -82,6 +83,6 @@ class UserReviewsController extends Controller
         $user = User::findOrFail($request->uid);
         $currentUser = $this->user();
         $currentUser->setReviewStatus($user);
-        return $this->response->item($currentUser, new UserTransformer());
+        return $this->response->item($currentUser, new UserForReviewTransformer());
     }
 }

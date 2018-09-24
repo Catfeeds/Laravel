@@ -42,7 +42,8 @@ class ProjectDeliveredViaDatabase extends Notification
             'project_id' => $project->id,
             'project_title' => $project->title,
             'delivery_id' => $this->delivery->id,
-            'user_name' => $designer->name
+            'user_name' => $designer->name,
+            'user_id' => $designer->id
         ];
     }
 }
