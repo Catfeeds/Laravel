@@ -95,7 +95,7 @@ class ProjectsController extends Controller
     {
         $this->authorize('update', $project);
 
-        if($project->status != Project::STATUS_REVIEWING || $project->status != Project::STATUS_REVIEW_FAILED) {
+        if($project->status != Project::STATUS_REVIEWING && $project->status != Project::STATUS_REVIEW_FAILED) {
             throw new BadRequestHttpException(__('该项目无法修改'));
         }
 

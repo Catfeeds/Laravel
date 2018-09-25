@@ -11,7 +11,7 @@ $factory->define(\App\Models\Project::class, function (Faker $faker) {
         'features'                => $faker->randomElements(['住宅', '商业', '办公', '公共空间', '学校', '零售'], 4),
         'depth'                   => $faker->randomElement(['概念方案', '方案设计', '概念方案 + 方案设计']),
         'description'             => $faker->realText(),
-        'project_file_url'        => $faker->randomElement([null, $faker->url]),
+//        'project_file_url'        => $faker->randomElement([null, $faker->url]),
         'delivery_time'           => $faker->randomElement(['三个月', '六个月', '其他']),
         'payment'                 => $faker->numberBetween(50, 200) . '万',
         'find_time'               => $faker->randomElement(['9~12天', '12~15天', '一个月内']),
