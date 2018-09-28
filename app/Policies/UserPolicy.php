@@ -7,6 +7,8 @@ use App\Models\ProjectInvitation;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class UserPolicy
 {
@@ -20,7 +22,7 @@ class UserPolicy
         }
 
         // 可以查看自己的信息
-        if($user->id == $currentUser->id) {
+        if ($user->id == $currentUser->id) {
             return true;
         }
 
@@ -50,19 +52,27 @@ class UserPolicy
                 ->whereHas('invitations', function ($query) use ($currentUser) {
                     $query->where([
                         'user_id' => $currentUser->id,
-                        'status' => ProjectInvitation::STATUS_ACCEPTED
+                        'status'  => ProjectInvitation::STATUS_ACCEPTED
                     ]);
                 })->exists();
 
-            if($condition1 || $condition2 || $condition3) {
+            if ($condition1 || $condition2 || $condition3) {
                 return true;
             }
 
-            if($currentUser->type === 'designer') {
+            if ($currentUser->type === 'designer') {
                 throw new AccessDeniedException(__('您无权查看该甲方的信息，仅当您与他有进行中的项目时才可查看'));
             } else {
                 throw new AccessDeniedException(__('您无权查看该甲方的信息'));
             }
         }
+    }
+
+    public function login(User $user)
+    {
+        if ($user->in_blacklist) {
+            throw new HttpException(419, __('该账号已被拉黑'));
+        }
+        return true;
     }
 }

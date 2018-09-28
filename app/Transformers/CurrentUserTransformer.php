@@ -26,6 +26,10 @@ class CurrentUserTransformer extends TransformerAbstract
             'account_name' => (string)$user->account_name,
             'qualification_urls' => (array)$user->qualification_urls,
             'total_payment' => (float)$user->payments()->sum('amount'),
+
+            'in_blacklist' => (boolean)$user->in_blacklist,
+            'review_status' => (integer)$user->review_status
+
         ];
 
         return array_merge($basic, $extra);

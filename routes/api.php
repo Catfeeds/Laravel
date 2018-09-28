@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', [
     'namespace'  => 'App\Http\Controllers',
-    'middleware' => ['serializer:array', 'bindings', 'change-locale']
+    'middleware' => ['serializer:array', 'bindings', 'change-locale', 'check-in-blacklist']
 ], function ($api) {
     // TODO 删除测试
     $api->get('test', 'TestController@test');

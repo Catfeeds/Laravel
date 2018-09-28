@@ -8,6 +8,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AuthorizationRequest;
+use App\Models\User;
 use App\Transformers\CurrentUserTransformer;
 use App\Transformers\UserTransformer;
 use \Tymon\JWTAuth\Facades\JWTAuth;
@@ -31,6 +32,11 @@ class AuthorizationsController extends Controller
 
         JWTAuth::setToken($token);
         $user = JWTAuth::toUser($token);
+
+        // 检查用户是否可以登录
+        $this->authorizeForUser($user, 'login', User::class);
+//        $user->can('login', User::class);
+
         return $this->response->item($user, new CurrentUserTransformer())
             ->setMeta([
                 'token' => $token,

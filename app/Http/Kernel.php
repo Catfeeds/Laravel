@@ -65,6 +65,8 @@ class Kernel extends HttpKernel
         // 访问节流
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         // 接口语言设置
-        'change-locale' => \App\Http\Middleware\ChangeLocale::class
+        'change-locale' => \App\Http\Middleware\ChangeLocale::class,
+        // 检查是否被拉黑
+        'check-in-blacklist' => \App\Http\Middleware\CheckInBlackList::class
     ];
 }
