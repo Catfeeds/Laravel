@@ -12,6 +12,11 @@ Route::group([
 
     $router->get('/', 'HomeController@index');
     $router->resource('users', UserController::class);
+
+    $router->get('/users/{user}/review_pass', 'UserReviewController@pass');
+    $router->get('/users/{user}/review_fail', 'UserReviewController@fail');
+
+
     $router->resource('projects', ProjectController::class, [
         'except' => ['create', 'store']
     ]);

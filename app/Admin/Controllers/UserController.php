@@ -82,6 +82,19 @@ class UserController extends Controller
 
         $grid->model()->orderBy('id', 'desc');
         $grid->id('ID')->sortable();
+        $grid->review_status('状态')->display(function ($status) {
+            $styles = [
+                0 => 'warning',
+                1 => 'default',
+                2 => 'danger'
+            ];
+            $texts = [
+                0 => '待审核',
+                1 => '已通过',
+                2 => '未通过'
+            ];
+            return "<span class='label label-{$styles[$status]}'>$texts[$status]</span>";
+        });
         $grid->avatar_url('头像')->image(null, 30, 30);
         $grid->name('姓名');
         $grid->type('用户类型')->display(function ($type) {
@@ -89,6 +102,10 @@ class UserController extends Controller
         });
         $grid->phone('手机号');
         $grid->created_at('注册时间')->sortable();
+        $grid->in_blacklist('是否拉黑')->switch([
+            'off' => ['value' => 0, 'text' => '否', 'color' => 'default'],
+            'on'  => ['value' => 1, 'text' => '是', 'color' => 'danger'],
+        ]);
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
@@ -101,6 +118,17 @@ class UserController extends Controller
                 ]);
             $filter->scope('designer', '设计师')->where('type', 'designer');
             $filter->scope('party', '甲方')->where('type', 'party');
+            $filter->equal('review_status', '审核状态')->multipleSelect([
+                0 => '待审核',
+                1 => '已通过',
+                2 => '未通过'
+            ]);
+            $filter->scope('reviewing', '待审核')->where('review_status', 0);
+            $filter->scope('blacklist', '黑名单')->where('in_blacklist', 1);
+        });
+
+        $grid->actions(function ($actions) {
+            $actions->disableDelete();
         });
 
         return $grid;
@@ -116,7 +144,52 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $show = new Show($user);
 
+        $show->panel()->tools(function ($tools) use ($user) {
+            if ($user->review_status == 0 || $user->review_status == 2) {
+                $tools->append(
+                    "<a class='btn btn-sm btn-success' style='margin-right: 5px' href='/admin/users/$user->id/review_pass'><i class='fa fa-check-circle'></i>&nbsp;&nbsp;审核通过</a>"
+                );
+            }
+            if ($user->review_status == 0) {
+                $tools->append(
+                    "<a class='btn btn-sm btn-warning' style='margin-right: 5px' href='/admin/users/$user->id/review_fail'><i class='fa fa-times-circle'></i>&nbsp;&nbsp;审核未通过</a>"
+                );
+            }
+        });
+
+        // TODO 取消拉黑
+
         $show->id('ID');
+        if ($user->in_blacklist) {
+            $show->in_blacklist('是否拉黑')->as(function ($value) {
+                $styles = [
+                    0 => 'default',
+                    1 => 'danger'
+                ];
+                $texts = [
+                    0 => '否',
+                    1 => '是'
+                ];
+                return "<span class='label label-$styles[$value]'>$texts[$value]</span>";
+            });
+        }
+        $show->review_status('审核状态')->as(function ($status) {
+            $styles = [
+                0 => 'warning',
+                1 => 'default',
+                2 => 'danger'
+            ];
+            $texts = [
+                0 => '待审核',
+                1 => '已通过',
+                2 => '未通过'
+            ];
+            return "<span class='label label-$styles[$status]'>$texts[$status]</span>";
+        });
+        $show->type('用户类型')->as(function ($type) {
+            $types = ['designer' => '设计师', 'party' => '甲方'];
+            return "<span class='label label-primary'>$types[$type]</span>";
+        });
         $show->name('姓名');
         if ($user->avatar_url) {
             $show->avatar_url('头像')->image(null, 100, 100);
@@ -196,6 +269,11 @@ class UserController extends Controller
             'designer' => '设计师',
             'party'    => '甲方'
         ])->rules('required');
+        $form->select('review_status', '审核状态')->options([
+            0 => '待审核',
+            1 => '已通过',
+            2 => '未通过'
+        ])->rules('required');
         $form->text('phone', '手机号')->prepend('<i class="fa fa-phone fa-fw"></i>')->rules('required');
         $form->email('email', '邮箱')->rules('nullable');
         $form->text('title', '职位/公司');
@@ -210,7 +288,6 @@ class UserController extends Controller
         $form->text('account_name', '开户名');
         $form->text('bank_card_number', '银行卡号');
         $form->text('id_number', '身份证号');
-
         $form->image('id_card_url', '身份证照片')
             ->uniqueName()
             ->removable()
@@ -220,9 +297,11 @@ class UserController extends Controller
             'on'  => ['value' => 1, 'text' => '是', 'color' => 'success'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'default']
         ])->rules('required');
+        $form->switch('in_blacklist', '是否拉黑')->states([
+            'on'  => ['value' => 1, 'text' => '是', 'color' => 'danger'],
+            'off' => ['value' => 0, 'text' => '否', 'color' => 'default'],
+        ]);
         $form->password('password', '密码')->help('填写此项后将覆盖该用户的密码，请谨慎操作。若您不想修改该用户的密码，请将此项留空。');
-
-//        $form->ignore('password');
 
         $form->saving(function ($form) {
             if ($form->password && $form->model()->password != $form->password) {
@@ -258,14 +337,25 @@ class UserController extends Controller
             'designer' => '设计师',
             'party'    => '甲方'
         ])->rules('required');
+        $form->select('review_status', '审核状态')->options([
+            0 => '待审核',
+            1 => '已通过',
+            2 => '未通过'
+        ])->rules('required');
         $form->text('phone', '手机号')->prepend('<i class="fa fa-phone fa-fw"></i>')->rules('required');
         $form->email('email', '邮箱')->rules('nullable');
         $form->text('title', '职位/公司');
         $form->textarea('introduction', '简介');
+
+
         $form->switch('email_activated', '邮箱是否激活')->states([
             'on'  => ['value' => 1, 'text' => '是', 'color' => 'success'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'default']
         ])->rules('required');
+        $form->switch('in_blacklist', '是否拉黑')->states([
+            'on'  => ['value' => 1, 'text' => '是', 'color' => 'danger'],
+            'off' => ['value' => 0, 'text' => '否', 'color' => 'default'],
+        ]);
         $form->password('password', '密码')->help('填写此项后将覆盖该用户的密码，请谨慎操作。若您不想修改该用户的密码，请将此项留空。');
 
         $form->saving(function ($form) {
