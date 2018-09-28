@@ -207,7 +207,9 @@ class UserController extends Controller
 
         if ($user->type === 'designer') {
             $show->professional_fields('专业领域')->as(function ($value) {
-                if (!$value) return $value;
+                if (!is_array($value)) {
+                    return null;
+                }
                 else return implode(' / ', $value);
             });
 

@@ -86,11 +86,11 @@ class UsersController extends Controller
             $needSendMail = true;
         }
 
-        // 身份信息只能填写一次
-        if ($request->id_number && $user->id_number) {
+        // 通过审核后不能修改身份信息
+        if ($user->review_status == 1 && ($request->id_number || $request->id_card_id)) {
             throw new BadRequestHttpException(__('认证信息只能设置一次，不能再次更改'));
         }
-        if ($request->id_card_id) {
+        if ($user->review_status != 1 && $request->id_card_id) {
             if ($user->id_card_url) {
                 throw new BadRequestHttpException(__('认证信息只能设置一次，不能再次更改'));
             }
@@ -104,6 +104,17 @@ class UsersController extends Controller
             $mailsService->sendActivationMail($user);
         }
 
+        return $this->response->item($user, new CurrentUserTransformer());
+    }
+
+    public function applyReview()
+    {
+        $user = $this->user();
+        if ($user->review_status == 1) {
+            $this->response->errorBadRequest(__('您已通过审核'));
+        }
+        $user->review_status = 0;
+        $user->save();
         return $this->response->item($user, new CurrentUserTransformer());
     }
 

@@ -173,6 +173,10 @@ $api->version('v1', [
         // 发送激活邮件
         $api->post('user/mails', 'UserEmailController@send')
             ->name('api.user.mails.send');
+        // 申请重新审核
+        $api->patch('user/review', 'UsersController@applyReview')
+            ->name('api.user.review.apply');
+
 
         /**
          * 用户认证相关
