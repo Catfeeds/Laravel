@@ -24,9 +24,21 @@ class User extends Authenticatable implements JWTSubject
 //        'password' // 取消hidden，管理系统要用到
 //    ];
     protected $casts = [
-        'qualification_urls' => 'array',
+        'qualification_urls'  => 'array',
         'professional_fields' => 'array'
     ];
+
+    // 根据完成项目数从高到低排序
+    // 完成项目以收到设计费为准
+    public function scopeOrderByCompletedProjects($query)
+    {
+        return $query->withCount('payments')->orderBy('payments_count', 'desc');
+    }
+
+    // 该用户（设计师）是否被推荐
+    public function recommendation () {
+        return $this->hasOne(RecommendedUser::class);
+    }
 
     public function followings()
     {
@@ -55,47 +67,56 @@ class User extends Authenticatable implements JWTSubject
     }
 
     // 发布的项目
-    public function projects() {
+    public function projects()
+    {
         return $this->hasMany(Project::class);
     }
 
     // 作品集
-    public function works() {
+    public function works()
+    {
         return $this->hasMany(Work::class);
     }
 
     // 发出的邀请
-    public function invitations() {
+    public function invitations()
+    {
         return $this->hasMany(Invitation::class);
     }
 
     // 收到的邀请：用来评价的邀请
-    public function receivedInvitations() {
+    public function receivedInvitations()
+    {
         return $this->hasMany(Invitation::class, 'invited_user_id');
     }
 
     // 收到的评价
-    public function reviews(){
+    public function reviews()
+    {
         return $this->hasMany(Review::class);
     }
 
     // 发表的评价
-    public function postedReviews() {
+    public function postedReviews()
+    {
         return $this->hasMany(Review::class, 'reviewer_id');
     }
 
     // 报名
-    public function applications() {
+    public function applications()
+    {
         return $this->hasMany(ProjectApplication::class);
     }
 
-    // 项目
-    public function projectInvitations() {
+    // 收到的项目邀请
+    public function projectInvitations()
+    {
         return $this->hasMany(ProjectInvitation::class);
     }
 
     // 设计费
-    public function payments() {
+    public function payments()
+    {
         return $this->hasMany(Payment::class);
     }
 
@@ -120,7 +141,8 @@ class User extends Authenticatable implements JWTSubject
      * @param $instance
      * @param bool $checkActivated
      */
-    public function notifyViaEmail($instance, $checkActivated = true) {
+    public function notifyViaEmail($instance, $checkActivated = true)
+    {
         if ($checkActivated && !$this->email_activated) {
             return;
         }
@@ -174,13 +196,14 @@ class User extends Authenticatable implements JWTSubject
     // 设置review_status属性：此用户对当前登录用户$user的评价状态
     // inviting: $user邀请此用户评价
     // reviewed: 此用户已经评价$user
-    public function setReviewStatus($user) {
+    public function setReviewStatus($user)
+    {
         if (!$user) {
             return $this->attributes['review_status'] = null;
         }
-        if($this->receivedInvitations()->where('user_id', $user->id)->exists()) {
+        if ($this->receivedInvitations()->where('user_id', $user->id)->exists()) {
             $this->attributes['review_status'] = 'inviting'; // 已邀请
-        } else if($user->reviews()->where('reviewer_id', $this->id)->exists()) {
+        } else if ($user->reviews()->where('reviewer_id', $this->id)->exists()) {
             $this->attributes['review_status'] = 'reviewed'; // 已评价
         } else {
             $this->attributes['review_status'] = null; // 未邀请
@@ -188,7 +211,8 @@ class User extends Authenticatable implements JWTSubject
     }
 
     // 一次性设置所有的额外属性
-    public function setExtraAttributes($user) {
+    public function setExtraAttributes($user)
+    {
         $this->setFollowing($user);
         $this->setReviewStatus($user);
     }
