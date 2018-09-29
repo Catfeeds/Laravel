@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Services\UploadService;
 use App\Http\Controllers\Controller;
+use App\Models\RecommendedUser;
 use App\Models\User;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
@@ -118,6 +119,7 @@ class UserController extends Controller
                 ]);
             $filter->scope('designer', '设计师')->where('type', 'designer');
             $filter->scope('party', '甲方')->where('type', 'party');
+            $filter->scope('recommend', '推荐到首页的设计师')->whereHas('recommendation');
             $filter->equal('review_status', '审核状态')->multipleSelect([
                 0 => '待审核',
                 1 => '已通过',
@@ -155,9 +157,10 @@ class UserController extends Controller
                     "<a class='btn btn-sm btn-warning' style='margin-right: 5px' href='/admin/users/$user->id/review_fail'><i class='fa fa-times-circle'></i>&nbsp;&nbsp;审核未通过</a>"
                 );
             }
-        });
 
-        // TODO 取消拉黑
+            // 设计师置顶推荐
+            $this->recommendButton($user, $tools);
+        });
 
         $show->id('ID');
         if ($user->in_blacklist) {
@@ -244,6 +247,22 @@ class UserController extends Controller
         $show->created_at('注册时间');
 
         return $show;
+    }
+
+    protected function recommendButton(User $user, $tools) {
+        if($user->type !== 'designer') return;
+
+        $recommending = RecommendedUser::where('user_id', $user->id)->exists();
+
+        if(!$recommending) {
+            $tools->append(
+                "<a class='btn btn-sm btn-default' style='margin-right: 5px' href='/admin/users/$user->id/recommend'>推荐到首页</a>"
+            );
+        } else {
+            $tools->append(
+                "<a class='btn btn-sm btn-default' style='margin-right: 5px' href='/admin/users/$user->id/cancel_recommend'>取消推荐</a>"
+            );
+        }
     }
 
     protected function form($id = null)

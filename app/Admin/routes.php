@@ -16,6 +16,9 @@ Route::group([
     $router->get('/users/{user}/review_pass', 'UserReviewController@pass');
     $router->get('/users/{user}/review_fail', 'UserReviewController@fail');
 
+    $router->get('/users/{user}/recommend', 'UserRecommendController@recommend');
+    $router->get('/users/{user}/cancel_recommend', 'UserRecommendController@cancelRecommend');
+
 
     $router->resource('projects', ProjectController::class, [
         'except' => ['create', 'store']

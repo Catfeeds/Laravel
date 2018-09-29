@@ -13,10 +13,24 @@ use Illuminate\Http\Request;
 
 class IndexController extends Controller
 {
-    // 获取平台的设计师，随机返回20名
+    // 获取平台的设计师
     public function designers()
     {
-        $users = User::where('type', 'designer')->inRandomOrder()->limit(20)->get();
+        // 先获取推荐的设计师
+        $users = User::where('type', 'designer')
+            ->has('recommendation')
+            ->limit(20)
+            ->inRandomOrder()
+            ->get();
+
+        if($users->count() < 20) {
+            $others = User::where('type', 'designer')
+                ->doesntHave('recommendation')
+                ->limit(20-($users->count()))
+                ->get();
+            $users = $users->concat($others);
+        }
+
         return $this->response->collection($users, new UserTransformer());
     }
 
