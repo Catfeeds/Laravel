@@ -23,10 +23,10 @@ class IndexController extends Controller
             ->inRandomOrder()
             ->get();
 
-        if($users->count() < 20) {
+        if ($users->count() < 20) {
             $others = User::where('type', 'designer')
                 ->doesntHave('recommendation')
-                ->limit(20-($users->count()))
+                ->limit(20 - ($users->count()))
                 ->get();
             $users = $users->concat($others);
         }
@@ -44,21 +44,25 @@ class IndexController extends Controller
             ->limit(20)
             ->get();
 
-        if(!$works->isEmpty()) {
+        if (!$works->isEmpty()) {
             $works = $works->random(5);
         }
 
         return $this->response->collection($works, new WorkTransformer());
     }
 
-    // 获取项目，进行中的项目在前面，已完成的项目在后面
+    // 获取项目：新发布 > 进行中 > 已完成
     public function projects()
     {
-        $status = Project::STATUS_COMPLETED;
+        $statusNewReleased = Project::STATUS_TENDERING;
+        $statusInProgress = Project::STATUS_WORKING;
         $projects = Project::whereIn('status', [
             Project::STATUS_TENDERING, Project::STATUS_WORKING, Project::STATUS_COMPLETED
         ])->where('mode', 'free')
-            ->orderByRaw("case when status = $status then 0 else 1 end desc, id desc")
+            ->orderByRaw("case when status = $statusNewReleased then 2
+                        when status = $statusInProgress then 1 
+                        else 0 end 
+                        desc, id desc")
             ->paginate(20);
         return $this->response->paginator($projects, new ProjectTransformer());
     }
