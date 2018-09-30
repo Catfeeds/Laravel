@@ -30,7 +30,7 @@ class UserPolicy
         if ($user->type === 'designer') {
             return true;
         } else {
-            // 甲方的信息只有与之达成协议的设计师可以看：
+            // 甲方的信息只有与之达成协议的设计师或评价他的设计师可以看：
 
             // 1. 设计师报名了甲方的某个项目，且该项目正在工作中
             $condition1 = $user->projects()
@@ -56,12 +56,19 @@ class UserPolicy
                     ]);
                 })->exists();
 
-            if ($condition1 || $condition2 || $condition3) {
+            // 4. 甲方邀请了当前设计师评价他，或者当前设计师已经评价过他（曾经邀请过，但是邀请记录在评价完之后就删除了）
+            $reviewed = $user->reviews()->where('reviewer_id', $currentUser->id)->exists();
+            $invited = $user->invitations()
+                ->where('invited_user_id', $currentUser->id)
+                ->toReview()
+                ->exists();
+
+            if ($condition1 || $condition2 || $condition3 || $reviewed || $invited) {
                 return true;
             }
 
             if ($currentUser->type === 'designer') {
-                throw new AccessDeniedException(__('您无权查看该甲方的信息，仅当您与他有进行中的项目时才可查看'));
+                throw new AccessDeniedException(__('您无权查看该甲方的信息，仅当您与Ta有进行中的项目时或收到Ta的评价邀请时才可查看'));
             } else {
                 throw new AccessDeniedException(__('您无权查看该甲方的信息'));
             }

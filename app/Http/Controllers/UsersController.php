@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Transformers\CurrentUserTransformer;
 use App\Transformers\UserForReviewTransformer;
 use App\Transformers\UserTransformer;
+use App\Transformers\UserWithCanReviewTransformer;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -137,9 +138,10 @@ class UsersController extends Controller
             $this->authorizeForUser($currentUser, 'retrieve', $user);
         }
 
-        $user->setFollowing($this->user());
         $user->increment('views'); // 浏览量+1
-        return $this->response->item($user, new UserTransformer());
+        $user->setFollowing($this->user()); // 是否关注
+        $user->setCanReview($this->user()); // 是否可以评价
+        return $this->response->item($user, new UserWithCanReviewTransformer());
     }
 
     public function follow(User $user)
@@ -260,7 +262,7 @@ class UsersController extends Controller
         $users = $query->paginate(20);
         $users->each(function ($user) use ($currentUser) {
             $user->setFollowing($currentUser);
-            $user->setReviewStatus($currentUser);
+            $user->setReviewStatusToUser($currentUser); // 搜索到的用户对当前用户的评价状态
         });
 
         return $this->response->paginator($users, new UserForReviewTransformer());

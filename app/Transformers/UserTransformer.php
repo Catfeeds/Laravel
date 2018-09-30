@@ -22,7 +22,7 @@ class UserTransformer extends TransformerAbstract
             'updated_at' => $user->updated_at->toDateTimeString(),
 
             // 只有设计师有这些信息
-            'professional_fields' => (array)$user->professional_fields,
+            'professional_fields' => (array)$user->professional_fields
         ];
     }
 }

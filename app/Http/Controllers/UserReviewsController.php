@@ -7,16 +7,19 @@ use App\Http\Requests\ReviewRequest;
 use App\Models\Invitation;
 use App\Models\Review;
 use App\Models\User;
+use App\Policies\ReviewPolicy;
 use App\Transformers\ReviewTransformer;
 use App\Transformers\UserForReviewTransformer;
 use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 class UserReviewsController extends Controller
 {
     // 某个用户的评价列表
-    public function index(User $user, Request $request) {
-        if($request->type === 'posted') { // 发表的评价
+    public function index(User $user, Request $request)
+    {
+        if ($request->type === 'posted') { // 发表的评价
             $reviews = $user->postedReviews()->recent()->paginate($request->per_page ?? 20);
         } else { // 收到的评价
             $reviews = $user->reviews()->recent()->paginate($request->per_page ?? 20);
@@ -25,34 +28,36 @@ class UserReviewsController extends Controller
     }
 
     // 邀请设计师
-    public function invite(InvitationRequest $request) {
+    public function invite(InvitationRequest $request)
+    {
         $user = $this->user();
 
         // 不能重复邀请同一个人评价
-        if($user->invitations()
+        if ($user->invitations()
             ->where('invited_user_id', $request->invited_user_id)
             ->toReview()
             ->exists()) {
             return $this->response->errorBadRequest(__('不能重复邀请'));
         }
-        if($user->reviews()
+        if ($user->reviews()
             ->where('reviewer_id', $request->invited_user_id)
             ->exists()) {
-            return $this->response->errorBadRequest(__('不能重复邀请'));
+            return $this->response->errorBadRequest(__('该用户已发表过评价，不能重复邀请'));
         }
 
         Invitation::create([
-            'user_id' => $user->id,
+            'user_id'         => $user->id,
             'invited_user_id' => $request->invited_user_id,
-            'type' => 'review'
+            'type'            => 'review'
         ]);
 
         return $this->response->noContent();
     }
 
     // 发表评价
-    public function store(User $user, ReviewRequest $request, Review $review) {
-        $this->authorize('store', [$review, $user]);
+    public function store(User $user, ReviewRequest $request, Review $review)
+    {
+        $this->authorize('store', [Review::class, $user]);
 
         $currentUser = $this->user();
 
@@ -72,17 +77,38 @@ class UserReviewsController extends Controller
     }
 
     // 删除评价
-    public function destroy(Review $review) {
+    public function destroy(Review $review)
+    {
         $this->authorize('destroy', $review);
         $review->delete();
         return $this->response->noContent();
     }
 
     // 当前登录用户对另一个用户的评价状态
-    public function status(Request $request) {
+    public function status(Request $request)
+    {
         $user = User::findOrFail($request->uid);
         $currentUser = $this->user();
-        $currentUser->setReviewStatus($user);
+        $currentUser->setReviewStatusToUser($user);
         return $this->response->item($currentUser, new UserForReviewTransformer());
+    }
+
+    // 当前登录用户是否可以评价另一个用户
+    public function canReview(Request $request)
+    {
+        $user = User::findOrFail($request->uid);
+        $currentUser = $this->user();
+
+        try {
+            $res = (new ReviewPolicy())->store($currentUser, $user);
+        } catch (AccessDeniedException $exception) {
+            $this->response->errorBadRequest($exception->getMessage());
+        }
+
+        if(!$res) {
+            $this->response->errorBadRequest(__('无权评价该用户'));
+    }
+
+        return ['can' => $res];
     }
 }

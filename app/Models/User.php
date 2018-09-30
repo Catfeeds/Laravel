@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Notifications\ActivateEmail;
+use App\Policies\ReviewPolicy;
 use Auth;
 use Cmgmyr\Messenger\Traits\Messagable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -36,7 +37,8 @@ class User extends Authenticatable implements JWTSubject
     }
 
     // 该用户（设计师）是否被推荐
-    public function recommendation () {
+    public function recommendation()
+    {
         return $this->hasOne(RecommendedUser::class);
     }
 
@@ -196,7 +198,7 @@ class User extends Authenticatable implements JWTSubject
     // 设置review_status属性：此用户对当前登录用户$user的评价状态
     // inviting: $user邀请此用户评价
     // reviewed: 此用户已经评价$user
-    public function setReviewStatus($user)
+    public function setReviewStatusToUser($user)
     {
         if (!$user) {
             return $this->attributes['review_status'] = null;
@@ -210,10 +212,29 @@ class User extends Authenticatable implements JWTSubject
         }
     }
 
+    // 用户$user是否可以评价此用户$this
+    public function setCanReview($user)
+    {
+        $KEY = 'can_review';
+
+        if (!$user) {
+            return $this->attributes[$KEY] = false;
+        }
+
+        try {
+            $res = (new ReviewPolicy())->store($user, $this);
+        } catch (\Exception $exception) {
+            $res = false;
+        }
+
+        return $this->attributes[$KEY] = $res;
+    }
+
     // 一次性设置所有的额外属性
     public function setExtraAttributes($user)
     {
         $this->setFollowing($user);
-        $this->setReviewStatus($user);
+        $this->setReviewStatusToUser($user);
+        $this->setCanReview($user);
     }
 }

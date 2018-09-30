@@ -21,12 +21,16 @@
   "已报名该项目": "Has already applied for the project",
   "认证信息只能设置一次，不能再次更改": "Can only set authentication information once",
   "原密码错误": "Wrong original password",
+
+  "该用户已发表过评价，不能重复邀请": "The user had already posted review and cannot be invited",
   "不能重复邀请": "Cannot repeat invitation",
   "未收到邀请": "Not invited",
   "已发表过评价": "Already reviewed",
+  "无权评价该用户": "You are not authorized to review the user",
+
   "您无权查看": "You have no right to visit",
   "您无权查看该甲方的信息": "You are not authorized to view the information of the Party.",
-  "您无权查看该甲方的信息，仅当您与他有进行中的项目时才可查看": "You are not authorized to view the information of the Party, but only if you have an ongoing project with him.",
+  "您无权查看该甲方的信息，仅当您与Ta有进行中的项目时或收到Ta的评价邀请时才可查看": "You are not authorized to view the information of the Party, but only if you have an ongoing project with or been invited to review by him/her.",
 
   "项目当前不允许修改交付文件": "Cannot edit the delivered file of the project"
 }
