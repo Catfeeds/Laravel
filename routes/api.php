@@ -265,6 +265,14 @@ $api->version('v1', [
         // 获取评价状态：是否可以评价某个用户
         $api->get('user/can_review', 'UserReviewsController@canReview')
             ->name('api.user.canReview');
+        // 置顶评价
+        $api->put('reviews/{review}/stick', 'UserReviewsController@stick')
+            ->where('review', '[0-9]+')
+            ->name('api.reviews.stick');
+        // 取消置顶评价
+        $api->put('reviews/{review}/unstick', 'UserReviewsController@unstick')
+            ->where('review', '[0-9]+')
+            ->name('api.reviews.unstick');
 
         /**
          * 项目相关

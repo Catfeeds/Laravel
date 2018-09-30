@@ -21,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\ProjectInvitation::observe(\App\Observers\ProjectInvitationObserver::class);
         \App\Models\Payment::observe(\App\Observers\PaymentObserver::class);
         \App\Models\ProjectDelivery::observe(\App\Observers\ProjectDeliveryObserver::class);
+        \App\Models\Review::observe(\App\Observers\ReviewObserver::class);
     }
 
     /**

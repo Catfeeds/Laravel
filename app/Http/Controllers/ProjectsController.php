@@ -219,13 +219,16 @@ class ProjectsController extends Controller
                 ->paginate(20);
             return $this->response->paginator($projects, new ProjectForPublisherTransformer());
         } else {
-            // 当前用户是设计师：返回报名和被邀请的项目的项目
+            // 当前用户是设计师：返回报名和接受邀请的项目的项目
             $projects = $this->getQueryFromRequest($request, Project::DESIGNER_ORDER_STATUS)
                 ->where(function ($query) use ($currentUser) {
                     $query->whereHas('applications', function ($query) use ($currentUser) {
                         $query->where('user_id', $currentUser->id);
                     })->orWhereHas('invitations', function ($query) use ($currentUser) {
-                        $query->where('user_id', $currentUser->id);
+                        $query->where([
+                            'user_id' => $currentUser->id,
+                            'status' => ProjectInvitation::STATUS_ACCEPTED
+                        ]);
                     });
                 })
                 ->recent()

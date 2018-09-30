@@ -23,7 +23,7 @@ class UserRequest extends FormRequest
                     'title' => 'max:50',
                     'email' => 'email',
                     'introduction' => 'max:200',
-                    'avatar_id' => 'exists:uploads,id,type,avatar,user_id,'.$userId,
+                    'avatar_url' => 'exists:uploads,path,type,avatar,user_id,'.$userId,
                     'id_card_id' => 'exists:uploads,id,type,id_card,user_id,'.$userId,
                     'id_number' => 'nullable|string',
                     'bank_name' => 'nullable|string|max:100',
@@ -40,7 +40,7 @@ class UserRequest extends FormRequest
     public function messages()
     {
         return [
-            'avatar_id.exists' => '图片id不存在',
+            'avatar_url.exists' => '图片path不存在',
             'id_card_id.exists' => '图片id不存在'
         ];
     }

@@ -18,20 +18,23 @@ class ReviewTransformer extends TransformerAbstract
     public function transform(Review $review)
     {
         return [
-            'id'                      => $review->id,
-            'content'                 => (string)$review->content,
-            'user_id'                 => (int)$review->user_id,
-            'reviewer_id'             => (int)$review->reviewer_id,
-            'created_at'              => $review->created_at->toDateTimeString(),
-            'updated_at'              => $review->updated_at->toDateTimeString()
+            'id'          => $review->id,
+            'order_id'    => (int)$review->order_id,
+            'content'     => (string)$review->content,
+            'user_id'     => (int)$review->user_id,
+            'reviewer_id' => (int)$review->reviewer_id,
+            'created_at'  => $review->created_at->toDateTimeString(),
+            'updated_at'  => $review->updated_at->toDateTimeString()
         ];
     }
 
-    public function includeUser(Review $review) {
+    public function includeUser(Review $review)
+    {
         return $this->item($review->user, new UserTransformer());
     }
 
-    public function includeReviewer(Review $review) {
+    public function includeReviewer(Review $review)
+    {
         return $this->item($review->reviewer, new UserTransformer());
     }
 }

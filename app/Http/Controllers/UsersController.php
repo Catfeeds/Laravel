@@ -66,11 +66,7 @@ class UsersController extends Controller
     public function update(UserRequest $request, UserMailsService $mailsService, UsersService $usersService)
     {
         $user = $this->user();
-        $attributes = $request->only(['name', 'title', 'introduction', 'id_number', 'bank_name', 'bank_card_number', 'account_name', 'qualification_urls', 'professional_fields']);
-
-        if ($request->avatar_id) {
-            $attributes['avatar_url'] = Upload::find($request->avatar_id)->path;
-        }
+        $attributes = $request->only(['name', 'title', 'introduction', 'id_number', 'bank_name', 'bank_card_number', 'account_name', 'qualification_urls', 'professional_fields', 'avatar_url']);
 
         // 更改邮箱时，发送激活邮件
         $needSendMail = false;
@@ -238,6 +234,11 @@ class UsersController extends Controller
                     $query->orWhereJsonContains('professional_fields', $field);
                 }
             });
+        }
+
+        // 按照完成项目个数降序：收到一份设计费代表完成一个项目
+        if($request->order === 'completed_project_count_desc') {
+            $query->withCount('payments')->orderBy('payments_count', 'desc');
         }
 
         $users = $query->paginate(20);

@@ -61,4 +61,9 @@ class ReviewPolicy
         // 只有被评价的人与发出评价的人可以删除
         return $user->id == $review->user_id || $user->id == $review->reviewer_id;
     }
+
+    public function stick(User $user, Review $review)
+    {
+        return $user->isAuthorOf($review);
+    }
 }

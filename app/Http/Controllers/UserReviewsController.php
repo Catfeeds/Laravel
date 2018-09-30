@@ -22,7 +22,9 @@ class UserReviewsController extends Controller
         if ($request->type === 'posted') { // 发表的评价
             $reviews = $user->postedReviews()->recent()->paginate($request->per_page ?? 20);
         } else { // 收到的评价
-            $reviews = $user->reviews()->recent()->paginate($request->per_page ?? 20);
+            // 置顶的评价在前面，其他评价按时间排序
+            // recent必须放在orderBy后面，表示次要排序条件
+            $reviews = $user->reviews()->orderBy('order_id', 'desc')->recent()->paginate($request->per_page ?? 20);
         }
         return $this->response->paginator($reviews, new ReviewTransformer());
     }
@@ -105,10 +107,28 @@ class UserReviewsController extends Controller
             $this->response->errorBadRequest($exception->getMessage());
         }
 
-        if(!$res) {
+        if (!$res) {
             $this->response->errorBadRequest(__('无权评价该用户'));
-    }
+        }
 
         return ['can' => $res];
+    }
+
+    // 置顶
+    public function stick(Review $review)
+    {
+        $this->authorize('stick', $review);
+        $review->order_id = 1;
+        $review->save();
+        return $this->response->item($review, (new ReviewTransformer())->setDefaultIncludes(['reviewer']));
+    }
+
+    // 取消置顶
+    public function unstick(Review $review)
+    {
+        $this->authorize('stick', $review);
+        $review->order_id = 0;
+        $review->save();
+        return $this->response->item($review, (new ReviewTransformer())->setDefaultIncludes(['reviewer']));
     }
 }
