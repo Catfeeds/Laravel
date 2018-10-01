@@ -202,16 +202,47 @@ class UsersController extends Controller
         return $this->response->paginator($users, new UserTransformer());
     }
 
+    // 推荐用户：甲方优先推荐以前合作过但是没关注的；设计师就推荐没关注的
     public function recommend()
     {
         $currentUser = $this->user();
-        $users = User::where('type', 'designer')
-            ->where('id', '!=', $currentUser->id)
-            ->whereDoesntHave('followers', function ($query) use ($currentUser) {
-                $query->where('follower_id', $currentUser->id);
-            })
-            ->limit(10)
-            ->get();
+
+        // 如果当前用户是甲方，优先推荐以前合作过但是没关注的设计师
+        if($currentUser->type === 'party') {
+            // 先获取合作过但是没关注的设计师
+            $users = User::where('type', 'designer')
+                ->whereHas('payments.project.user', function ($query) use ($currentUser) {
+                    $query->where('user_id', $currentUser->id);
+                })
+                ->whereDoesntHave('followers', function ($query) use ($currentUser) {
+                    $query->where('follower_id', $currentUser->id);
+                })
+                ->limit(10)
+                ->inRandomOrder()
+                ->get();
+
+            if ($users->count() < 20) {
+                $others = User::where('type', 'designer')
+                    ->whereNotIn('id', $users->pluck('id'))
+                    ->limit(10 - ($users->count()))
+                    ->inRandomOrder()
+                    ->get();
+                $users = $users->concat($others);
+            }
+        }
+
+        // 如果当前用户是设计师，推荐Ta没关注的设计师
+        else {
+            $users = User::where('type', 'designer')
+                ->where('id', '!=', $currentUser->id)
+                ->whereDoesntHave('followers', function ($query) use ($currentUser) {
+                    $query->where('follower_id', $currentUser->id);
+                })
+                ->limit(10)
+                ->inRandomOrder()
+                ->get();
+        }
+
         return $this->response->collection($users, new UserTransformer());
     }
 
