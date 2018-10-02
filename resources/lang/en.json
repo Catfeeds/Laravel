@@ -22,6 +22,8 @@
   "认证信息只能设置一次，不能再次更改": "Can only set authentication information once",
   "原密码错误": "Wrong original password",
 
+  "您还未通过审核，无法报名该项目": "You have not passed the review and cannot apply for the project",
+
   "该用户已发表过评价，不能重复邀请": "The user had already posted review and cannot be invited",
   "不能重复邀请": "Cannot repeat invitation",
   "未收到邀请": "Not invited",
