@@ -166,7 +166,10 @@ return [
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
         // 站内信
-        Cmgmyr\Messenger\MessengerServiceProvider::class
+        Cmgmyr\Messenger\MessengerServiceProvider::class,
+
+        // SendCloud邮件发送
+        Naux\Mail\SendCloudServiceProvider::class,
     ],
 
     /*

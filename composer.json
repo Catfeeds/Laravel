@@ -17,6 +17,7 @@
         "laravel/socialite": "^3.0",
         "laravel/tinker": "^1.0",
         "liyu/dingo-serializer-switch": "^0.3.0",
+        "naux/sendcloud": "^1.1",
         "overtrue/easy-sms": "^1.1",
         "predis/predis": "~1.0",
         "propaganistas/laravel-phone": "^4.0",
