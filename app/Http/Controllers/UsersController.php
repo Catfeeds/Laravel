@@ -224,6 +224,9 @@ class UsersController extends Controller
             if ($users->count() < 20) {
                 $others = User::where('type', 'designer')
                     ->whereNotIn('id', $users->pluck('id'))
+                    ->whereDoesntHave('followers', function ($query) use ($currentUser) {
+                        $query->where('follower_id', $currentUser->id);
+                    })
                     ->limit(10 - ($users->count()))
                     ->inRandomOrder()
                     ->get();

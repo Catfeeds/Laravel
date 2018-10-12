@@ -27,6 +27,7 @@ class IndexController extends Controller
             $others = User::where('type', 'designer')
                 ->doesntHave('recommendation')
                 ->limit(20 - ($users->count()))
+                ->inRandomOrder()
                 ->get();
             $users = $users->concat($others);
         }
