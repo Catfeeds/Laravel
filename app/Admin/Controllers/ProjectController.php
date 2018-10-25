@@ -258,7 +258,9 @@ class ProjectController extends Controller
             ->rules('required');
         $form->text('delivery_time', '交付时间')->rules('required|max:50');
         $form->text('find_time', '希望用多长时间找设计师')->rules('required|max:50');
-        $form->text('payment', '希望付给设计师的费用')->rules('required|max:200');
+        $form->text('payment', '希望付给设计师的费用')
+            ->help("请按照如下格式填写设计费：单位 金额。如：“RMB 1,000,000.00” 或 “USD 144,306.40”")
+            ->rules('required|max:200');
         $form->textarea('remark', '申请备注');
         $form->display('created_at', '发布于');
         $form->display('updated_at', '上次更新');

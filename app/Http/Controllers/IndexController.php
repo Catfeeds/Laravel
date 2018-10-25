@@ -46,7 +46,8 @@ class IndexController extends Controller
             ->get();
 
         if (!$works->isEmpty()) {
-            $works = $works->random(5);
+            $num = $works->count() > 5 ? 5 : $works->count();
+            $works = $works->random($num);
         }
 
         return $this->response->collection($works, new WorkTransformer());

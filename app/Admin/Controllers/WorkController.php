@@ -114,4 +114,10 @@ class WorkController extends Controller
         });
         return $show;
     }
+
+    protected function form()
+    {
+        $form = new Form(new Work);
+        return $form;
+    }
 }

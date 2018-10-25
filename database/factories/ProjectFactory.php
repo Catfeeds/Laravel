@@ -13,7 +13,7 @@ $factory->define(\App\Models\Project::class, function (Faker $faker) {
         'description'             => $faker->realText(),
 //        'project_file_url'        => $faker->randomElement([null, $faker->url]),
         'delivery_time'           => $faker->randomElement(['三个月', '六个月', '其他']),
-        'payment'                 => $faker->numberBetween(50, 200) . '万',
+        'payment'                 => $faker->randomElement(['RMB 1,000,000.00', 'RMB 1,475,021.36', 'USD 2,681,131.60']),
         'find_time'               => $faker->randomElement(['9~12天', '12~15天', '一个月内']),
         'mode'                    => $faker->randomElement(['free', 'invite', 'specify']),
         'canceled_at'             => $faker->randomElement([null, \Carbon\Carbon::now()]),
