@@ -38,7 +38,7 @@ class IndexController extends Controller
     // 获取近一个月点赞最多的设计师的作品
     public function works()
     {
-        // 先选出20个，然后随机挑5个
+        // 选择近一个月最热门的5个作品
         $works = Work::where('created_at', '>=', Carbon::now()->subMonths(1))
             ->public()
             ->orderBy('like_count', 'desc')
@@ -48,6 +48,17 @@ class IndexController extends Controller
         if (!$works->isEmpty()) {
             $num = $works->count() > 5 ? 5 : $works->count();
             $works = $works->random($num);
+        }
+
+        // 如果近一个月热门的不够5张，使用1个月前的补全
+        if ($works->count() < 5) {
+            $works = $works->concat(
+                Work::where('created_at', '<', Carbon::now()->subMonths(1))
+                    ->public()
+                    ->orderBy('like_count', 'desc')
+                    ->limit(5 - $works->count())
+                    ->get()
+            );
         }
 
         return $this->response->collection($works, new WorkTransformer());
