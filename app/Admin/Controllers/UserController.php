@@ -273,7 +273,7 @@ class UserController extends Controller
         ])->exists()) {
             $form = $this->formForDesigner($id);
         } else {
-            $form = $this->formForParty($id);
+            $form = $this->formForClient($id);
         }
         return $form;
     }
@@ -346,7 +346,7 @@ class UserController extends Controller
         return $form;
     }
 
-    protected function formForParty($id = null)
+    protected function formForClient($id = null)
     {
         $form = new Form(new User());
         $form->text('name', '姓名')->rules('required');

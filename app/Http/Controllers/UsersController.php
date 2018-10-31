@@ -142,7 +142,7 @@ class UsersController extends Controller
 
     public function follow(User $user)
     {
-        if ($user->type === 'party') {
+        if ($user->type === 'client') {
             return $this->response->errorBadRequest('只能关注设计师');
         }
 
@@ -208,7 +208,7 @@ class UsersController extends Controller
         $currentUser = $this->user();
 
         // 如果当前用户是甲方，优先推荐以前合作过但是没关注的设计师
-        if($currentUser->type === 'party') {
+        if($currentUser->type === 'client') {
             // 先获取合作过但是没关注的设计师
             $users = User::where('type', 'designer')
                 ->whereHas('payments.project.user', function ($query) use ($currentUser) {

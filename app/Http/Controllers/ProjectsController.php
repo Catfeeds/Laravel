@@ -191,9 +191,9 @@ class ProjectsController extends Controller
     }
 
     // 某个业主发布的公开项目
-    public function partyIndex(User $user, Request $request)
+    public function clientIndex(User $user, Request $request)
     {
-        if ($user->type !== 'party') {
+        if ($user->type !== 'client') {
             return $this->response->errorUnauthorized('公开接口只能访问甲方发布的项目');
         }
 
@@ -212,7 +212,7 @@ class ProjectsController extends Controller
         $currentUser = $this->user();
 
         // 当前用户是甲方：返回发布的项目
-        if ($currentUser->type == 'party') {
+        if ($currentUser->type == 'client') {
             $projects = $this->getQueryFromRequest($request, Project::ALL_STATUS)
                 ->where('user_id', $currentUser->id)
                 ->recent()
@@ -254,7 +254,7 @@ class ProjectsController extends Controller
         $currentUser = $this->user();
 
         // 当前用户是甲方：返回发布的项目
-        if ($currentUser->type == 'party') {
+        if ($currentUser->type == 'client') {
             $projects = $currentUser->projects()
                 ->whereIn('status', [
                     Project::STATUS_REVIEWING,

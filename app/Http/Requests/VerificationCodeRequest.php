@@ -9,7 +9,7 @@ class VerificationCodeRequest extends FormRequest
         return [
             'phone' => 'required_without:email|phone:CN',
             'email' => 'required_without:phone|email',
-            'user_type' => 'required_with:phone|in:party,designer',
+            'user_type' => 'required_with:phone|in:client,designer',
             'action_type'  => 'required|in:register,resetPassword,changePhone'
         ];
     }

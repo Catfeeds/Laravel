@@ -13,14 +13,14 @@ class UserSeeder extends Seeder
     public function run()
     {
         $designerAvatar = (new UsersService())->defaultAvatar('D');
-        $partyAvatar = (new UsersService())->defaultAvatar('P');
+        $clientAvatar = (new UsersService())->defaultAvatar('P');
         \App\Models\User::insert([
-            'name'            => 'Party A',
+            'name'            => 'Client A',
             'phone'           => '13000000000',
-            'type'            => 'party',
+            'type'            => 'client',
             'email'           => '111@163.com',
             'email_activated' => false,
-            'avatar_url' => $partyAvatar,
+            'avatar_url' => $clientAvatar,
             'password'        => bcrypt('123123'),
             'created_at'      => now(),
             'updated_at'      => now()
@@ -37,12 +37,12 @@ class UserSeeder extends Seeder
             'updated_at'      => now()
         ]);
         \App\Models\User::insert([
-            'name'            => 'Party.Andrew',
+            'name'            => 'Client.Andrew',
             'phone'           => '13000000002',
-            'type'            => 'party',
+            'type'            => 'client',
             'email'           => '123123@163.com',
             'email_activated' => true,
-            'avatar_url' => $partyAvatar,
+            'avatar_url' => $clientAvatar,
             'password'        => bcrypt('123123'),
             'created_at'      => now(),
             'updated_at'      => now()

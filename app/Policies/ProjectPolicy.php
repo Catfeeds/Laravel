@@ -44,7 +44,7 @@ class ProjectPolicy
 //            } else {
 //                // 如果是非公开项目
 //                // 如果当前用户是甲方：只有作者可查看
-//                if ($user->type === 'party') {
+//                if ($user->type === 'client') {
 //                    return $user->isAuthorOf($project);
 //                } else {
 //                    // 如果当前用户是设计师
@@ -73,7 +73,7 @@ class ProjectPolicy
 
     public function store(User $user)
     {
-        return $user->type === 'party'; // 只有甲方才能发布项目
+        return $user->type === 'client'; // 只有甲方才能发布项目
     }
 
     public function update(User $user, Project $project)

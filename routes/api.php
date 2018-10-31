@@ -140,9 +140,9 @@ $api->version('v1', [
     $api->get('projects/{project}', 'ProjectsController@index')
         ->name('api.projects.index');
     // 某个业主发布的项目
-    $api->get('users/{user}/projects', 'ProjectsController@partyIndex')
+    $api->get('users/{user}/projects', 'ProjectsController@clientIndex')
         ->where('user', '[0-9]+')
-        ->name('api.users.projects.partyIndex');
+        ->name('api.users.projects.clientIndex');
     // 搜索项目
     $api->get('projects', 'ProjectsController@search')
         ->name('api.projects.search');

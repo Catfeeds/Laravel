@@ -9,7 +9,7 @@ class ResetPasswordRequest extends FormRequest
         return [
             'phone' => 'required_without:email|phone:CN',
             'email' => 'required_without:phone|email',
-            'type' => 'required|in:designer,party',
+            'type' => 'required|in:designer,client',
             'code' => 'required|size:6',
             'password' => 'required|string'
         ];

@@ -11,8 +11,8 @@ class ProjectApplicationObserver
     // 有设计师报名时通知甲方
     public function created(ProjectApplication $application)
     {
-        $party = $application->project->user;
-        $party->notify(new ProjectAppliedViaDatabase($application));
-        $party->notifyViaEmail(new ProjectAppliedViaEmail($application));
+        $client = $application->project->user;
+        $client->notify(new ProjectAppliedViaDatabase($application));
+        $client->notifyViaEmail(new ProjectAppliedViaEmail($application));
     }
 }

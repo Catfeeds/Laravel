@@ -20,7 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->nullable(); // 这里不能写成unique，因为一个邮箱可以被多个用户临时填写。应当是email与email_activated共同唯一
             $table->boolean('email_activated')->default(false);
             $table->string('password');
-            $table->enum('type', ['party', 'designer', 'expert'])->comment('用户类型：party、designer、expert');
+            $table->enum('type', ['client', 'designer', 'expert'])->comment('用户类型：client、designer、expert');
             $table->string('avatar_url')->nullable();
             $table->string('title')->nullable()->comment('个人职位');
             $table->string('introduction')->nullable()->comment('个人简介');

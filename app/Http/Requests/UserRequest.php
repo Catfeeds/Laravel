@@ -10,7 +10,7 @@ class UserRequest extends FormRequest
             case 'POST':
                 return [
                     'name' => ['between:1,200', 'regex:/^(?:[\x{4e00}-\x{9fa5}]+)(?:·[\x{4e00}-\x{9fa5}]+)*$|^[a-zA-Z0-9]+\s?[\.·\-()a-zA-Z]*[a-zA-Z]+$/u'],
-                    'type' => 'required|string|in:designer,party',
+                    'type' => 'required|string|in:designer,client',
                     'phone' => 'required_without:email|phone:CN',
                     'email' => 'required_without:phone|email',
                     'password' => 'required|string|min:6|max:30',

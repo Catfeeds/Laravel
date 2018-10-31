@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Review;
 use Illuminate\Database\Seeder;
 
 class ReviewSeeder extends Seeder
@@ -11,6 +12,7 @@ class ReviewSeeder extends Seeder
      */
     public function run()
     {
+        Review::flushEventListeners();
         factory(App\Models\Review::class, 200)->create();
     }
 }

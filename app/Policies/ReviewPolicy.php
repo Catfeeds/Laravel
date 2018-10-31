@@ -22,7 +22,7 @@ class ReviewPolicy
 
         // 有一个已完成（交付了设计文件）的项目时可以评价
         // 1. 甲方评价设计师：该设计师曾经在甲方的一个已完成项目里提交过设计文件
-        if ($currentUser->type === 'party' && $reviewedUser->type === 'designer') {
+        if ($currentUser->type === 'client' && $reviewedUser->type === 'designer') {
             $hasCompletedProject = $currentUser->projects()
                 ->where('status', Project::STATUS_COMPLETED)
                 ->whereHas('deliveries', function ($query) use ($reviewedUser) {
@@ -33,7 +33,7 @@ class ReviewPolicy
             }
         }
         // 2. 设计师评价甲方：该设计师曾经在甲方的一个已完成项目里提交过设计文件
-        if ($currentUser->type === 'designer' && $reviewedUser->type === 'party') {
+        if ($currentUser->type === 'designer' && $reviewedUser->type === 'client') {
             $hasCompletedProject = $reviewedUser->projects()
                 ->where('status', Project::STATUS_COMPLETED)
                 ->whereHas('deliveries', function ($query) use ($currentUser) {

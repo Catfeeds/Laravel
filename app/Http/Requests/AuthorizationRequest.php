@@ -10,7 +10,7 @@ class AuthorizationRequest extends FormRequest
 //            'phone' => 'required|phone:CN',
             'identifier' => 'required|string',
             'password' => 'required|string',
-            'type' => 'required|string|in:designer,party'
+            'type' => 'required|string|in:designer,client'
         ];
     }
 }
