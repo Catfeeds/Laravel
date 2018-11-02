@@ -62,9 +62,8 @@ class UserPasswordController extends Controller
             ])->first();
         } else {
             $user = User::where([
-                'email'           => $request->email,
-                'email_activated' => true,
-                'type'            => $request->type
+                'email' => $request->email,
+                'type'  => $request->type
             ])->first();
         }
         if (!$user) {

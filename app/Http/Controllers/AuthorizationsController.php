@@ -21,7 +21,6 @@ class AuthorizationsController extends Controller
 
         if(filter_var($request->identifier, FILTER_VALIDATE_EMAIL) ) {
             $credentials['email'] = $request->identifier;
-            $credentials['email_activated'] = true; // 只有激活邮箱后才能用邮箱登录
         } else {
             $credentials['phone'] = $request->identifier;
         }

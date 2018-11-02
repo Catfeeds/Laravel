@@ -14,7 +14,6 @@ class CurrentUserTransformer extends TransformerAbstract
             'phone' => (string)$user->phone,
             'email' => (string)$user->email,
 
-            'email_activated' => (boolean)$user->email_activated,
             'notification_count' => (int)$user->notification_count,
             'unread_message_count' => (int)$user->unreadMessagesCount(),
 

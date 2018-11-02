@@ -14,6 +14,6 @@ use App\Services\UsersService;
 class TestController extends Controller
 {
     public function test(){
-        return (new UsersService())->defaultAvatar('zhu kai');
+        return view('emails.activate', ['token' => '123']);
     }
 }

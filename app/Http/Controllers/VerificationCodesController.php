@@ -79,8 +79,8 @@ class VerificationCodesController extends Controller
 
     private function sendViaEmail($email, $code)
     {
-        \Mail::raw("验证码: $code", function ($message) use ($email) {
-            $message->to($email)->subject('测试邮件');
+        \Mail::raw("Verification code: $code", function ($message) use ($email) {
+            $message->to($email)->subject('【Yogooooo】Verification code');
         });
     }
 }

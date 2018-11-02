@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Handlers\ImageUploadHandler;
 use App\Http\Requests\CheckPhoneRequest;
 use App\Http\Requests\SearchUsersRequest;
-use App\Services\UserMailsService;
 use App\Services\UsersService;
 use App\Services\VerificationCodesService;
 use App\Http\Requests\UserRequest;
@@ -49,7 +47,6 @@ class UsersController extends Controller
             'type'            => $request->type,
             'phone'           => $request->phone,
             'email'           => $request->email,
-            'email_activated' => $request->email ? true : false,
             'avatar_url'      => $usersService->defaultAvatar($request->name),
             'password'        => bcrypt($request->password),
         ]);
@@ -63,25 +60,10 @@ class UsersController extends Controller
             ->setStatusCode(201);
     }
 
-    public function update(UserRequest $request, UserMailsService $mailsService, UsersService $usersService)
+    public function update(UserRequest $request)
     {
         $user = $this->user();
         $attributes = $request->only(['name', 'title', 'introduction', 'id_number', 'bank_name', 'bank_card_number', 'account_name', 'qualification_urls', 'professional_fields', 'avatar_url']);
-
-        // 更改邮箱时，发送激活邮件
-        $needSendMail = false;
-        if ($request->email && $request->email != $user->email) {
-            if (!$user->phone) {
-                $this->response->errorBadRequest(__('您还未绑定手机号，无法更改绑定邮箱'));
-            }
-
-            if ($usersService->isEmailBound($request->email)) {
-                $this->response->errorBadRequest(__('该邮箱已被绑定'));
-            }
-            $attributes['email'] = $request->email;
-            $attributes['email_activated'] = false;
-            $needSendMail = true;
-        }
 
         // 通过审核后不能修改身份信息
         if ($user->review_status == 1 && ($request->id_number || $request->id_card_id)) {
@@ -95,11 +77,6 @@ class UsersController extends Controller
         }
 
         $user->update($attributes);
-
-        // 发送激活邮件
-        if ($needSendMail) {
-            $mailsService->sendActivationMail($user);
-        }
 
         return $this->response->item($user, new CurrentUserTransformer());
     }

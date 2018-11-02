@@ -240,10 +240,6 @@ class UserController extends Controller
             }
         }
 
-        $show->email_activated('邮箱是否激活')->using([
-            1 => '是',
-            0 => '否'
-        ])->label($user->email_activated ? 'success' : 'danger');
         $show->created_at('注册时间');
 
         return $show;
@@ -314,10 +310,7 @@ class UserController extends Controller
             ->removable()
             ->rules('max:5120', ['max' => '身份证照片最大是5MB']);
 
-        $form->switch('email_activated', '邮箱是否激活')->states([
-            'on'  => ['value' => 1, 'text' => '是', 'color' => 'success'],
-            'off' => ['value' => 0, 'text' => '否', 'color' => 'default']
-        ])->rules('required');
+
         $form->switch('in_blacklist', '是否拉黑')->states([
             'on'  => ['value' => 1, 'text' => '是', 'color' => 'danger'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'default'],
@@ -368,11 +361,6 @@ class UserController extends Controller
         $form->text('title', '职位/公司');
         $form->textarea('introduction', '简介');
 
-
-        $form->switch('email_activated', '邮箱是否激活')->states([
-            'on'  => ['value' => 1, 'text' => '是', 'color' => 'success'],
-            'off' => ['value' => 0, 'text' => '否', 'color' => 'default']
-        ])->rules('required');
         $form->switch('in_blacklist', '是否拉黑')->states([
             'on'  => ['value' => 1, 'text' => '是', 'color' => 'danger'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'default'],
@@ -433,10 +421,6 @@ class UserController extends Controller
 //            }
 //        }
 
-        $show->email_activated('邮箱是否激活')->using([
-            1 => '是',
-            0 => '否'
-        ])->label($user->email_activated ? 'success' : 'danger');
         $show->created_at('注册时间');
 
         $show->panel()->tools(function ($tools) use ($user) {

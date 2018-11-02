@@ -139,15 +139,10 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * 发送邮件通知，相当于系统向该用户发送通知
-     * 默认为邮箱激活时才可以发送
      * @param $instance
-     * @param bool $checkActivated
      */
-    public function notifyViaEmail($instance, $checkActivated = true)
+    public function notifyViaEmail($instance)
     {
-        if ($checkActivated && !$this->email_activated) {
-            return;
-        }
         $this->laravelNotify($instance);
     }
 

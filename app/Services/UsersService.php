@@ -24,12 +24,10 @@ class UsersService
     }
 
     // 检查邮箱是否已被绑定（注册）：一个邮箱只能绑定一个用户
-    // 只有激活了才算是成功绑定
     public function isEmailBound($email)
     {
         return User::where([
-            'email' => $email,
-            'email_activated' => true
+            'email' => $email
         ])->exists();
     }
 
