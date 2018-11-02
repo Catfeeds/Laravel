@@ -35,12 +35,12 @@ class ProjectAppliedViaEmail extends Notification implements ShouldQueue
         $project = $this->application->project;
         $designer = $this->application->user;
         return (new MailMessage)
-            ->subject($designer->name . ' 报名了您发布的项目')
-            ->greeting('您好！')
-            ->line("设计师 $designer->name 报名了您的项目 $project->title")
-            ->line('报名备注：'. $this->application->remark)
-            ->action('立即查看', url(env('APP_FRONT_URL') . "#/project/$project->id"))
-            ->line('（这是一封自动产生的邮件，请勿回复）')
+            ->subject($designer->name . ' applied your project')
+            ->greeting('Hello!')
+            ->line("Designer $designer->name applied your project $project->title")
+            ->line('Remark: '. $this->application->remark)
+            ->action('View now', url(env('APP_FRONT_URL') . "#/project/$project->id"))
+            ->line('(This is an automatically generated email, please do not reply)')
             ->salutation( null);
     }
 }

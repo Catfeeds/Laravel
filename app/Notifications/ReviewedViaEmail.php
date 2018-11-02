@@ -34,12 +34,12 @@ class ReviewedViaEmail extends Notification implements ShouldQueue
     {
         $reviewer = $this->review->reviewer;
         return (new MailMessage)
-            ->subject($reviewer->name . ' 评价了您')
-            ->greeting('您好！')
-            ->line("$reviewer->name 评价了您。")
-            ->line('评价内容：'. $this->review->content)
-            ->action('立即查看', url(env('APP_FRONT_URL') . "#/profile"))
-            ->line('（这是一封自动产生的邮件，请勿回复）')
+            ->subject($reviewer->name . ' wrote a review for you')
+            ->greeting('Hello!')
+            ->line("$reviewer->name wrote a review for you.")
+            ->line('Content: '. $this->review->content)
+            ->action('View now', url(env('APP_FRONT_URL') . "#/profile"))
+            ->line('(This is an automatically generated email, please do not reply)')
             ->salutation( null);
     }
 }

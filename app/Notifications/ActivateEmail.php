@@ -36,11 +36,11 @@ class ActivateEmail extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('激活邮件')
-            ->greeting('您好！')
-            ->line('欢迎加入'.env('APP_NAME').'！请点击下面的按钮激活邮箱：')
-            ->action('立即激活', url(config('route.activateEmail') . "?token=$this->token"))
-            ->line('（这是一封自动产生的邮件，请勿回复）')
+            ->subject('Activation Email')
+            ->greeting('Hello!')
+            ->line('Welcome to join '.env('APP_NAME').'! Please click the button below to activate your mail:')
+            ->action('Activate now', url(config('route.activateEmail') . "?token=$this->token"))
+            ->line('(This is an automatically generated email, please do not reply)')
             ->salutation( null);
     }
 }

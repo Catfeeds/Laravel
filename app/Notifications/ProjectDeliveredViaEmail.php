@@ -36,11 +36,11 @@ class ProjectDeliveredViaEmail extends Notification implements ShouldQueue
         $project = $this->delivery->project;
         $designer = $this->delivery->user;
         return (new MailMessage)
-            ->subject($designer->name . ' 提交了项目设计文件')
-            ->greeting('您好！')
-            ->line("设计师 $designer->name 提交了您的项目 $project->title 的设计文件")
-            ->action('立即查看', url(env('APP_FRONT_URL') . "#/project/$project->id"))
-            ->line('（这是一封自动产生的邮件，请勿回复）')
+            ->subject($designer->name . ' has delivered the design file of your project')
+            ->greeting('Hello!')
+            ->line("Designer $designer->name has delivered the design file of your project $project->title")
+            ->action('View now', url(env('APP_FRONT_URL') . "#/project/$project->id"))
+            ->line('(This is an automatically generated email, please do not reply)')
             ->salutation( null);
     }
 }

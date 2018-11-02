@@ -29,11 +29,11 @@ class ProjectInvitedViaEmail extends Notification implements ShouldQueue
         $project = $this->invitation->project;
         $party = $project->user;
         return (new MailMessage)
-            ->subject($party->name . ' 邀请您参与Ta的项目')
-            ->greeting('您好！')
-            ->line("甲方 $party->name 邀请您参与Ta的项目 $project->title")
-            ->action('立即查看', url(env('APP_FRONT_URL') . "#/project/$project->id"))
-            ->line('（这是一封自动产生的邮件，请勿回复）')
+            ->subject($party->name . ' invites you to participate his/her project')
+            ->greeting('Hello!')
+            ->line("Client $party->name invites you to participate his/her project $project->title")
+            ->action('View now', url(env('APP_FRONT_URL') . "#/project/$project->id"))
+            ->line('(This is an automatically generated email, please do not reply)')
             ->salutation( null);
     }
 }
