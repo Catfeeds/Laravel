@@ -27,15 +27,15 @@ class ProjectInvitedViaDatabase extends Notification
     public function toDatabase($notifiable)
     {
         $project = $this->invitation->project;
-        $party = $project->user;
+        $client = $project->user;
 
         //存放在数据库里的数据
         return [
             'type' => 'project_invited',
             'project_id' => $project->id,
             'project_title' => $project->title,
-            'party_id' =>$party->id, // 发出邀请的甲方的信息
-            'party_name' => $party->name
+            'client_id' =>$client->id, // 发出邀请的甲方的信息
+            'client_name' => $client->name
         ];
     }
 }

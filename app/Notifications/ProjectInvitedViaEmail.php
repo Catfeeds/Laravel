@@ -27,11 +27,11 @@ class ProjectInvitedViaEmail extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         $project = $this->invitation->project;
-        $party = $project->user;
+        $client = $project->user;
         return (new MailMessage)
-            ->subject($party->name . ' invites you to participate his/her project')
+            ->subject($client->name . ' invites you to participate his/her project')
             ->greeting('Hello!')
-            ->line("Client $party->name invites you to participate his/her project $project->title")
+            ->line("Client $client->name invites you to participate his/her project $project->title")
             ->action('View now', url(env('APP_FRONT_URL') . "#/project/$project->id"))
             ->line('(This is an automatically generated email, please do not reply)')
             ->salutation( null);

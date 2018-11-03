@@ -40,7 +40,7 @@ class HomeController extends Controller
                     $column->append($infoBox);
                 });
                 $row->column(4, function (Column $column) {
-                    $infoBox = new InfoBox('甲方', 'users', 'light-blue', '/admin/users?&_scope_=party', User::where('type', 'party')->count(). ' 名');
+                    $infoBox = new InfoBox('甲方', 'users', 'light-blue', '/admin/users?&_scope_=client', User::where('type', 'client')->count(). ' 名');
                     $column->append($infoBox);
                 });
                 $row->column(4, function (Column $column) {

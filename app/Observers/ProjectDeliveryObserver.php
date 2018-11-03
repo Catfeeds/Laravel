@@ -11,8 +11,8 @@ class ProjectDeliveryObserver
     // 有设计师提交设计文件时通知甲方
     public function created(ProjectDelivery $delivery)
     {
-        $party = $delivery->project->user;
-        $party->notify(new ProjectDeliveredViaDatabase($delivery));
-        $party->notifyViaEmail(new ProjectDeliveredViaEmail($delivery));
+        $client = $delivery->project->user;
+        $client->notify(new ProjectDeliveredViaDatabase($delivery));
+        $client->notifyViaEmail(new ProjectDeliveredViaEmail($delivery));
     }
 }

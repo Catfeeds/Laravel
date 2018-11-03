@@ -115,10 +115,10 @@ class UserController extends Controller
             $filter->equal('type', '用户类型')
                 ->select([
                     'designer' => '设计师',
-                    'party'    => '甲方'
+                    'client'    => '甲方'
                 ]);
             $filter->scope('designer', '设计师')->where('type', 'designer');
-            $filter->scope('party', '甲方')->where('type', 'party');
+            $filter->scope('client', '甲方')->where('type', 'client');
             $filter->scope('recommend', '推荐到首页的设计师')->whereHas('recommendation');
             $filter->equal('review_status', '审核状态')->multipleSelect([
                 0 => '待审核',
@@ -190,7 +190,7 @@ class UserController extends Controller
             return "<span class='label label-$styles[$status]'>$texts[$status]</span>";
         });
         $show->type('用户类型')->as(function ($type) {
-            $types = ['designer' => '设计师', 'party' => '甲方'];
+            $types = ['designer' => '设计师', 'client' => '甲方'];
             return "<span class='label label-primary'>$types[$type]</span>";
         });
         $show->name('姓名');
@@ -200,7 +200,7 @@ class UserController extends Controller
             $show->avatar_url('头像');
         }
         $show->type('用户类型')->as(function ($type) {
-            $types = ['designer' => '设计师', 'party' => '甲方'];
+            $types = ['designer' => '设计师', 'client' => '甲方'];
             return "<span class='label label-primary'>$types[$type]</span>";
         });
         $show->phone('手机号');
@@ -284,7 +284,7 @@ class UserController extends Controller
             ->rules('max:2048', ['max' => '头像最大是2MB']);
         $form->select('type', '用户类型')->options([
             'designer' => '设计师',
-            'party'    => '甲方'
+            'client'    => '甲方'
         ])->rules('required');
         $form->select('review_status', '审核状态')->options([
             0 => '待审核',
@@ -292,7 +292,7 @@ class UserController extends Controller
             2 => '未通过'
         ])->rules('required');
         $form->text('phone', '手机号')->prepend('<i class="fa fa-phone fa-fw"></i>')->rules('required');
-        $form->email('email', '邮箱')->rules('nullable');
+        $form->email('email', '邮箱')->rules('unique:users,email',  ['unique' => '该邮箱已被绑定']);
         $form->text('title', '职位/公司');
         $form->textarea('introduction', '简介');
 
@@ -315,7 +315,7 @@ class UserController extends Controller
             'on'  => ['value' => 1, 'text' => '是', 'color' => 'danger'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'default'],
         ]);
-        $form->password('password', '密码')->help('填写此项后将覆盖该用户的密码，请谨慎操作。若您不想修改该用户的密码，请将此项留空。');
+        $form->password('password', '密码')->help('填写此项后将覆盖该用户的密码，请谨慎操作');
 
         $form->saving(function ($form) {
             if ($form->password && $form->model()->password != $form->password) {
@@ -349,7 +349,7 @@ class UserController extends Controller
             ->rules('max:2048', ['max' => '头像最大是2MB']);
         $form->select('type', '用户类型')->options([
             'designer' => '设计师',
-            'party'    => '甲方'
+            'client'    => '甲方'
         ])->rules('required');
         $form->select('review_status', '审核状态')->options([
             0 => '待审核',
@@ -357,7 +357,7 @@ class UserController extends Controller
             2 => '未通过'
         ])->rules('required');
         $form->text('phone', '手机号')->prepend('<i class="fa fa-phone fa-fw"></i>')->rules('required');
-        $form->email('email', '邮箱')->rules('nullable');
+        $form->email('email', '邮箱')->rules('nullable')->rules('unique:users,email',  ['unique' => '该邮箱已被绑定']);
         $form->text('title', '职位/公司');
         $form->textarea('introduction', '简介');
 
@@ -365,7 +365,7 @@ class UserController extends Controller
             'on'  => ['value' => 1, 'text' => '是', 'color' => 'danger'],
             'off' => ['value' => 0, 'text' => '否', 'color' => 'default'],
         ]);
-        $form->password('password', '密码')->help('填写此项后将覆盖该用户的密码，请谨慎操作。若您不想修改该用户的密码，请将此项留空。');
+        $form->password('password', '密码')->help('填写此项后将覆盖该用户的密码，请谨慎操作');
 
         $form->saving(function ($form) {
             if ($form->password && $form->model()->password != $form->password) {
@@ -397,7 +397,7 @@ class UserController extends Controller
         }
         $show->type('用户类型')->using([
             'designer' => '设计师',
-            'party'    => '甲方'
+            'client'    => '甲方'
         ]);
         $show->phone('手机号');
         $show->email('邮箱');
