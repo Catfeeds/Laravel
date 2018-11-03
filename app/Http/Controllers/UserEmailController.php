@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Mail\ActivationMail;
 use App\Models\EmailToken;
 use App\Models\User;
 use App\Services\UsersService;
@@ -31,9 +32,7 @@ class UserEmailController extends Controller
         $emailToken->token = $token;
         $emailToken->save();
 
-        \Mail::send('emails.activate', ['token' => $token], function ($message) use ($request) {
-            $message->to($request->email)->subject('【Yogooooo】Activation Email');
-        });
+        \Mail::to($request->email)->queue(new ActivationMail($token));
 
         return $this->response->noContent();
     }

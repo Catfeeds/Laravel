@@ -171,8 +171,14 @@ $api->version('v1', [
         $api->patch('user', 'UsersController@update')
             ->name('api.user.update');
         // 发送激活邮件
-        $api->post('user/mails', 'UserEmailController@send')
-            ->name('api.user.mails.send');
+        $api->group([
+            'middleware' => 'api.throttle',
+            'limit'      => 5, // 一分钟只能发送5次邮件
+            'expires'    => 1
+        ], function ($api) {
+            $api->post('user/mails', 'UserEmailController@send')
+                ->name('api.user.mails.send');
+        });
         // 申请重新审核
         $api->patch('user/review', 'UsersController@applyReview')
             ->name('api.user.review.apply');

@@ -71,7 +71,7 @@
             Yogooooo
         </div>
 
-        <p class="text">Hello! Welcome to join Yogooooo! Please click the link below to activate your mail:</p>
+        <p class="text">Hello! Welcome to join Yogooooo! Please click the link below to activate your mail. Thank you!</p>
 
         <a href="{{ config('url.activateEmail') . "?token=$token"  }}" target="_blank">{{ config('url.activateEmail') . "?token=$token"  }}</a>
     </div>
