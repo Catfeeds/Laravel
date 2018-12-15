@@ -47,5 +47,8 @@ Route::group([
     $router->post('/payments/update', 'PaymentController@update');
     // 删除设计费发放条目
     $router->delete('/payments/{payment}', 'PaymentController@destroy');
+
+    // 首页轮播图
+    $router->resource('index_images', IndexImageController::class);
 });
 

@@ -36,29 +36,29 @@ class HomeController extends Controller
             })
             ->row(function (Row $row) {
                 $row->column(4, function (Column $column) {
-                    $infoBox = new InfoBox('设计师', 'users', 'light-blue', '/admin/users?&_scope_=designer', User::where('type', 'designer')->count() . ' 名');
+                    $infoBox = new InfoBox(User::where('type', 'designer')->count() . ' 名', 'users', 'light-blue', '/admin/users?&_scope_=designer', '设计师');
                     $column->append($infoBox);
                 });
                 $row->column(4, function (Column $column) {
-                    $infoBox = new InfoBox('甲方', 'users', 'light-blue', '/admin/users?&_scope_=client', User::where('type', 'client')->count(). ' 名');
+                    $infoBox = new InfoBox(User::where('type', 'client')->count(). ' 名', 'users', 'light-blue', '/admin/users?&_scope_=client', '甲方');
                     $column->append($infoBox);
                 });
                 $row->column(4, function (Column $column) {
-                    $infoBox = new InfoBox('项目', 'file-pdf-o', 'light-blue', '/admin/projects', Project::count(). ' 个');
+                    $infoBox = new InfoBox(Project::count(). ' 个', 'file-pdf-o', 'light-blue', '/admin/projects', '项目');
                     $column->append($infoBox);
                 });
             })
             ->row(function (Row $row) {
                 $row->column(4, function (Column $column) {
-                    $infoBox = new InfoBox('作品集', 'picture-o', 'light-blue', '/admin/works', Work::count(). ' 个');
+                    $infoBox = new InfoBox(Work::count(). ' 个', 'picture-o', 'light-blue', '/admin/works', '作品集');
                     $column->append($infoBox);
                 });
                 $row->column(4, function (Column $column) {
-                    $infoBox = new InfoBox('动态', 'paper-plane', 'light-blue', '/admin/activities', Activity::count(). ' 条');
+                    $infoBox = new InfoBox(Activity::count(). ' 条', 'paper-plane', 'light-blue', '/admin/activities', '动态');
                     $column->append($infoBox);
                 });
                 $row->column(4, function (Column $column) {
-                    $infoBox = new InfoBox('评论', 'comments', 'light-blue', '/admin/replies', Reply::count(). ' 条');
+                    $infoBox = new InfoBox(Reply::count(). ' 条', 'comments', 'light-blue', '/admin/replies', '评论');
                     $column->append($infoBox);
                 });
             });

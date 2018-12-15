@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\IndexImage;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Work;
@@ -24,7 +25,10 @@ class IndexController extends Controller
             ->get();
 
         if ($users->count() < 20) {
-            $others = User::where('type', 'designer')
+            $others = User::where([
+                    'type' => 'designer',
+                    // 'review_status' => 1 // 首页只显示通过审核的设计师
+                ])
                 ->doesntHave('recommendation')
                 ->limit(20 - ($users->count()))
                 ->inRandomOrder()
@@ -35,33 +39,18 @@ class IndexController extends Controller
         return $this->response->collection($users, new UserTransformer());
     }
 
-    // 获取近一个月点赞最多的设计师的作品
+    // 获取首页作品
     public function works()
     {
-        // 选择近一个月最热门的5个作品
-        $works = Work::where('created_at', '>=', Carbon::now()->subMonths(1))
-            ->public()
-            ->orderBy('like_count', 'desc')
-            ->limit(20)
-            ->get();
+        // 首页的10个轮播图
+        $images = IndexImage::limit(10)->get();
 
-        if (!$works->isEmpty()) {
-            $num = $works->count() > 5 ? 5 : $works->count();
-            $works = $works->random($num);
-        }
+        $images = $images->map(function ($img) {
+           $img['url'] = \Storage::disk(config('admin.upload.disk'))->url($img['url']);
+           return $img;
+        });
 
-        // 如果近一个月热门的不够5张，使用1个月前的补全
-        if ($works->count() < 5) {
-            $works = $works->concat(
-                Work::where('created_at', '<', Carbon::now()->subMonths(1))
-                    ->public()
-                    ->orderBy('like_count', 'desc')
-                    ->limit(5 - $works->count())
-                    ->get()
-            );
-        }
-
-        return $this->response->collection($works, new WorkTransformer());
+        return $images;
     }
 
     // 获取项目：新发布 > 进行中 > 已完成
