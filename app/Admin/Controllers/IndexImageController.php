@@ -78,8 +78,6 @@ class IndexImageController extends Controller
     {
         $form = new Form(new IndexImage);
 
-        $form->text('author', '作者')->rules('max:50');
-        $form->text('title', '标题')->rules('max:100');
         $form->image('url', '图片')
             ->move('images/index/')
 //            ->resize(600, null, function ($constraint) {
@@ -89,7 +87,10 @@ class IndexImageController extends Controller
 //                $constraint->upsize();
 //            })
             ->uniqueName()
-            ->rules('required');
+            ->rules('required')
+            ->help('为了获得更好的显示效果，请上传长宽比为3:1的横版图片');
+        $form->text('author', '作者')->rules('max:50');
+        $form->text('title', '标题')->rules('max:100');
 
         return $form;
     }
