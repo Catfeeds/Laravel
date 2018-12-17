@@ -43,7 +43,7 @@ class IndexController extends Controller
     public function works()
     {
         // 首页的10个轮播图
-        $images = IndexImage::limit(10)->get();
+        $images = IndexImage::recent()->limit(10)->get();
 
         $images = $images->map(function ($img) {
            $img['url'] = \Storage::disk(config('admin.upload.disk'))->url($img['url']);

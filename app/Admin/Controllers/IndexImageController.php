@@ -52,6 +52,8 @@ class IndexImageController extends Controller
     {
         $grid = new Grid(new IndexImage);
 
+        $grid->model()->recent();
+
         $grid->id('ID');
         $grid->author('作者');
         $grid->title('标题');
