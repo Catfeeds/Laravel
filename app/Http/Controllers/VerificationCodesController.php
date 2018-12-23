@@ -15,8 +15,14 @@ class VerificationCodesController extends Controller
     {
         $this->checkAvailable($request);
 
-        // 6位随机数，左侧补0
-        $code = str_pad(random_int(1, 999999), 6, 0, STR_PAD_LEFT);
+        // 有效期内，使用旧的验证码
+        $code = \Cache::get($request->phone ?? $request->email);
+        if ($code) {
+            $code = $code['code'];
+        } else {
+            // 否则，6位随机数，左侧补0
+            $code = str_pad(random_int(1, 999999), 6, 0, STR_PAD_LEFT);
+        }
 
         if ($request->phone) {
             $this->sendViaPhone($request->phone, $code, $easySms);
