@@ -12,6 +12,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -115,7 +116,7 @@ class UserController extends Controller
             $filter->equal('type', '用户类型')
                 ->select([
                     'designer' => '设计师',
-                    'client'    => '甲方'
+                    'client'   => '甲方'
                 ]);
             $filter->scope('designer', '设计师')->where('type', 'designer');
             $filter->scope('client', '甲方')->where('type', 'client');
@@ -212,8 +213,7 @@ class UserController extends Controller
             $show->professional_fields('专业领域')->as(function ($value) {
                 if (!is_array($value)) {
                     return null;
-                }
-                else return implode(' / ', $value);
+                } else return implode(' / ', $value);
             });
 
             $show->qualification_urls('资质证书')->as(function ($urls) {
@@ -245,12 +245,13 @@ class UserController extends Controller
         return $show;
     }
 
-    protected function recommendButton(User $user, $tools) {
-        if($user->type !== 'designer') return;
+    protected function recommendButton(User $user, $tools)
+    {
+        if ($user->type !== 'designer') return;
 
         $recommending = RecommendedUser::where('user_id', $user->id)->exists();
 
-        if(!$recommending) {
+        if (!$recommending) {
             $tools->append(
                 "<a class='btn btn-sm btn-default' style='margin-right: 5px' href='/admin/users/$user->id/recommend'>推荐到首页</a>"
             );
@@ -263,19 +264,11 @@ class UserController extends Controller
 
     protected function form($id = null)
     {
-        if (User::where([
+        $isDesigner = User::where([
             'id'   => $id,
             'type' => 'designer'
-        ])->exists()) {
-            $form = $this->formForDesigner($id);
-        } else {
-            $form = $this->formForClient($id);
-        }
-        return $form;
-    }
+        ])->exists();
 
-    protected function formForDesigner($id = null)
-    {
         $form = new Form(new User());
         $form->text('name', '姓名')->rules('required');
         $form->image('avatar_url', '头像')
@@ -284,32 +277,50 @@ class UserController extends Controller
             ->rules('max:2048', ['max' => '头像最大是2MB']);
         $form->select('type', '用户类型')->options([
             'designer' => '设计师',
-            'client'    => '甲方'
+            'client'   => '甲方'
         ])->rules('required');
         $form->select('review_status', '审核状态')->options([
             0 => '待审核',
             1 => '已通过',
             2 => '未通过'
         ])->rules('required');
-        $form->text('phone', '手机号')->prepend('<i class="fa fa-phone fa-fw"></i>')->rules('required');
-        $form->email('email', '邮箱')->rules('unique:users,email',  ['unique' => '该邮箱已被绑定']);
+        $form->text('phone', '手机号')
+            ->prepend('<i class="fa fa-phone fa-fw"></i>')
+            ->rules([
+                'nullable',
+                'required_without:email',
+                Rule::unique('users')->ignore($id)
+            ], [
+                'unique'           => '该手机号已被绑定',
+                'required_without' => '手机或邮箱必须填写一个'
+            ]);
+        $form->email('email', '邮箱')
+            ->rules([
+                'nullable',
+                'required_without:phone',
+                Rule::unique('users')->ignore($id)
+            ], [
+                'unique'           => '该邮箱已被绑定',
+                'required_without' => '手机或邮箱必须填写一个'
+            ]);
         $form->text('title', '职位/公司');
         $form->textarea('introduction', '简介');
 
-        // TODO saved中需要查找是否包含根域名，然后设置成完整域名
+        if ($isDesigner) {
+            // TODO saved中需要查找是否包含根域名，然后设置成完整域名
 //            $form->multipleImage('qualification_urls', '资质证书')
 //                ->uniqueName()
 //                ->removable()
 //                ->rules('max:2048', ['max' => '资质证书最大是2MB']);
-        $form->text('bank_name', '开户行');
-        $form->text('account_name', '开户名');
-        $form->text('bank_card_number', '银行卡号');
-        $form->text('id_number', '身份证号');
-        $form->image('id_card_url', '身份证照片')
-            ->uniqueName()
-            ->removable()
-            ->rules('max:5120', ['max' => '身份证照片最大是5MB']);
-
+            $form->text('bank_name', '开户行');
+            $form->text('account_name', '开户名');
+            $form->text('bank_card_number', '银行卡号');
+            $form->text('id_number', '身份证号');
+            $form->image('id_card_url', '身份证照片')
+                ->uniqueName()
+                ->removable()
+                ->rules('max:5120', ['max' => '身份证照片最大是5MB']);
+        }
 
         $form->switch('in_blacklist', '是否拉黑')->states([
             'on'  => ['value' => 1, 'text' => '是', 'color' => 'danger'],
@@ -322,62 +333,19 @@ class UserController extends Controller
                 $form->password = bcrypt($form->password);
             }
         });
-        $form->saved(function ($form) {
-            $user = $form->model();
 
+        $form->saved(function ($form) use ($isDesigner) {
+            $user = $form->model();
             $attributes = [];
             if (request('avatar_url') && $user->avatar_url) {
                 $attributes['avatar_url'] = UploadService::getFullUrlByPath($user->avatar_url);
             }
-            if (request('id_card_url') && $user->id_card_url) {
-                $attributes['id_card_url'] = UploadService::getFullUrlByPath($user->id_card_url);
+            if ($isDesigner) {
+                if (request('id_card_url') && $user->id_card_url) {
+                    $attributes['id_card_url'] = UploadService::getFullUrlByPath($user->id_card_url);
+                }
             }
-
             $user->update($attributes);
-        });
-
-        return $form;
-    }
-
-    protected function formForClient($id = null)
-    {
-        $form = new Form(new User());
-        $form->text('name', '姓名')->rules('required');
-        $form->image('avatar_url', '头像')
-            ->uniqueName()
-            ->removable()
-            ->rules('max:2048', ['max' => '头像最大是2MB']);
-        $form->select('type', '用户类型')->options([
-            'designer' => '设计师',
-            'client'    => '甲方'
-        ])->rules('required');
-        $form->select('review_status', '审核状态')->options([
-            0 => '待审核',
-            1 => '已通过',
-            2 => '未通过'
-        ])->rules('required');
-        $form->text('phone', '手机号')->prepend('<i class="fa fa-phone fa-fw"></i>')->rules('required');
-        $form->email('email', '邮箱')->rules('nullable')->rules('unique:users,email',  ['unique' => '该邮箱已被绑定']);
-        $form->text('title', '职位/公司');
-        $form->textarea('introduction', '简介');
-
-        $form->switch('in_blacklist', '是否拉黑')->states([
-            'on'  => ['value' => 1, 'text' => '是', 'color' => 'danger'],
-            'off' => ['value' => 0, 'text' => '否', 'color' => 'default'],
-        ]);
-        $form->password('password', '密码')->help('填写此项后将覆盖该用户的密码，请谨慎操作');
-
-        $form->saving(function ($form) {
-            if ($form->password && $form->model()->password != $form->password) {
-                $form->password = bcrypt($form->password);
-            }
-        });
-        $form->saved(function ($form) {
-            $user = $form->model();
-            if (request('avatar_url') && $user->avatar_url) {
-                $attributes['avatar_url'] = UploadService::getFullUrlByPath($user->avatar_url);
-                $user->update($attributes);
-            }
         });
 
         return $form;
@@ -397,7 +365,7 @@ class UserController extends Controller
         }
         $show->type('用户类型')->using([
             'designer' => '设计师',
-            'client'    => '甲方'
+            'client'   => '甲方'
         ]);
         $show->phone('手机号');
         $show->email('邮箱');
